@@ -1,0 +1,39 @@
+
+
+/* Header.module.css */
+.header {
+    background-color: #f8f9fa;
+    /* Fondo claro */
+    padding: 1rem 0;
+    /* Padding vertical */
+}
+
+.header_body{
+    display: flex;
+    justify-content: space-around;
+}
+
+.logo {
+    width: auto;
+    height: 50px;
+}
+
+.header_body > div{
+    text-align: center;
+}
+
+.title {
+    font-size: 1.25rem;
+    /* Tamaño del título */
+    font-weight: bold;
+    /* Negrita */
+    margin-bottom: 0;
+    /* Sin margen inferior */
+}
+
+.subtitle {
+    color: #6c757d;
+    /* Color de texto secundario */
+    margin-bottom: 0;
+    /* Sin margen inferior */
+}
