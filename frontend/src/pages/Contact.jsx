@@ -1,5 +1,5 @@
 export const Contact = () => {
     return (
-        <div>vista de Contacto</div>
+        <div className="container">vista de Contacto</div>
     )
 }
