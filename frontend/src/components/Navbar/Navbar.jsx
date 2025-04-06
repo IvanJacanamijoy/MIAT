@@ -6,24 +6,22 @@ import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuIt
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
 const navigation = [
-  { name: 'Inicio', to: '/', current: true },
-  { name: 'Contacto', to: '/contact', current: false },
-  { name: 'Servicios', to: '/services', current: false },
-  { name: 'Quienes somos', to: '/about', current: false },
+  { name: 'Inicio', to: '/'},
+  { name: 'Contacto', to: '/contact'},
+  { name: 'Servicios', to: '/services'},
+  { name: 'Quienes somos', to: '/about'},
 ]
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
+const images = {
+  logo_miat_rojo: '/src/assets/images/navbar/logo_miat_rojo.png',
+  ruta: '/src/assets/navbar/logo_miat_rojo.png'
+}
+
 const Navbar = () => {
-
-  const images = {
-    logo_miat_rojo: '/src/assets/navbar/logo_miat_rojo.png',
-    ruta: '/src/assets/navbar/logo_miat_rojo.png'
-  }
-
-
   return (
     <Disclosure as="nav" className="">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -40,7 +38,7 @@ const Navbar = () => {
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-around">
             <div className="flex shrink-0 items-center">
               <img
-                alt="Your Company"
+                alt="Logo miat"
                 src={images.logo_miat_rojo}
                 className="h-8 w-auto"
               />
@@ -115,7 +113,7 @@ const Navbar = () => {
             <DisclosureButton
               key={item.name}
               as="a"
-              href={item.href}
+              href={item.to}
               aria-current={item.current ? 'page' : undefined}
               className={classNames(
                 item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
