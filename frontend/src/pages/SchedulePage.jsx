@@ -1,7 +1,9 @@
-export const ServiceHistory = () => {
+const SchedulePage = () => {
     return (
-        <div className="container">
+        <div>
             vista de historial de servicios
         </div>
     )
 }
+
+export default SchedulePage;
