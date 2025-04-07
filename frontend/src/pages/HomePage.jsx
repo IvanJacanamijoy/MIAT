@@ -28,31 +28,29 @@ const HomePage = () => {
 
             {/* Formulario de inicio de sesión */}
             <div className="bg-white bg-opacity-90 p-8 rounded-xl shadow-lg py-12">
-              <Form action="#" styles="space-y-2"/>
+              <Form action="#" styles="space-y-2" />
             </div>
           </div>
         </div>
       </div>
-      {/* Nueva sección SIN FONGO (transparente) */}
-      <div className="relative bg-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-white mb-6">Nuestros Servicios Eléctricos</h2>
-            <p className="text-xl text-gray-200 max-w-3xl mx-auto">
-              Soluciones integrales para tus necesidades eléctricas residenciales, comerciales e industriales
+
+      {/* Seccion de "Agenda Tu servicio" */}
+      <div className="relative bg-white">
+        <div className="max-w-7xl mx-auto max-h-screen grid grid-cols-2">
+          <div className="my-auto flex flex-col px-4 sm:px-10 py-4 col-span-2 md:col-span-1">
+            <h2 className='text-6xl lg:text-7xl font-bold'>
+              Agenda Tu Servicio
+            </h2>
+            <p className='py-6 text-lg font-semibold'>
+              Agenda el servicio que necesitas y recibe una visita técnica para evaluar tu requerimiento. Nuestro equipo especializado realizará un análisis detallado y te proporcionará una cotización precisa para continuar con la solución más adecuada.
             </p>
-          </div>
-
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-            otraseccion
-          </div>
-
-          <div className="mt-12 text-center">
-            <button className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors">
+            <button className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors justify-center max-w-xs mx-auto">
+              {/* icono de reloj */}
               <ClockIcon className="h-5 w-5 mr-2" />
-              Agendar una visita
+              ¡Agenda AQUI!
             </button>
           </div>
+          <img src="/src/assets/images/home/imagen_fondo_agendar.png" alt="" className='max-h-screen hidden md:block'/>
         </div>
       </div>
     </div>
