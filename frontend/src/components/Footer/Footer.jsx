@@ -15,16 +15,15 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
 
           {/* Sección del logo */}
-          <div className="flex flex-col items-center md:items-start">
-            <div className="flex items-center mb-4 flex-col">
-              <img
-                src={images.logo_miat_negro}
-                alt="Logo miat"
-                className="h-24 w-auto"
-              />
-              <span className="ml-2 text-white text-md font-semibold">Politica de privacidad</span>
-              <span className="ml-2 text-white text-md font-semibold">Politica de cookies</span>
-            </div>
+          <div className="flex flex-col items-center mb-4">
+            <img
+              src={images.logo_miat_negro}
+              alt="Logo miat"
+              className="h-24 w-auto"
+            />
+            <span className="ml-2 text-white text-md font-semibold">Politica de privacidad</span>
+            <span className="ml-2 text-white text-md font-semibold">Politica de cookies</span>
+
           </div>
 
           {/* Sección "Qué podemos hacer por ti" */}
@@ -50,18 +49,18 @@ const Footer = () => {
           </div>
 
           {/* Información de contacto */}
-          <div className="text-center md:items-end">
+          <div className="text-center sm:items-end">
             <h3 className="text-xl font-bold text-white mb-4">Comunicate con nosotros</h3>
             <div className="space-y-2">
               <div className='flex justify-around max-w-72 m-auto'>
                 <a href="#">
-                  <img className='h-10 w-auto' src={images.logo_whatsapp} alt="" />
+                  <img className='h-10 w-auto' src={images.logo_whatsapp} alt="logo de whatsapp" />
                 </a>
                 <a href="#">
-                  <img className='h-10 w-auto' src={images.logo_gmail} alt="" />
+                  <img className='h-10 w-auto' src={images.logo_gmail} alt="logo de gmail" />
                 </a>
                 <a href="#">
-                  <img className='h-10 w-auto' src={images.logo_telefono} alt="" />
+                  <img className='h-10 w-auto' src={images.logo_telefono} alt="logo de telefono" />
                 </a>
               </div>
               <a

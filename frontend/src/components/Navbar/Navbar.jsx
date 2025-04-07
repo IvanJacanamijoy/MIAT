@@ -1,10 +1,11 @@
 import './Navbar.css'
 import React from 'react';
-import { Link, NavLink } from 'react-router-dom'; // Importa Link para la navegación
+import { NavLink } from 'react-router-dom'; // Importa Link para la navegación
 
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react' //revisar
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline' //revisar iconos
 
+//array de objetos para indical las rutas
 const navigation = [
   { name: 'Inicio', to: '/'},
   { name: 'Contacto', to: '/contact'},
@@ -16,6 +17,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
+//objeto imagenes con las url de las imagenes
 const images = {
   logo_miat_rojo: '/src/assets/images/navbar/logo_miat_rojo.png',
   ruta: '/src/assets/navbar/logo_miat_rojo.png'
@@ -23,6 +25,7 @@ const images = {
 
 const Navbar = () => {
   return (
+    //revisar barra de navegacion, como funciona
     <Disclosure as="nav" className="">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-around">
