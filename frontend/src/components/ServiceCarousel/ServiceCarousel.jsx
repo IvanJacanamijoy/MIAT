@@ -59,7 +59,7 @@ const ServiceCarousel = ({ items }) => {
       <div className='relative overflow-hidden'>
         {/* Carrusel */}
         <div
-          className="flex transition-transform duration-300 ease-in-out py-20"
+          className="flex transition-transform duration-300 ease-in-out py-10"
           style={{
             transform: `translateX(-${indiceActual * (100/serviciosVisibles)}%)`,
           }}
