@@ -1,7 +1,49 @@
 import { ClockIcon } from '@heroicons/react/24/outline';
 import Form from '../components/Form'
+import { ServiceCarousel } from '../components/ServiceCarousel';
+
 
 const HomePage = () => {
+  const carouselItems = [
+    {
+      titulo: "Servicio Eléctrico Residencial",
+      descripcion: "Soluciones completas para tu hogar con garantía de 2 años",
+      imageUrl: "/src/assets/images/servicecarousel/servicio_1.png",
+      textoBoton: "Ver Mas"
+    },
+    {
+      titulo: "Servicio Eléctrico otro",
+      descripcion: "Soluciones completas para tu hogar con garantía de 2 años",
+      imageUrl: "/src/assets/images/servicecarousel/servicio_2.png",
+      textoBoton: "Ver Mas"
+    },
+    {
+      titulo: "Servicio otro Residencial",
+      descripcion: "Soluciones completas para tu hogar con garantía de 2 años",
+      imageUrl: "/src/assets/images/servicecarousel/servicio_3.png",
+      textoBoton: "Ver Mas"
+    },
+    {
+      titulo: "Servicio Eléctrico Residencial",
+      descripcion: "Soluciones completas para tu hogar con garantía de 2 años",
+      imageUrl: "/src/assets/images/servicecarousel/servicio_1.png",
+      textoBoton: "Ver Mas"
+    },
+    {
+      titulo: "Servicio Eléctrico otro",
+      descripcion: "Soluciones completas para tu hogar con garantía de 2 años",
+      imageUrl: "/src/assets/images/servicecarousel/servicio_2.png",
+      textoBoton: "Ver Mas"
+    },
+    {
+      titulo: "Servicio otro Residencial",
+      descripcion: "Soluciones completas para tu hogar con garantía de 2 años",
+      imageUrl: "/src/assets/images/servicecarousel/servicio_3.png",
+      textoBoton: "Ver Mas"
+    }
+  ];
+
+
   return (
     <div className="relative">
       {/* Fondo con imagen */}
@@ -38,7 +80,7 @@ const HomePage = () => {
       <div className="relative bg-white">
         <div className="max-w-7xl mx-auto max-h-screen grid grid-cols-2">
           <div className="my-auto flex flex-col px-4 sm:px-10 py-4 col-span-2 md:col-span-1">
-            <h2 className='text-6xl lg:text-7xl font-bold'>
+            <h2 className='text-4xl lg:text-7xl font-bold'>
               Agenda Tu Servicio
             </h2>
             <p className='py-6 text-lg font-semibold'>
@@ -50,8 +92,16 @@ const HomePage = () => {
               ¡Agenda AQUI!
             </button>
           </div>
-          <img src="/src/assets/images/home/imagen_fondo_agendar.png" alt="" className='max-h-screen hidden md:block'/>
+          <img src="/src/assets/images/home/imagen_fondo_agendar.png" alt="" className='max-h-screen hidden md:block' />
         </div>
+      </div>
+
+      {/* seccion carrucel de servicios */}
+      <div
+        className='bg-[url(/src/assets/images/home/imagen_fondo_agendar.png] bg-local'
+      >
+
+        <ServiceCarousel items={carouselItems} />
       </div>
     </div>
 
