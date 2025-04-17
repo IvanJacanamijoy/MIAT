@@ -53,11 +53,18 @@ const HomePage = () => {
       md:w-[945px] 
       lg:w-[1280px]
       max-w-full
+      min-h-screen
       ">
         {/* Capa de fondo con opacidad */}
         <div
-          className="absolute inset-0 bg-[url(src/assets/images/home/imagen_fondo.png)] 
-    bg-local bg-center bg-cover backface-hidden opacity-70 z-0"
+          className="
+          absolute 
+          inset-0 bg-[url(src/assets/images/home/imagen_fondo.png)] 
+          bg-local 
+          bg-center 
+          bg-cover 
+          
+          opacity-70"
         ></div>
 
         {/* Contenido principal */}
@@ -87,13 +94,16 @@ const HomePage = () => {
       <section className="
       mx-auto 
       max-h-screen 
-      grid grid-cols-2 
+      grid grid-cols-2
+      md:grid-cols-5
+      lg:grid-cols-3
       bg-white  
       h-[500px] 
       md:w-[945px] 
       lg:w-[1280px]
-      max-w-full">
-        <div className="my-auto flex flex-col px-4 sm:px-10 py-4 col-span-2 md:col-span-1">
+      max-w-full
+      ">
+        <div className="my-auto flex flex-col px-4 sm:px-10 py-4 col-span-2 md:col-span-3 lg:col-span-2">
           <h2 className='text-4xl lg:text-7xl font-bold'>
             Agenda Tu Servicio
           </h2>
@@ -106,7 +116,7 @@ const HomePage = () => {
             ¡Agenda AQUI!
           </button>
         </div>
-        <img src="/src/assets/images/home/imagen_fondo_agendar.png" alt="" className='max-h-screen hidden md:block lg:ml-5' />
+        <img src="/src/assets/images/home/imagen_fondo_agendar.png" alt="" className='max-h-screen min-h-[500px] hidden md:block md:col-span-2 lg:col-span-1' />
       </section>
 
 
@@ -136,7 +146,7 @@ const HomePage = () => {
         flex
         justify-center
         items-center'>
-        <div className='text-center w-2xl lg:w-8xl xl:w-4xl flex flex-col items-center bg-gray-950 py-15 px-10 lg:px-25 rounded-2xl my-10'>
+        <div className='text-center w-2xl lg:w-8xl xl:w-4xl flex flex-col items-center bg-gray-950 py-15 px-10 lg:px-25 rounded-2xl my-10 m-4 sm:m-0'>
           <img
             src="/src/assets/images/navbar/logo_miat_rojo.png"
             alt="logo miat"
