@@ -6,12 +6,12 @@ import Navbar from '../components/Navbar'
 const MainLayout = () => {
     return (
         <div className="app">
-            <Navbar className="absolute top-0 left-0 right-0 z-20"/>
-            <main className='flex-grow relative'>
+            <Navbar />
+            <main >
                 {/* aqui se renderizan las paginas */}
                 <Outlet />
             </main>
-            <Footer className="z-20"/>
+            <Footer/>
         </div>
     )
 }
