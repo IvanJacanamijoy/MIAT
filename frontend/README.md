@@ -1,5 +1,9 @@
-# MIAt
+# MIAT
 
+##Para inicializar el proyecto
+- se clona el repositorio remoto
+- nos posicionamos en el directorio frontend y usamos npm install
+- npm 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
