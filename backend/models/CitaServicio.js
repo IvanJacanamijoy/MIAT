@@ -1,5 +1,7 @@
 //importamos la conexion a la base de datos
 const pool = require('../config/database')
+//importamos zod para realizar validaciones
+const zod = require('zod')
 
 class Cita{
     //metodo asincronico para obtener todos los datos de la tabla cita
