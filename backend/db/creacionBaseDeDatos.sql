@@ -1,17 +1,110 @@
+CREATE DATABASE MIAT;
+
 USE MIAT;
-CREATE TABLE citas (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  fecha DATETIME NOT NULL,
-  tecnico VARCHAR(50) NOT NULL,
-  direccion VARCHAR(255) NOT NULL,
-  estado ENUM('pendiente', 'confirmada', 'cancelada') DEFAULT 'pendiente',
-  create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+CREATE TABLE Rol (
+    IdRol INT PRIMARY KEY AUTO_INCREMENT,
+    Descripcion VARCHAR(50) NOT NULL
 );
 
+CREATE TABLE Persona (
+    IdPersona INT PRIMARY KEY AUTO_INCREMENT,
+    Nombres VARCHAR(100) NOT NULL,
+    Apellidos VARCHAR(100) NOT NULL,
+    Email VARCHAR(100) UNIQUE,
+    Contraseña VARCHAR(255) NOT NULL,
+    Direccion TEXT,
+    Telefono VARCHAR(20),
+    IdRol INT NOT NULL,
+    FOREIGN KEY (IdRol) REFERENCES Rol(IdRol)
+);
 
-INSERT INTO citas (fecha, tecnico, direccion, estado) VALUES
-('2023-11-15 10:00:00', 'Juan Pérez', 'Calle Principal 123, Ciudad A', 'confirmada'),
-('2023-11-16 14:30:00', 'María Gómez', 'Avenida Central 456, Ciudad B', 'pendiente'),
-('2023-11-17 09:15:00', 'Carlos Rodríguez', 'Boulevard Norte 789, Ciudad C', 'confirmada'),
-('2023-11-18 16:45:00', 'Ana López', 'Calle Sur 321, Ciudad D', 'cancelada'),
-('2023-11-19 11:30:00', 'Pedro Martínez', 'Avenida Este 654, Ciudad E', 'pendiente');
+CREATE TABLE Estado (
+    IdEstado INT PRIMARY KEY AUTO_INCREMENT,
+    Descripcion VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE TipoServicio (
+    IdTipoServicio INT PRIMARY KEY AUTO_INCREMENT,
+    Descripcion VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE CitaServicio (
+    IdCita INT PRIMARY KEY AUTO_INCREMENT,
+    Fecha DATE NOT NULL,
+    Hora TIME NOT NULL,
+    Direccion TEXT NOT NULL,
+    IdCliente INT NOT NULL,
+    IdTecnico INT NOT NULL,
+    IdEstado INT NOT NULL,
+    FOREIGN KEY (IdCliente) REFERENCES Persona(IdPersona),
+    FOREIGN KEY (IdTecnico) REFERENCES Persona(IdPersona),
+    FOREIGN KEY (IdEstado) REFERENCES Estado(IdEstado)
+);
+
+CREATE TABLE CitaTipoServicio (
+    IdCita INT,
+    IdTipoServicio INT,
+    PRIMARY KEY (IdCita, IdTipoServicio),
+    FOREIGN KEY (IdCita) REFERENCES CitaServicio(IdCita),
+    FOREIGN KEY (IdTipoServicio) REFERENCES TipoServicio(IdTipoServicio)
+);
+
+CREATE TABLE VisitaTecnica (
+    IdVisita INT PRIMARY KEY AUTO_INCREMENT,
+    TiempoEstimado INT, -- en minutos
+    IdCita INT UNIQUE NOT NULL,
+    IdTecnico INT NOT NULL,
+    FOREIGN KEY (IdCita) REFERENCES CitaServicio(IdCita),
+    FOREIGN KEY (IdTecnico) REFERENCES Persona(IdPersona)
+);
+
+CREATE TABLE Diagnostico (
+    IdDiagnostico INT PRIMARY KEY AUTO_INCREMENT,
+    Descripcion TEXT NOT NULL,
+    Medidas TEXT,
+    Materiales TEXT,
+    FotoDiagnostico VARCHAR(255),
+    IdVisita INT UNIQUE NOT NULL,
+    FOREIGN KEY (IdVisita) REFERENCES VisitaTecnica(IdVisita)
+);
+
+CREATE TABLE Cotizacion (
+    IdCotizacion INT PRIMARY KEY AUTO_INCREMENT,
+    CostoMateriales DECIMAL(10,2) NOT NULL,
+    CostoManoObra DECIMAL(10,2) NOT NULL,
+    PrecioTotal DECIMAL(10,2) NOT NULL,
+    Garantia TEXT,
+    Observaciones TEXT,
+    IdDiagnostico INT UNIQUE NOT NULL,
+    IdEstado INT NOT NULL,
+    FOREIGN KEY (IdDiagnostico) REFERENCES Diagnostico(IdDiagnostico),
+    FOREIGN KEY (IdEstado) REFERENCES Estado(IdEstado)
+);
+
+CREATE TABLE Servicio (
+    IdServicio INT PRIMARY KEY AUTO_INCREMENT,
+    Descripcion TEXT,
+    FotosAntes VARCHAR(255),
+    FotosDespues VARCHAR(255),
+    HoraInicial TIME,
+    HoraFinal TIME,
+    Observaciones TEXT,
+    IdCliente INT NOT NULL,
+    IdTecnico INT NOT NULL,
+    IdCotizacion INT UNIQUE NOT NULL,
+    IdEstado INT NOT NULL,
+    FOREIGN KEY (IdCliente) REFERENCES Persona(IdPersona),
+    FOREIGN KEY (IdTecnico) REFERENCES Persona(IdPersona),
+    FOREIGN KEY (IdCotizacion) REFERENCES Cotizacion(IdCotizacion),
+    FOREIGN KEY (IdEstado) REFERENCES Estado(IdEstado)
+);
+
+CREATE TABLE ServicioTipoServicio (
+    IdServicio INT,
+    IdTipoServicio INT,
+    PRIMARY KEY (IdServicio, IdTipoServicio),
+    FOREIGN KEY (IdServicio) REFERENCES Servicio(IdServicio),
+    FOREIGN KEY (IdTipoServicio) REFERENCES TipoServicio(IdTipoServicio)
+);
+
