@@ -5,6 +5,7 @@ import ContactPage from '../pages/ContactPage'
 import SchedulePage from '../pages/SchedulePage'
 import AboutPage from "../pages/AboutPage";
 import ServicePage from "../pages/ServicePage"
+import RegisterForm from "../components/Form/Forms";
 
 
 const router = createBrowserRouter([
@@ -28,10 +29,13 @@ const router = createBrowserRouter([
           path: 'about',
           element: <AboutPage />
         },
+        
         {
           path: 'services',
           element: <ServicePage />
         },
+
+        
       ]
     }
   ])
