@@ -5,6 +5,7 @@ import ContactPage from '../pages/ContactPage'
 import SchedulePage from '../pages/SchedulePage'
 import AboutPage from "../pages/AboutPage";
 import ServicePage from "../pages/ServicePage"
+import ReportPage from "../pages/reportPage";
 
 
 const router = createBrowserRouter([
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
         {
           path: 'services',
           element: <ServicePage />
+        },
+        {
+          path: 'report',
+          element: <ReportPage/>
         },
       ]
     }
