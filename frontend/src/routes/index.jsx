@@ -5,11 +5,8 @@ import ContactPage from '../pages/ContactPage'
 import SchedulePage from '../pages/SchedulePage'
 import AboutPage from "../pages/AboutPage";
 import ServicePage from "../pages/ServicePage"
-<<<<<<< HEAD
 import ReportPage from "../pages/reportPage";
-=======
-import RegisterForm from "../components/Form/Forms";
->>>>>>> 5592d8db24b3f4fa0cd7f3361caf1a81b164dd72
+import FormsPage from "../pages/FormsPage";
 
 
 const router = createBrowserRouter([
@@ -33,20 +30,18 @@ const router = createBrowserRouter([
           path: 'about',
           element: <AboutPage />
         },
-        
         {
           path: 'services',
           element: <ServicePage />
         },
-<<<<<<< HEAD
         {
           path: 'report',
           element: <ReportPage/>
         },
-=======
-
-        
->>>>>>> 5592d8db24b3f4fa0cd7f3361caf1a81b164dd72
+        {
+          path: 'forms',
+          element: <FormsPage/>
+        }
       ]
     }
   ])

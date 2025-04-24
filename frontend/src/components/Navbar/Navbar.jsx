@@ -11,7 +11,8 @@ const navigation = [
   { name: 'Contacto', to: '/contact'},
   { name: 'Servicios', to: '/services'},
   { name: 'Quienes somos', to: '/about'},
-  {name: 'informes', to: '/report'}
+  {name: 'informes', to: '/report'},
+  {name: 'formularios', to: '/forms'}
 ]
 
 function classNames(...classes) {
