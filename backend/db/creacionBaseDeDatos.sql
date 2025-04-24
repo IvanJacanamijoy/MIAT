@@ -12,6 +12,7 @@ CREATE TABLE Persona (
     Nombres VARCHAR(100) NOT NULL,
     Apellidos VARCHAR(100) NOT NULL,
     Email VARCHAR(100) UNIQUE,
+    Identificacion VARCHAR(25) UNIQUE NOT NULL,
     Contraseña VARCHAR(255) NOT NULL,
     Direccion TEXT,
     Telefono VARCHAR(20),
@@ -108,3 +109,22 @@ CREATE TABLE ServicioTipoServicio (
     FOREIGN KEY (IdTipoServicio) REFERENCES TipoServicio(IdTipoServicio)
 );
 
+-- Insertar datos ficticios en la tabla Rol
+INSERT INTO Rol (Descripcion) VALUES
+('Cliente'),         -- IdRol = 1
+('Técnico'),         -- IdRol = 2
+('Administrador');   -- IdRol = 3
+
+-- Insertar datos ficticios en la tabla Persona
+
+INSERT INTO Persona (Nombres, Apellidos, Email, Identificacion, Contraseña, Direccion, Telefono, IdRol) VALUES
+('Juan', 'Perez Gomez', 'juan.perez@example.com', '1010101010', 'hashed_password_1', 'Calle Falsa 123, Ciudad', '3001112233', 1), -- Cliente
+('Maria', 'Lopez Rodriguez', 'maria.lopez@example.com', '2020202020', 'hashed_password_2', 'Avenida Siempre Viva 456, Pueblo', '3104445566', 1), -- Cliente
+('Carlos', 'Garcia Fernandez', 'carlos.garcia@example.com', '3030303030', 'hashed_password_3', 'Carrera Inventada 789, Villa', '3207778899', 2), -- Técnico
+('Ana', 'Martinez Sanchez', 'ana.martinez@example.com', '4040404040', 'hashed_password_4', 'Transversal Imaginaria 101, Sector', '3010001122', 1), -- Cliente
+('Pedro', 'Ramirez Torres', 'pedro.ramirez@example.com', '5050505050', 'hashed_password_5', 'Diagonal Creada 202, Barrio', '3113334455', 2), -- Técnico
+('Sofia', 'Diaz Castro', 'sofia.diaz@example.com', '6060606060', 'hashed_password_6', 'Callejón Ficticio 303, Zona', '3216667788', 3), -- Administrador
+('Luis', 'Hernandez Vargas', 'luis.hernandez@example.com', '7070707070', 'hashed_password_7', 'Bulevar Soñado 404, Urbanización', '3029990011', 1), -- Cliente
+('Elena', 'Jimenez Ruiz', 'elena.jimenez@example.com', '8080808080', 'hashed_password_8', 'Pasaje Abstracto 505, Conjunto', '3122223344', 2), -- Técnico
+('Miguel', 'Moreno Gil', 'miguel.moreno@example.com', '9090909090', 'hashed_password_9', 'Ronda Imaginaria 606, Vereda', '3225556677', 1), -- Cliente
+('Laura', 'Alvarez Perez', 'laura.alvarez@example.com', '1111111111', 'hashed_password_10', 'Camino Inexistente 707, Finca', '3038889900', 1); -- Cliente
