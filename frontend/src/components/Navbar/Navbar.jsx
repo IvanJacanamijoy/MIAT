@@ -10,9 +10,9 @@ const navigation = [
   { name: 'Inicio', to: '/'},
   { name: 'Contacto', to: '/contact'},
   { name: 'Servicios', to: '/services'},
-  { name: 'Quienes somos', to: '/about'},
+  { name: 'Quienes somos', to: '/whoweare'},
   {name: 'informes', to: '/report'},
-  {name: 'formularios', to: '/forms'}
+  {name: 'formularios', to: '/forms'},
 ]
 
 function classNames(...classes) {
