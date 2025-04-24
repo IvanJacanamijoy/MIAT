@@ -6,7 +6,7 @@ const LoginForm = () => {
         <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
           {/* Contenedor para el logo, centrado en la parte superior */}
           <div className="flex justify-center mb-4">
-            <img src="miat-logo.png" alt="MIAT Logo" className="h-12" />
+            <img src="src/assets/images/navbar/logo_miat_rojo.png" alt="MIAT Logo" className="h-12" />
           </div>
   
           {/* Inicio del formulario */}

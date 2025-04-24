@@ -1,6 +1,6 @@
 const CardReport = ({ urlImagen, direccion, fecha, hora }) => {
     return (
-        <div className="grid grid-cols-2 max-w-[1000px] bg-white rounded-2xl mx-auto mt-3">
+        <div className="grid grid-cols-2 md:max-w-[1000px] w-[800px] bg-white rounded-2xl mx-auto mt-3">
             <img src={urlImagen} alt="imagen de referencia" className="my-auto ml-3"/>
             <div className="p-5 flex flex-col">
                 <h2 className="font-bold text-lg mb-2">Servicio Mantenimiento de Redes</h2>
