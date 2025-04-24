@@ -1,3 +1,4 @@
+import { HashRouterRouter as Router, Routes, Route } from 'react-router-dom';
 //importamos las variables de entorno
 require('dotenv').config()
 //importamos express
