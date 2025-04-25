@@ -1,10 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
 import MainLayout from '../layout/MainLayout'
 import HomePage from '../pages/HomePage'
-import ContactPage from '../pages/ContactPage'
+import ContactPage from '../pages/ContactPage' // Importa el componente ContactPage
 import SchedulePage from '../pages/SchedulePage'
 import AboutPage from "../pages/AboutPage";
-import ServicePage from "../pages/ServicePage"
+import ServicePage from "../pages/ServicePage" // Importa el componente ServicePage
 
 
 const router = createBrowserRouter([
@@ -17,8 +17,9 @@ const router = createBrowserRouter([
           element: <HomePage />
         },
         {
-          path: 'contact',
-          element: <ContactPage />
+          // MODIFICADO: Cambiado el path de 'contact' a 'contacto'
+          path: 'contacto', // <-- Esta es la ruta URL que ahora coincide con el href del enlace
+          element: <ContactPage /> // <-- Este es el componente que se renderiza en esa ruta
         },
         {
           path: 'schedule',
@@ -35,5 +36,5 @@ const router = createBrowserRouter([
       ]
     }
   ])
-  
+
   export default router

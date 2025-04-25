@@ -3,7 +3,7 @@ const SchedulePage = () => {
         <div>
             vista de historial de servicios
         </div>
-    )
+    ) 
 }
 
 export default SchedulePage;
