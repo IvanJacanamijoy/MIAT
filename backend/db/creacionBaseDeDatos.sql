@@ -7,8 +7,8 @@ CREATE TABLE Rol (
     Descripcion VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE Persona (
-    IdPersona INT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE Usuario (
+    IdUsuario INT PRIMARY KEY AUTO_INCREMENT,
     Nombres VARCHAR(100) NOT NULL,
     Apellidos VARCHAR(100) NOT NULL,
     Email VARCHAR(100) UNIQUE,
@@ -38,8 +38,8 @@ CREATE TABLE CitaServicio (
     IdCliente INT NOT NULL,
     IdTecnico INT NOT NULL,
     IdEstado INT NOT NULL,
-    FOREIGN KEY (IdCliente) REFERENCES Persona(IdPersona),
-    FOREIGN KEY (IdTecnico) REFERENCES Persona(IdPersona),
+    FOREIGN KEY (IdCliente) REFERENCES Usuario(IdUsuario),
+    FOREIGN KEY (IdTecnico) REFERENCES Usuario(IdUsuario),
     FOREIGN KEY (IdEstado) REFERENCES Estado(IdEstado)
 );
 
@@ -57,7 +57,7 @@ CREATE TABLE VisitaTecnica (
     IdCita INT UNIQUE NOT NULL,
     IdTecnico INT NOT NULL,
     FOREIGN KEY (IdCita) REFERENCES CitaServicio(IdCita),
-    FOREIGN KEY (IdTecnico) REFERENCES Persona(IdPersona)
+    FOREIGN KEY (IdTecnico) REFERENCES Usuario(IdUsuario)
 );
 
 CREATE TABLE Diagnostico (
@@ -95,8 +95,8 @@ CREATE TABLE Servicio (
     IdTecnico INT NOT NULL,
     IdCotizacion INT UNIQUE NOT NULL,
     IdEstado INT NOT NULL,
-    FOREIGN KEY (IdCliente) REFERENCES Persona(IdPersona),
-    FOREIGN KEY (IdTecnico) REFERENCES Persona(IdPersona),
+    FOREIGN KEY (IdCliente) REFERENCES Usuario(IdUsuario),
+    FOREIGN KEY (IdTecnico) REFERENCES Usuario(IdUsuario),
     FOREIGN KEY (IdCotizacion) REFERENCES Cotizacion(IdCotizacion),
     FOREIGN KEY (IdEstado) REFERENCES Estado(IdEstado)
 );
@@ -115,9 +115,9 @@ INSERT INTO Rol (Descripcion) VALUES
 ('Técnico'),         -- IdRol = 2
 ('Administrador');   -- IdRol = 3
 
--- Insertar datos ficticios en la tabla Persona
+-- Insertar datos ficticios en la tabla Usuario
 
-INSERT INTO Persona (Nombres, Apellidos, Email, Identificacion, Contraseña, Direccion, Telefono, IdRol) VALUES
+INSERT INTO usuario (Nombres, Apellidos, Email, Identificacion, Contraseña, Direccion, Telefono, IdRol) VALUES
 ('Juan', 'Perez Gomez', 'juan.perez@example.com', '1010101010', 'hashed_password_1', 'Calle Falsa 123, Ciudad', '3001112233', 1), -- Cliente
 ('Maria', 'Lopez Rodriguez', 'maria.lopez@example.com', '2020202020', 'hashed_password_2', 'Avenida Siempre Viva 456, Pueblo', '3104445566', 1), -- Cliente
 ('Carlos', 'Garcia Fernandez', 'carlos.garcia@example.com', '3030303030', 'hashed_password_3', 'Carrera Inventada 789, Villa', '3207778899', 2), -- Técnico

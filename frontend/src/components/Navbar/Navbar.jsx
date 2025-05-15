@@ -1,19 +1,13 @@
-import './Navbar.css'
-import React from 'react';
-import { NavLink } from 'react-router-dom'; // Importa Link para la navegación
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { Bars3Icon, XMarkIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react' //revisar
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline' //revisar iconos
-
-//array de objetos para indical las rutas
-const navigation = [
-  { name: 'Inicio', to: '/'},
-  { name: 'Contacto', to: '/contact'},
-  { name: 'Servicios', to: '/services'},
-  { name: 'Quienes somos', to: '/whoweare'},
-  {name: 'informes', to: '/report'},
-  {name: 'formularios', to: '/forms'},
-]
+// Simulación de datos de usuario y roles (reemplazar con tu lógica de backend)
+const usuarios = [
+  { id: 1, email: 'admin@example.com', password: 'password', rol: 'admin', nombre: 'Admin' },
+  { id: 2, email: 'cliente@example.com', password: 'password', rol: 'cliente', nombre: 'Cliente' },
+  { id: 3, email: 'tecnico@example.com', password: 'password', rol: 'tecnico', nombre: 'Técnico' },
+];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -26,19 +20,78 @@ const images = {
 }
 
 const Navbar = () => {
+  const [rol, setRol] = useState(null);
+  const [nombre, setNombre] = useState('');
+  const [isOpen, setIsOpen] = useState(false); // Para el menú móvil
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const usuarioLogueado = localStorage.getItem('usuario');
+    if (usuarioLogueado) {
+      const usuario = JSON.parse(usuarioLogueado);
+      setRol(usuario.rol);
+      setNombre(usuario.nombre);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('usuario');
+    window.location.href = '/';
+  };
+
+  let navigation = [];
+  if (rol === 'admin') {
+    navigation = [
+      { name: 'Dashboard', to: '/admin' },
+      { name: 'Usuarios', to: '/admin/usuarios' },
+      { name: 'Reportes', to: '/admin/reportes' },
+    ];
+  } else if (rol === 'usuario') {
+    navigation = [
+      { name: 'Dashboard', to: '/usuario' },
+      { name: 'Perfil', to: '/usuario/perfil' },
+      { name: 'Soporte', to: '/usuario/soporte' },
+    ];
+  } else if (rol === 'tecnico') {
+    navigation = [
+      { name: 'Dashboard', to: '/tecnico' },
+      { name: 'Tareas', to: '/tecnico/tareas' },
+      { name: 'Inventario', to: '/tecnico/inventario' },
+    ];
+  } else {
+    navigation = [
+      { name: 'Inicio', to: '/' },
+      { name: 'Servicios', to: '/service' },
+      { name: 'Agenda tu servicio', to: '/schedule' },
+      { name: 'Quienes somos', to: '/whoweare' },
+      { name: 'Contacto', to: '/contact' },
+    ];
+  }
+
+  // Función para determinar si un enlace está activo
+  const isActive = (path) => {
+    return window.location.pathname === path;
+  };
+
   return (
-    //revisar barra de navegacion, como funciona
-    <Disclosure as="nav" className="">
+    <nav className=""> {/* Eliminé el as="nav" de Headless UI */}
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-around">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-            {/* Mobile menu button*/}
-            <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-              <span className="absolute -inset-0.5" />
+            {/* Botón del menú móvil */}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+              aria-controls="mobile-menu"
+              aria-expanded={isOpen}
+            >
               <span className="sr-only">Open main menu</span>
-              <Bars3Icon aria-hidden="true" className="block size-6 group-data-[open]:hidden" />
-              <XMarkIcon aria-hidden="true" className="hidden size-6 group-data-[open]:block" />
-            </DisclosureButton>
+              {isOpen ? (
+                <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+              ) : (
+                <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+              )}
+            </button>
           </div>
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-around">
             <div className="flex shrink-0 items-center">
@@ -47,90 +100,62 @@ const Navbar = () => {
                 src={images.logo_miat_rojo}
                 className="h-8 w-auto"
               />
-              <p className='text-3xl font-bold'>MIAT</p>
+              <p className="text-3xl font-bold">MIAT</p>
             </div>
             <div className="hidden sm:ml-6 sm:block bg-red-600 py-4 px-7 rounded-full">
-              <div className="flex space-x-4 ">
+              <div className="flex space-x-4">
                 {navigation.map((item) => (
-                  <NavLink
+                  <Link
+                    key={item.to}
                     to={item.to}
-                    className={
-                      ({ isActive }) => isActive ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium' : 'text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium'
-                    }
+                    className={isActive(item.to)
+                      ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium'
+                      : 'text-black hover:bg-white rounded-md px-3 py-2 text-sm font-medium'}
                   >
                     {item.name}
-                  </NavLink>
+                  </Link>
                 ))}
               </div>
             </div>
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-            {/* Profile dropdown */}
-            <Menu as="div" className="relative ml-3">
-              <div>
-                <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                  <span className="absolute -inset-1.5" />
-                  <span className="sr-only">Open user menu</span>
-                  <img
-                    alt=""
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                    className="size-8 rounded-full"
-                  />
-                </MenuButton>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+              {/* Menú de perfil */}
+              <div className="relative ml-3">
+                <a
+                  className={
+                    rol == null ? "hidden" : "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  }
+                  role="menuitem"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleLogout();
+                  }}
+                >
+                  Cerrar sesión
+                </a>
               </div>
-              <MenuItems
-                transition
-                className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-              >
-                <MenuItem>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
-                  >
-                    Your Profile
-                  </a>
-                </MenuItem>
-                <MenuItem>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
-                  >
-                    Settings
-                  </a>
-                </MenuItem>
-                <MenuItem>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
-                  >
-                    Sign out
-                  </a>
-                </MenuItem>
-              </MenuItems>
-            </Menu>
-          </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <DisclosurePanel className="sm:hidden">
+      {/* Menú móvil */}
+      <div className={`sm:hidden ${isOpen ? 'block' : 'hidden'}`} id="mobile-menu">
         <div className="space-y-1 px-2 pb-3 pt-2">
           {navigation.map((item) => (
-            <DisclosureButton
-              key={item.name}
-              as="a"
-              href={item.to}
-              aria-current={item.current ? 'page' : undefined}
-              className={classNames(
-                item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                'block rounded-md px-3 py-2 text-base font-medium',
-              )}
+            <Link
+              key={item.to}
+              to={item.to}
+              className={isActive(item.to)
+                ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium block '
+                : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium block cursor-pointer'}
+              onClick={() => setIsOpen(false)} // Cerrar el menú al hacer clic
             >
               {item.name}
-            </DisclosureButton>
+            </Link>
           ))}
         </div>
-      </DisclosurePanel>
-    </Disclosure>
+      </div>
+    </nav>
   );
 };
 

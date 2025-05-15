@@ -1,9 +1,24 @@
 import { ClockIcon } from '@heroicons/react/24/outline';
 import Form from '../components/Form/Form'
 import { ServiceCarousel } from '../components/ServiceCarousel';
-
+import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const HomePage = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { iniciarSesion, usuario } = useAuth(); // Usamos el contexto de autenticación
+
+  // Verificar si ya hay un usuario logueado
+  useEffect(() => {
+    if (usuario) {
+      navigate(`/${usuario.rol}`);
+    }
+  }, [navigate, usuario]);
   const carouselItems = [
     {
       titulo: "Servicio Eléctrico Residencial",
@@ -43,6 +58,54 @@ const HomePage = () => {
     }
   ];
 
+  // Verificar si ya hay un usuario logueado
+  useEffect(() => {
+    if (usuario) {
+      navigate(`/${usuario.rol}`);
+    }
+  }, [navigate, usuario]);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+
+    if (!email || !password) {
+      setError('Por favor, ingresa tu email y contraseña.');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      // Conexión con tu API de backend
+      const response = await fetch('http://localhost:3000/usuarios/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: email, password: password }),
+      });
+
+      const data = await response.json();
+      console.log(data)
+      if (response.ok) {
+        // Llamar a la función iniciarSesion del contexto
+        const usuarioData = {
+          id: data.id,
+          email: data.email,
+          rol: data.rol === 1 ? 'admin' : data.rol === 2 ? 'usuario' : 'tecnico',
+          nombre: data.nombre
+        };
+        iniciarSesion(usuarioData); // Actualiza el contexto y localStorage
+      } else {
+        setError(data.mensaje || 'Error al iniciar sesión. Credenciales incorrectas.');
+      }
+    } catch (error) {
+      setError(`Error: ${error.message || 'Hubo un problema al iniciar sesión. Por favor, intenta de nuevo.'}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className='flex flex-col items-center'>
@@ -53,7 +116,7 @@ const HomePage = () => {
       md:w-[945px] 
       lg:w-[1280px]
       max-w-full
-      min-h-screen
+      
       ">
         {/* Capa de fondo con opacidad */}
         <div
@@ -62,13 +125,14 @@ const HomePage = () => {
           inset-0 bg-[url(src/assets/images/home/imagen_fondo.png)] 
           bg-local 
           bg-center 
-          bg-cover 
+          bg-cover
+          h-[500px] 
           
           opacity-70"
         ></div>
 
         {/* Contenido principal */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 h-full">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 ">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               {/* Texto principal */}
@@ -80,8 +144,38 @@ const HomePage = () => {
               </div>
 
               {/* Formulario de inicio de sesión */}
-              <div className="bg-white bg-opacity-90 p-8 rounded-xl shadow-lg py-12">
-                <Form action="#" styles="space-y-2" />
+              <div className="bg-white bg-opacity-90 p-8 rounded-xl shadow-lg">
+                <Form
+                  onSubmit={handleLogin}
+                  styles="space-y-4"
+                  inputs={[
+                    {
+                      label: 'Correo electronico',
+                      type: 'email',
+                      value: email,
+                      onChange: (e) => setEmail(e.target.value),
+                      placeholder: 'Ingresa tu email',
+                      disabled: isLoading,
+                    },
+                    {
+                      label: 'Contraseña',
+                      type: 'password',
+                      value: password,
+                      onChange: (e) => setPassword(e.target.value),
+                      placeholder: 'Ingresa tu contraseña',
+                      disabled: isLoading,
+                    },
+                  ]}
+                  error={error}
+                  isLoading={isLoading}
+                  buttonText={isLoading ? 'Cargando...' : 'Iniciar Sesión'}
+                />
+                {error && (
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <strong className="font-bold">Error: </strong>
+                    <span className="block sm:inline">{error}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

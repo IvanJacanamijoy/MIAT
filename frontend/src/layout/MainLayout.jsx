@@ -1,17 +1,15 @@
 import './MainLayout.css'
-import { Outlet } from 'react-router-dom'
 import Footer from '../components/Footer'
 import Navbar from '../components/Navbar'
 
-const MainLayout = () => {
+const MainLayout = ({children}) => {
     return (
         <div className="app">
             <Navbar />
-            <main >
-                {/* aqui se renderizan las paginas */}
-                <Outlet />
+            <main>
+                {children}
             </main>
-            <Footer/>
+            <Footer />
         </div>
     )
 }

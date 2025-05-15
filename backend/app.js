@@ -6,8 +6,8 @@ const express = require('express');
 const cors = require('cors');
 //creamos una app con express
 const app = express();
-//importamos las rutas de persona
-const personaRouter = require('./routes/personaRoutes');
+//importamos las rutas de usuario
+const usuarioRouter = require('./routes/usuarioRoutes');
 //inicializamos knex
 const knex = require('knex')(require('./knexfile').development);
 //puerto del proyecto
@@ -17,18 +17,18 @@ const PORT = process.env.PORT;
 app.use(cors());
 app.use(express.json());
 
-// Rutas de persona
-app.use('/personas', personaRouter);
+// Rutas de usuario
+app.use('/usuarios', usuarioRouter);
 
 // Probando ruta de prueba
-app.use('/prueba', (req, res)=>{
+app.use('/prueba', (req, res) => {
     res.send('ruta funcionando')
 })
 
 //Verificando la conexion a la base de datos
 //ejecutamos la consulta 'SELECT 1' se usa comunmente para verificar la conexion 
 // sin acceder a ninguna tabla en especifico
-knex.raw('SELECT 1').then( () => {
+knex.raw('SELECT 1').then(() => {
     //si la conexion es esxitosa se muestra en la consola un mensaje indicando esto
     console.log(`Conexión a la base de datos de ${process.env.DB_NAME} exitosa`);
     //El servidor se inicia solo si laconexion a la base de datos es exitosa
