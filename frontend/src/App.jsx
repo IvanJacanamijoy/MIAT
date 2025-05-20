@@ -15,6 +15,7 @@ import UserManager from './pages/admin/UserManager';
 import UserDashboard from "./pages/user/UserDashboard"
 //vista de tecnico
 import TechnicianDashboard from "./pages/technician/TechnicianDashboard"
+import WhoWeare from './pages/WhoWeare';
 
 
 
@@ -61,6 +62,7 @@ const App = () => {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/" element={<MainLayout><HomePage /></MainLayout>} />
             <Route path="/service" element={<MainLayout><ServicePage /></MainLayout>} />
+            <Route path="/whoweare" element={<MainLayout><WhoWeare /></MainLayout>}/>
 
             {/* Rutas protegidas por rol, con MainLayout */}
             <Route path="/admin" element={<RequireAuth allowedRoles={['admin']}><MainLayout><AdminDashboard /></MainLayout></RequireAuth>} />
