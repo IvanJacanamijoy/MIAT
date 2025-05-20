@@ -4,13 +4,22 @@ import { AuthProvider, useAuth } from './context/AuthContext'; // Importa AuthPr
 
 //importamos las paginas
 import MainLayout from "./layout/MainLayout";
-import HomePage from "./pages/HomePage";
-import ServicePage from "./pages/ServicePage";
-import LoginPage from "./pages/LoginPage";
-import ContactPage from "./pages/ContactPage"
-import RegisterPage from './pages/RegisterPage';
+import HomePage from "./pages/home/HomePage";
+import ServicePage from "./pages/home/ServicePage";
+import LoginPage from "./pages/home/LoginPage";
+import RegisterPage from './pages/home/RegisterPage';
+//vistas de administrador
+import AdminDashboard from "./pages/admin/AdminDashboard"
+import UserManager from './pages/admin/UserManager';
+//vistas de usuario
+import UserDashboard from "./pages/user/UserDashboard"
+//vista de tecnico
+import TechnicianDashboard from "./pages/technician/TechnicianDashboard"
 
-import AdminDashboard from "./pages/AdminDashboard"
+
+
+
+
 
 // Componentes para las vistas de cada rol
 const AdminUsuarios = () => <div>Admin Usuarios</div>;
@@ -55,14 +64,14 @@ const App = () => {
 
             {/* Rutas protegidas por rol, con MainLayout */}
             <Route path="/admin" element={<RequireAuth allowedRoles={['admin']}><MainLayout><AdminDashboard /></MainLayout></RequireAuth>} />
-            <Route path="/admin/usuarios" element={<RequireAuth allowedRoles={['admin']}><MainLayout><AdminUsuarios /></MainLayout></RequireAuth>} />
+            <Route path="/admin/usuarios" element={<RequireAuth allowedRoles={['admin']}><MainLayout><UserManager /></MainLayout></RequireAuth>} />
             <Route path="/admin/reportes" element={<RequireAuth allowedRoles={['admin']}><MainLayout><AdminReportes /></MainLayout></RequireAuth>} />
 
-            <Route path="/usuario" element={<RequireAuth allowedRoles={['usuario']}><MainLayout><ClienteDashboard /></MainLayout></RequireAuth>} />
+            <Route path="/usuario" element={<RequireAuth allowedRoles={['usuario']}><MainLayout><UserDashboard /></MainLayout></RequireAuth>} />
             <Route path="/usuario/perfil" element={<RequireAuth allowedRoles={['usuario']}><MainLayout><ClientePerfil /></MainLayout></RequireAuth>} />
             <Route path="/usuario/soporte" element={<RequireAuth allowedRoles={['usuario']}><MainLayout><ClienteSoporte /></MainLayout></RequireAuth>} />
 
-            <Route path="/tecnico" element={<RequireAuth allowedRoles={['tecnico']}><MainLayout><TecnicoDashboard /></MainLayout></RequireAuth>} />
+            <Route path="/tecnico" element={<RequireAuth allowedRoles={['tecnico']}><MainLayout><TechnicianDashboard /></MainLayout></RequireAuth>} />
             <Route path="/tecnico/tareas" element={<RequireAuth allowedRoles={['tecnico']}><MainLayout><TecnicoTareas /></MainLayout></RequireAuth>} />
             <Route path="/tecnico/inventario" element={<RequireAuth allowedRoles={['tecnico']}><MainLayout><TecnicoInventario /></MainLayout></RequireAuth>} />
 

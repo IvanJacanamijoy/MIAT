@@ -25,6 +25,14 @@ class UsuarioController {
             res.status(500).json({ message: `Error buscando a la Usuario con id ${id}`, error: error.message })
         }
     }
+    async getTodosLosUsuarios(req, res){
+        try {
+            const usuarios = await UsuarioModel.getTodosLosUsuarios();
+            res.json(usuarios);
+        }catch(error){
+            res.status(500).json({message: 'Error al obtener los usuarios', error: error});
+        }
+    }
     /* Manejando la solicitud para crear una Usuario
     metodo asincronico que crea una Usuario */
     async createUsuario(req, res) {

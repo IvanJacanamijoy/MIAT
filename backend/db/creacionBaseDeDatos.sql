@@ -111,7 +111,7 @@ CREATE TABLE ServicioTipoServicio (
 
 -- Insertar datos ficticios en la tabla Rol
 INSERT INTO Rol (Descripcion) VALUES
-('Cliente'),         -- IdRol = 1
+('Usuario'),         -- IdRol = 1
 ('Técnico'),         -- IdRol = 2
 ('Administrador');   -- IdRol = 3
 

@@ -1,13 +1,9 @@
 import { EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 
-const Form = ({ onSubmit, styles, inputs, error, isLoading, buttonText = 'Enviar', login = false }) => {
-    const login = login;
+const Form = ({ onSubmit, styles, inputs, error, isLoading, buttonText = 'Enviar' }) => {
 
     return (
         <>
-            <div className="flex justify-center mb-4">
-                <img src="src/assets/images/navbar/logo_miat_rojo.png" alt="MIAT Logo" className="h-12" />
-            </div>
             <form onSubmit={onSubmit} className={styles} method='POST'>
                 {inputs.map((input, index) => (
                     <div key={index} className="mb-4">
@@ -37,6 +33,7 @@ const Form = ({ onSubmit, styles, inputs, error, isLoading, buttonText = 'Enviar
                         <span className="block sm:inline">{error}</span>
                     </div>
                 )}
+                <span className=' block mt-2'>¿No tiene una cuenta? <a href="/register" className='text-blue-600 hover:underline-offset-1'>Registrarse</a></span>
                 <div className="flex space-x-4">
 
                     <button

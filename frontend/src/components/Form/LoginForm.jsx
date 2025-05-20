@@ -46,11 +46,11 @@ const LoginForm = () => {
         localStorage.setItem('usuario', JSON.stringify({
           id: data.usuario.IdPersona,
           email: data.usuario.Email,
-          rol: data.usuario.IdRol === 1 ? 'admin' : data.usuario.IdRol === 2 ? 'cliente' : 'tecnico',
+          rol: data.usuario.IdRol === 1 ? 'usuario' : data.usuario.IdRol === 2 ? 'tecnico' : 'admin',
           nombre: data.usuario.Nombres
         }));
         // Redirigir al dashboard según el rol
-        navigate(`/${data.usuario.IdRol === 1 ? 'admin' : data.usuario.IdRol === 2 ? 'cliente' : 'tecnico'}`);
+        navigate(`/${data.usuario.IdRol === 1 ? 'usuario' : data.usuario.IdRol === 2 ? 'tecnico' : 'admin'}`);
       } else {
         setError(data.mensaje || 'Error al iniciar sesión. Credenciales incorrectas.');
       }
@@ -71,7 +71,7 @@ const LoginForm = () => {
         </div>
 
         {/* Inicio del formulario */}
-        <form>
+        <form onSubmit={handleLogin}>
           {/* Campo de entrada para el correo electrónico */}
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
@@ -120,12 +120,6 @@ const LoginForm = () => {
               Olvidé mi contraseña
             </a>
           </div>
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-              <strong className="font-bold">Error: </strong>
-              <span className="block sm:inline">{error}</span>
-            </div>
-          )}
 
           {/* Botón para enviar el formulario */}
           <div className="flex items-center justify-center">

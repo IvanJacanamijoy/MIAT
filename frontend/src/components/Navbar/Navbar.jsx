@@ -43,8 +43,10 @@ const Navbar = () => {
   if (rol === 'admin') {
     navigation = [
       { name: 'Dashboard', to: '/admin' },
-      { name: 'Usuarios', to: '/admin/usuarios' },
-      { name: 'Reportes', to: '/admin/reportes' },
+      { name: 'Gestion Usuarios', to: '/admin/usuarios' },
+      { name: 'Citas Asignadas', to: '/admin/citas' },
+      { name: 'Servicios', to: '/admin/servicios' },
+      { name: 'Cotizaciones', to: '/admin/cotizaciones' },
     ];
   } else if (rol === 'usuario') {
     navigation = [
@@ -74,9 +76,9 @@ const Navbar = () => {
   };
 
   return (
-    <nav className=""> {/* Eliminé el as="nav" de Headless UI */}
-      <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-        <div className="relative flex h-16 items-center justify-around">
+    <nav className="">
+      <div className="mx-auto max-w-7xl px-2 sm:px-5 lg:px-8 h-[76px] sm:h-auto">
+        <div className="relative flex items-center justify-around">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
             {/* Botón del menú móvil */}
             <button
@@ -102,15 +104,15 @@ const Navbar = () => {
               />
               <p className="text-3xl font-bold">MIAT</p>
             </div>
-            <div className="hidden sm:ml-6 sm:block bg-red-600 py-4 px-7 rounded-full">
-              <div className="flex space-x-4">
+            <div className="hidden ml-2 xs:ml-6 sm:block bg-red-600 py-4 px-7 rounded-full">
+              <div className="flex space-x-4 items-center">
                 {navigation.map((item) => (
                   <Link
                     key={item.to}
                     to={item.to}
                     className={isActive(item.to)
-                      ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium'
-                      : 'text-black hover:bg-white rounded-md px-3 py-2 text-sm font-medium'}
+                      ? 'bg-white text-black rounded-sm px-3 text-sm font-semibold max-h-10 text-center'
+                      : 'text-black hover:bg-white rounded-sm px-3 text-sm font-semibold max-h-10 text-center '}
                   >
                     {item.name}
                   </Link>
@@ -139,7 +141,7 @@ const Navbar = () => {
       </div>
 
       {/* Menú móvil */}
-      <div className={`sm:hidden ${isOpen ? 'block' : 'hidden'}`} id="mobile-menu">
+      <div className={`xs:hidden ${isOpen ? 'block' : 'hidden'}`} id="mobile-menu">
         <div className="space-y-1 px-2 pb-3 pt-2">
           {navigation.map((item) => (
             <Link
