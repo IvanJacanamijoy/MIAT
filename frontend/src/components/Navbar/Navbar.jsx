@@ -42,31 +42,38 @@ const Navbar = () => {
   let navigation = [];
   if (rol === 'admin') {
     navigation = [
-      { name: 'Dashboard', to: '/admin' },
-      { name: 'Gestion Usuarios', to: '/admin/usuarios' },
-      { name: 'Citas Asignadas', to: '/admin/citas' },
+      { name: 'Inicio', to: '/admin' },
+      { name: 'Agendar Visitas', to: '/admin/agendar' },
+      { name: 'Gestionar Usuarios', to: '/admin/usuarios' },
+      { name: 'Visitas tecnicas', to: '/admin/citasasignadas' },
       { name: 'Servicios', to: '/admin/servicios' },
       { name: 'Cotizaciones', to: '/admin/cotizaciones' },
+      { name: 'Informes', to: '/admin/informes' },
     ];
   } else if (rol === 'usuario') {
     navigation = [
-      { name: 'Dashboard', to: '/usuario' },
-      { name: 'Perfil', to: '/usuario/perfil' },
-      { name: 'Soporte', to: '/usuario/soporte' },
+      { name: 'Inicio', to: '/usuario' },
+      { name: 'Servicios', to: '/usuario/servicios' },
+      { name: 'Mis servicios', to: '/usuario/misservicios' },
+      { name: 'Cotizaciones', to: '/usuario/cotizaciones' },
+      { name: 'Informes', to: '/usuario/informes' },
+      { name: 'Visitas tecnicas', to: '/usuario/visitastecnicas' },
+      { name: 'Contacto', to: '/contacto' },
     ];
   } else if (rol === 'tecnico') {
     navigation = [
       { name: 'Dashboard', to: '/tecnico' },
-      { name: 'Tareas', to: '/tecnico/tareas' },
-      { name: 'Inventario', to: '/tecnico/inventario' },
+      { name: 'Visitas Asignadas', to: '/tecnico/visitasasignadas ' },
+      { name: 'Mis Servicios', to: '/tecnico/servicios' },
+      { name: 'Mis cotizaciones', to: '/tecnico/cotizaciones' },
+      { name: 'Mis Informes', to: '/tecnico/informes' },
     ];
   } else {
     navigation = [
       { name: 'Inicio', to: '/' },
-      { name: 'Servicios', to: '/service' },
-      { name: 'Agenda tu servicio', to: '/schedule' },
-      { name: 'Quienes somos', to: '/whoweare' },
-      { name: 'Contacto', to: '/contact' },
+      { name: 'Servicios', to: '/servicios' },
+      { name: 'Contactanos', to: '/contacto' },
+      { name: 'Quienes somos', to: '/quienessomos' },
     ];
   }
 
@@ -104,7 +111,7 @@ const Navbar = () => {
               />
               <p className="text-3xl font-bold">MIAT</p>
             </div>
-            <div className="hidden ml-2 xs:ml-6 sm:block bg-red-600 py-4 px-7 rounded-full">
+            <div className="hidden ml-2 xs:ml-6 sm:block bg-red-500 py-4 px-7 rounded-full">
               <div className="flex space-x-4 items-center">
                 {navigation.map((item) => (
                   <Link
@@ -124,7 +131,7 @@ const Navbar = () => {
               <div className="relative ml-3">
                 <a
                   className={
-                    rol == null ? "hidden" : "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    rol == null ? "hidden" : "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded-3xl"
                   }
                   role="menuitem"
                   onClick={(e) => {

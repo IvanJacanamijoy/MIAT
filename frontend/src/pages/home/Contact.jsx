@@ -1,7 +1,7 @@
 import React from 'react';
 
 
-const ContactPage = () => {
+const Contact = () => {
 
   return (
     <div className='flex flex-col items-center'> {/* Contenedor principal */}
@@ -81,4 +81,4 @@ const ContactPage = () => {
   );
 };
 
-export default ContactPage;
+export default Contact;

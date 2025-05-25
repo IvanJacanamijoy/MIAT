@@ -1,9 +1,6 @@
-const WhoWeare = () => {
+const WhoWeAre = () => {
     return (
-        <div>
-            Quienes somos
-        </div>
-    )
+        <div>quienes somos</div>
+    );
 }
-
-export default WhoWeare;
+export default WhoWeAre;

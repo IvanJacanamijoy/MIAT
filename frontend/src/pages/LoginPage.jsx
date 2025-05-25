@@ -30,6 +30,7 @@ const LoginPage = () => {
         }
 
         try {
+            // console.log(email , " ", password)
             // Conexión con tu API de backend
             const response = await fetch('http://localhost:3000/usuarios/login', {
                 method: 'POST',
@@ -38,16 +39,16 @@ const LoginPage = () => {
                 },
                 body: JSON.stringify({ email: email, password: password }),
             });
-            console.log(`correo: ${email} y contraseña ${password}`)
+            // console.log(response)
 
             const data = await response.json();
-
+            console.log(data)
             if (response.ok) {
                 // Llamar a la función iniciarSesion del contexto
                 const usuarioData = {
                     id: data.id,
                     email: data.email,
-                    rol: data.rol === 1 ? 'admin' : data.usuario.IdRol === 2 ? 'cliente' : 'tecnico',
+                    rol: data.rol === 1 ? 'usuario' : data.IdRol === 2 ? 'tecnico' : 'admin',
                     nombre: data.nombre
                 };
                 iniciarSesion(usuarioData); // Actualiza el contexto y localStorage
@@ -90,12 +91,6 @@ const LoginPage = () => {
                     isLoading={isLoading}
                     buttonText={isLoading ? 'Cargando...' : 'Iniciar Sesión'}
                 />
-                {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                        <strong className="font-bold">Error: </strong>
-                        <span className="block sm:inline">{error}</span>
-                    </div>
-                )}
             </div>
         </div>
     );

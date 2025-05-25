@@ -1,6 +1,6 @@
-const UserDashboard  = () =>{
-    return (
-        <div>Dashboard del usuario</div>
+const UserDashboard = () => {
+    return(
+        <div>vista que muestra el Dashboard del usuario</div>
     )
 }
 export default UserDashboard;

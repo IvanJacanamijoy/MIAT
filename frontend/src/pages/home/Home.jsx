@@ -1,11 +1,11 @@
 import { ClockIcon } from '@heroicons/react/24/outline';
-import Form from '../components/Form/Form'
-import { ServiceCarousel } from '../components/ServiceCarousel';
+import Form from '../../components/Form/Form'
+import { ServiceCarousel } from '../../components/ServiceCarousel';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
-const HomePage = () => {
+const Home = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -87,13 +87,13 @@ const HomePage = () => {
       });
 
       const data = await response.json();
-      console.log(data)
+      // console.log(data)
       if (response.ok) {
         // Llamar a la función iniciarSesion del contexto
         const usuarioData = {
           id: data.id,
           email: data.email,
-          rol: data.rol === 1 ? 'admin' : data.rol === 2 ? 'usuario' : 'tecnico',
+          rol: data.rol === 1 ? 'usuario' : data.rol === 2 ? 'tecnico' : 'admin',
           nombre: data.nombre
         };
         iniciarSesion(usuarioData); // Actualiza el contexto y localStorage
@@ -170,12 +170,6 @@ const HomePage = () => {
                   isLoading={isLoading}
                   buttonText={isLoading ? 'Cargando...' : 'Iniciar Sesión'}
                 />
-                {error && (
-                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                    <strong className="font-bold">Error: </strong>
-                    <span className="block sm:inline">{error}</span>
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -255,4 +249,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default Home;
