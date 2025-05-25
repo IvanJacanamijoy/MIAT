@@ -21,16 +21,14 @@ import UserAssignedVisits from './pages/user/UserAssignedVisits';
 import TechnicalVisits from './pages/user/TechnicalVisits'
 
 //vista de tecnico
-<<<<<<< HEAD
 import TechnicianDashboard from './pages/technician/TechnicianDashboard'
 import TechnicianAssignedVisits from './pages/technician/TechnicianAssignedVisits';
 import TechnicianServices from './pages/technician/TechnicianServices';
 import TechnicianQuote from './pages/technician/TechnicianQuote';
 import TechnicianReports from './pages/technician/TechnicianReports';
-=======
 import TechnicianDashboard from "./pages/technician/TechnicianDashboard"
 import WhoWeare from './pages/WhoWeare';
->>>>>>> 3f54e344803dc1eeb7e1fd1d54ad4c228f71542e
+
 
 //vistas de administrador
 import AdminDashboard from './pages/admin/AdminDashboard';
