@@ -33,34 +33,6 @@ class UsuarioController {
             res.status(500).json({ message: 'Error al obtener los usuarios', error: error });
         }
     }
-    /* Manejando la solicitud para obtener un Usuario por su identificacion
-    metodo asincronico que obtiene una Usuario por su identificacion */
-    async getUsuarioByIdentificacion(req, res) {
-        console.log(`La identificacion es : ${req.params.identificacion}`)
-        // obtenemos la identificacion de los parametros de la request
-        const identificacion = req.params.identificacion;
-
-        // Manejo de errores
-        // intentamos ejecutar la consulta
-        try {
-            // guardamos el resultado de la consulta en la variable usuario
-            const usuario = await UsuarioModel.getUsuarioByIdentificacion(identificacion);
-            // si usuario existe devolvemos el usuario en formato json
-            if (usuario) {
-                console.log(usuario)
-                // Mapea el ID de Knex a _id para compatibilidad con el frontend si es necesario
-                res.json(usuario);
-            } else {
-                // sino la request quedara con un status 404 y retornara un mensaje de error en formato json
-                res.status(404).json({ message: 'Usuario no encontrado alv' });
-            }
-        } catch (error) {
-            // si la request genera un error quedara con un status 500
-            // y retornara un mensaje de error en formato json
-            // Nota: Aquí se usaba 'id' en el mensaje de error, lo cambié a 'identificacion'
-            res.status(500).json({ message: `Error buscando al usuario con identificación ${identificacion}`, error: error.message });
-        }
-    }
     /* Manejando la solicitud para crear una Usuario
     metodo asincronico que crea una Usuario */
     async createUsuario(req, res) {

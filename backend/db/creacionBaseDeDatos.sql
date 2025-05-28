@@ -7,6 +7,15 @@ CREATE TABLE Rol (
     Descripcion VARCHAR(50) NOT NULL
 );
 
+CREATE TABLE Estado (
+    IdEstado INT PRIMARY KEY AUTO_INCREMENT,
+    Descripcion VARCHAR(50) NOT NULL
+);
+
+INSERT INTO Estado (Descripcion) VALUES
+('Activo'),         -- IdEstado = 1
+('Inactivo');         -- IdEstado = 2
+
 CREATE TABLE Usuario (
     IdUsuario INT PRIMARY KEY AUTO_INCREMENT,
     Nombres VARCHAR(100) NOT NULL,
@@ -17,12 +26,9 @@ CREATE TABLE Usuario (
     Direccion TEXT,
     Telefono VARCHAR(20),
     IdRol INT NOT NULL,
-    FOREIGN KEY (IdRol) REFERENCES Rol(IdRol)
-);
-
-CREATE TABLE Estado (
-    IdEstado INT PRIMARY KEY AUTO_INCREMENT,
-    Descripcion VARCHAR(50) NOT NULL
+    IdEstado INT NOT NULL,
+    FOREIGN KEY (IdRol) REFERENCES Rol(IdRol),
+    FOREIGN KEY (IdEstado) REFERENCES Estado(IdEstado)
 );
 
 CREATE TABLE TipoServicio (
@@ -117,14 +123,14 @@ INSERT INTO Rol (Descripcion) VALUES
 
 -- Insertar datos ficticios en la tabla Usuario
 
-INSERT INTO usuario (Nombres, Apellidos, Email, Identificacion, Contraseña, Direccion, Telefono, IdRol) VALUES
-('Juan', 'Perez Gomez', 'admin@admin.com', '1010101010', '$2b$10$gIGIJUxPIF113akSMaxALuWRTGOSoKrKB8MPHXhiDJRU31dEATPeS', 'Calle Falsa 123, Ciudad', '3001112233', 3), -- Administrador
-('Maria', 'Lopez Rodriguez', 'usuario@usuario.com', '2020202020', '$2b$10$m8UDA.AAbfcpRH9NfJcdxuunfTSsXwWo9AE4Y1X7YdNFPluh2qZxO', 'Avenida Siempre Viva 456, Pueblo', '3104445566', 1), -- Usuario
-('Carlos', 'Garcia Fernandez', 'tecnico@tecnico.com', '3030303030', '$2b$10$Vo.rYFkLqtzJqJJOyyr0SOslC6GlP92UYwgkaT4U2VXu4bcFEbBca', 'Carrera Inventada 789, Villa', '3207778899', 2), -- Tecnico
-('Ana', 'Martinez Sanchez', 'ana.martinez@example.com', '4040404040', 'hashed_password_4', 'Transversal Imaginaria 101, Sector', '3010001122', 1), -- Usuario
-('Pedro', 'Ramirez Torres', 'pedro.ramirez@example.com', '5050505050', 'hashed_password_5', 'Diagonal Creada 202, Barrio', '3113334455', 2), -- Técnico
-('Sofia', 'Diaz Castro', 'sofia.diaz@example.com', '6060606060', 'hashed_password_6', 'Callejón Ficticio 303, Zona', '3216667788', 3), -- Administrador
-('Luis', 'Hernandez Vargas', 'luis.hernandez@example.com', '7070707070', 'hashed_password_7', 'Bulevar Soñado 404, Urbanización', '3029990011', 1), -- Usuario
-('Elena', 'Jimenez Ruiz', 'elena.jimenez@example.com', '8080808080', 'hashed_password_8', 'Pasaje Abstracto 505, Conjunto', '3122223344', 2), -- Técnico
-('Miguel', 'Moreno Gil', 'miguel.moreno@example.com', '9090909090', 'hashed_password_9', 'Ronda Imaginaria 606, Vereda', '3225556677', 1), -- Usuario
-('Laura', 'Alvarez Perez', 'laura.alvarez@example.com', '1111111111', 'hashed_password_10', 'Camino Inexistente 707, Finca', '3038889900', 1); -- Usuario
+INSERT INTO usuario (Nombres, Apellidos, Email, Identificacion, Contraseña, Direccion, Telefono, IdRol, IdEstado) VALUES
+('Juan', 'Perez Gomez', 'admin@admin.com', '1010101010', '$2b$10$gIGIJUxPIF113akSMaxALuWRTGOSoKrKB8MPHXhiDJRU31dEATPeS', 'Calle Falsa 123, Ciudad', '3001112233', 3, 1), -- Administrador
+('Maria', 'Lopez Rodriguez', 'usuario@usuario.com', '2020202020', '$2b$10$m8UDA.AAbfcpRH9NfJcdxuunfTSsXwWo9AE4Y1X7YdNFPluh2qZxO', 'Avenida Siempre Viva 456, Pueblo', '3104445566', 1, 1), -- Usuario
+('Carlos', 'Garcia Fernandez', 'tecnico@tecnico.com', '3030303030', '$2b$10$Vo.rYFkLqtzJqJJOyyr0SOslC6GlP92UYwgkaT4U2VXu4bcFEbBca', 'Carrera Inventada 789, Villa', '3207778899', 2, 1), -- Tecnico
+('Ana', 'Martinez Sanchez', 'ana.martinez@example.com', '4040404040', 'hashed_password_4', 'Transversal Imaginaria 101, Sector', '3010001122', 1, 1), -- Usuario
+('Pedro', 'Ramirez Torres', 'pedro.ramirez@example.com', '5050505050', 'hashed_password_5', 'Diagonal Creada 202, Barrio', '3113334455', 2, 1), -- Técnico
+('Sofia', 'Diaz Castro', 'sofia.diaz@example.com', '6060606060', 'hashed_password_6', 'Callejón Ficticio 303, Zona', '3216667788', 3, 2), -- Administrador
+('Luis', 'Hernandez Vargas', 'luis.hernandez@example.com', '7070707070', 'hashed_password_7', 'Bulevar Soñado 404, Urbanización', '3029990011', 1, 2), -- Usuario
+('Elena', 'Jimenez Ruiz', 'elena.jimenez@example.com', '8080808080', 'hashed_password_8', 'Pasaje Abstracto 505, Conjunto', '3122223344', 2, 2), -- Técnico
+('Miguel', 'Moreno Gil', 'miguel.moreno@example.com', '9090909090', 'hashed_password_9', 'Ronda Imaginaria 606, Vereda', '3225556677', 1, 1), -- Usuario
+('Laura', 'Alvarez Perez', 'laura.alvarez@example.com', '1111111111', 'hashed_password_10', 'Camino Inexistente 707, Finca', '3038889900', 1, 2); -- Usuario
