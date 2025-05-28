@@ -13,6 +13,7 @@ const Home = () => {
   const navigate = useNavigate();
   const { iniciarSesion, usuario } = useAuth(); // Usamos el contexto de autenticación
 
+
   // Verificar si ya hay un usuario logueado
   useEffect(() => {
     if (usuario) {
@@ -127,14 +128,14 @@ const Home = () => {
           bg-center 
           bg-cover
           h-auto
-          md:h-[500px] 
+           
           opacity-70"
         ></div>
 
         {/* Contenido principal */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 ">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+        <div className={ error != '' ? 'relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 md:py-14' : 'relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 md:py-22'}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid md:grid-cols-2 gap-12 items-center h-full">
               {/* Texto principal */}
               <div className="">
                 <h2 className="text-4xl font-bold text-gray-950 mb-6">Calidad y precisión en cada conexión</h2>
@@ -199,7 +200,7 @@ const Home = () => {
           <p className='py-6 text-lg font-semibold'>
             Agenda el servicio que necesitas y recibe una visita técnica para evaluar tu requerimiento. Nuestro equipo especializado realizará un análisis detallado y te proporcionará una cotización precisa para continuar con la solución más adecuada.
           </p>
-          <button className="cursor-pointer inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors justify-center max-w-xs mx-auto">
+          <button className="cursor-pointer inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-500 hover:bg-red-600 transition-colors justify-center max-w-xs mx-auto">
             {/* icono de reloj */}
             <ClockIcon className="h-5 w-5 mr-2" />
             ¡Agenda AQUI!

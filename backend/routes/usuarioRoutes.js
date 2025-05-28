@@ -7,8 +7,9 @@ const usuarioController = require('../controller/usuarioController');
 
 
 // GET -> obtener una usuario por id
-router.get('/:id', usuarioController.getUsuarioById);
 router.get('/', usuarioController.getTodosLosUsuarios);
+router.get('/:id', usuarioController.getUsuarioById);
+router.get('/identificacion/:identificacion', usuarioController.getUsuarioByIdentificacion);
 // POST -> crear una nueva usuario
 router.post('/register', usuarioController.createUsuario);
 // PUT -> actualizamos los datos de una usuario

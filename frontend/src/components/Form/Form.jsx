@@ -39,7 +39,7 @@ const Form = ({ onSubmit, styles, inputs, error, isLoading, buttonText = 'Enviar
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="bg-red-600 hover:bg-red-800 text-white px-6 py-3 rounded-lg font-medium transition-colors cursor-pointer"
+                        className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-medium transition-colors cursor-pointer"
                     >
                         {buttonText}
                     </button>

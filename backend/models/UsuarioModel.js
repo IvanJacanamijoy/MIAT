@@ -18,6 +18,20 @@ class UsuarioModel {
             return 'Error buscando Usuario con id ' + id + ': ' + error;
         }
     }
+    /*Obtener una Usuarios por Identificacion
+        funcion asincrona que espera el resultado de la consulta ()*/
+    async getUsuarioByIdentificacion(identificacion) {
+        //intentamos ajecutar la consulta (manejo de errores)
+        try {
+            //guardamos el primer registro que cumpla con la condicion (IdUsuario = id)
+            // y retornamos el resultado de la consulta
+            const resultQuery = knex('usuario').where({ Identificacion: identificacion }).first();
+            return resultQuery;
+        } catch (error) {
+            //en caso de algun error retornamos el error
+            return 'Error buscando Usuario con la identificacion ' + identificacion + ': ' + error;
+        }
+    }
     /* Obtener todos los usuarios
     funcion asincrona que espera todos los usuarios*/
     async getTodosLosUsuarios(){

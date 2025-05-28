@@ -84,7 +84,7 @@ const Navbar = () => {
 
   return (
     <nav className="">
-      <div className="mx-auto max-w-7xl px-2 sm:px-5 lg:px-8 h-[76px] sm:h-auto">
+      <div className="mx-auto w-full px-2 sm:px-5 lg:px-8 h-[76px] sm:h-auto">
         <div className="relative flex items-center justify-around">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
             {/* Botón del menú móvil */}
@@ -103,7 +103,7 @@ const Navbar = () => {
             </button>
           </div>
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-around">
-            <div className="flex shrink-0 items-center">
+            <div className="flex shrink-0 items-center mt-1">
               <img
                 alt="Logo miat"
                 src={images.logo_miat_rojo}
@@ -111,37 +111,41 @@ const Navbar = () => {
               />
               <p className="text-3xl font-bold">MIAT</p>
             </div>
-            <div className="hidden ml-2 xs:ml-6 sm:block bg-red-500 py-4 px-7 rounded-full">
-              <div className="flex space-x-4 items-center">
+            <div className="hidden ml-2 sm:ml-6 sm:block bg-red-500 py-4 px-7 rounded-full">
+              <div className="flex space-x-4 items-center md:h-[40px]">
                 {navigation.map((item) => (
                   <Link
                     key={item.to}
                     to={item.to}
                     className={isActive(item.to)
-                      ? 'bg-white text-black rounded-sm px-3 text-sm font-semibold max-h-10 text-center'
-                      : 'text-black hover:bg-white rounded-sm px-3 text-sm font-semibold max-h-10 text-center '}
+                      ? 'bg-white text-black rounded-sm px-2 text-sm font-semibold text-center'
+                      : 'text-black hover:bg-white rounded-sm px-2 text-sm font-semibold text-center '}
                   >
                     {item.name}
                   </Link>
                 ))}
               </div>
             </div>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-              {/* Menú de perfil */}
-              <div className="relative ml-3">
-                <a
-                  className={
-                    rol == null ? "hidden" : "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded-3xl"
-                  }
-                  role="menuitem"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleLogout();
-                  }}
-                >
-                  Cerrar sesión
-                </a>
-              </div>
+            {/* boton de cerrar sesion */}
+            <div className="absolute inset-y-0 -right-3 mt-1 sm:flex items-center pr-2 sm:static sm:inset-auto sm:ml-1 sm:pr-0">
+              <a
+                className={
+                  rol == null ? "hidden" : "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-2 border-gray-200 cursor-pointer rounded-4xl text-center"
+                }
+                role="menuitem"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleLogout();
+                }}
+              >
+                <span className='hidden sm:block'>Cerrar sesión</span>
+                <div className='block sm:hidden'>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={0.9} stroke="currentColor" className="size-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                  </svg>
+                </div>
+
+              </a>
             </div>
           </div>
         </div>

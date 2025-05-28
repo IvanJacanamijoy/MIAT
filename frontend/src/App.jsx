@@ -21,16 +21,11 @@ import UserAssignedVisits from './pages/user/UserAssignedVisits';
 import TechnicalVisits from './pages/user/TechnicalVisits'
 
 //vista de tecnico
-<<<<<<< HEAD
 import TechnicianDashboard from './pages/technician/TechnicianDashboard'
 import TechnicianAssignedVisits from './pages/technician/TechnicianAssignedVisits';
 import TechnicianServices from './pages/technician/TechnicianServices';
 import TechnicianQuote from './pages/technician/TechnicianQuote';
 import TechnicianReports from './pages/technician/TechnicianReports';
-=======
-import TechnicianDashboard from "./pages/technician/TechnicianDashboard"
-import WhoWeare from './pages/WhoWeare';
->>>>>>> 3f54e344803dc1eeb7e1fd1d54ad4c228f71542e
 
 //vistas de administrador
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -69,7 +64,6 @@ const App = () => {
             {/* rutas del home */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-<<<<<<< HEAD
             <Route path="/" element={<MainLayout><Home /></MainLayout>} />
             <Route path="/contacto" element={<MainLayout><Contact /></MainLayout>} />
             <Route path="/servicios" element={<MainLayout><HomeService /></MainLayout>} />
@@ -90,11 +84,6 @@ const App = () => {
             <Route path="/tecnico/servicios" element={<RequireAuth allowedRoles={['tecnico']}><MainLayout><TechnicianServices /></MainLayout></RequireAuth>} />
             <Route path="/tecnico/cotizaciones" element={<RequireAuth allowedRoles={['tecnico']}><MainLayout><TechnicianQuote /></MainLayout></RequireAuth>} />
             <Route path="/tecnico/informes" element={<RequireAuth allowedRoles={['tecnico']}><MainLayout><TechnicianReports /></MainLayout></RequireAuth>} />
-=======
-            <Route path="/" element={<MainLayout><HomePage /></MainLayout>} />
-            <Route path="/service" element={<MainLayout><ServicePage /></MainLayout>} />
-            <Route path="/whoweare" element={<MainLayout><WhoWeare /></MainLayout>}/>
->>>>>>> 3f54e344803dc1eeb7e1fd1d54ad4c228f71542e
 
             {/* Rutas protegidas por rol, con MainLayout */}
             <Route path="/admin" element={<RequireAuth allowedRoles={['admin']}><MainLayout><AdminDashboard /></MainLayout></RequireAuth>} />
