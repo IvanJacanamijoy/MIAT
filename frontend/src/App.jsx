@@ -26,6 +26,12 @@ import TechnicianAssignedVisits from './pages/technician/TechnicianAssignedVisit
 import TechnicianServices from './pages/technician/TechnicianServices';
 import TechnicianQuote from './pages/technician/TechnicianQuote';
 import TechnicianReports from './pages/technician/TechnicianReports';
+<<<<<<< HEAD
+=======
+import TechnicianDashboard from "./pages/technician/TechnicianDashboard"
+import WhoWeare from './pages/WhoWeare';
+
+>>>>>>> 9c6e0bc55a868e4f3c6cd49f88edebd09d519d9f
 
 //vistas de administrador
 import AdminDashboard from './pages/admin/AdminDashboard';
