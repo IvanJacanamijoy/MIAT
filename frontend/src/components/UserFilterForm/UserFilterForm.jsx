@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Modal from '../Modal';
 import UserForm from './UserForm';
+import Switch from '@mui/material/Switch'
 
 const UserFilterForm = () => {
   const [allUsers, setAllUsers] = useState([]); // Guarda todos los usuarios obtenidos de la API
@@ -113,11 +114,10 @@ const UserFilterForm = () => {
 
   // Función para crear o actualizar un usuario
   const handleCreateOrUpdateUser = async (updatedUser) => {
-    if (updatedUser.IdUsuario) {
-      // Si el usuario ya tiene un ID, es una actualización
+   
       try {
         // Conexión con tu API de backend
-        const response = await fetch('http://localhost:3000/usuarios/' + updatedUser.IdUsuario, {
+        await fetch('http://localhost:3000/usuarios/' + updatedUser.IdUsuario, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -126,24 +126,40 @@ const UserFilterForm = () => {
         });
 
         alert('Usuario actualizado')
-        location.reload()
+        fetchAllUsers();
 
       } catch (error) {
         // setErrors(`Error: ${error.message || 'Hubo un problema al registrar el usurio. Por favor, intenta de nuevo.'}`);
       } finally {
         // setIsLoading(false);
       }
-    } else {
-      // Si no tiene ID, es un nuevo usuario (puedes añadir lógica para generar IDs)
-
-      // corregir el envio de datos para un usuario nuevo
-
-
-      const newId = Math.max(...users.map(u => u.id)) + 1; // ID simple para ejemplo
-      setUsers([...users, { ...updatedUser, id: newId }]);
-    }
     handleCancelEdit(); // Cierra el modal y limpia el usuario a editar
   };
+  // Función para cambiar el estado de un usuario
+  const handleEstadoUsuario = async (updatedUser) => {
+    //obtenemos el usuario y extraemos su id
+    let estado = updatedUser.IdEstado;
+    //cambiamos su estado de activo a inactivo y viceversa
+    if (estado == 1) {
+      estado = 2;
+    } else {
+      estado = 1;
+    }
+    //intentamos actualizar su estado en la base de datos
+    try {
+      await fetch('http://localhost:3000/usuarios/' + updatedUser.IdUsuario, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ IdEstado: estado }),
+      });
+      fetchAllUsers();
+    } catch (error) {
+
+    }
+  }
+
 
   // Función para cancelar la edición y cerrar el modal
   const handleCancelEdit = () => {
@@ -152,7 +168,10 @@ const UserFilterForm = () => {
   };
   return (
     <div className="px-4">
-      <form key='userFilterForm' onSubmit={handleFilterSubmit} className="space-y-4  p-2 rounded-xl border-gray-200 bg-white my-2">
+      <form 
+      key='userFilterForm' 
+      onSubmit={handleFilterSubmit} 
+      className="relative z-10 space-y-4  p-2 rounded-xl border-gray-200 bg-white my-2">
         <div className="sm:flex">
           <div className='sm:w-[80%] sm:mr-5 sm:'>
             {fields.map((field) => (
@@ -203,15 +222,16 @@ const UserFilterForm = () => {
                   <img
                     src="/src/assets/images/userfilter/imagen_perfil.png"
                     alt="imagen de perfil"
-                    className='h-25 mx-auto my-4' />
+                    className='h-25 mx-auto my-4 rounded-full border-8 border-red-500' />
                   <div className='px-2'>
                     <span className='block bg-black text-white text-center rounded-2xl py-1 font-semibold mb-2 mx-auto w-40'>ID {user.Identificacion}</span>
                     <span className='block font-semibold'>{user.Nombres + " " + user.Apellidos}</span>
                     <span className='block font-semibold'>{user.Email}</span>
                     <span className='block font-semibold'>{user.Direccion}</span>
                     <span className='block font-semibold'>{"Tel. " + user.Telefono}</span>
-                    <span className={`block font-semibold border-2 w-24 text-center rounded-2xl mx-auto ${user.IdEstado == 1 ? ' text-green-600 bg-green-100' : user.IdEstado == 2 ? ' bg-red-100 text-rose-600' : ''}`}>
+                    <span className={`block font-semibold border-2 w-24 text-center rounded-2xl mx-auto ${user.IdEstado == 1 ? ' text-green-600 bg-green-100' : user.IdEstado == 2 ? ' bg-gray-100 text-gray-600' : ''}`}>
                       {user.IdEstado == 1 ? 'Activo' : user.IdEstado == 2 ? 'Inactivo' : ''}</span>
+
                   </div>
                   <div className='flex mt-4 mb-2 justify-center'>
                     <button
@@ -225,16 +245,17 @@ const UserFilterForm = () => {
 
 
                     </button>
-                    <button
-                      onClick={() => handleEliminarUsuario(user.IdUsuario)}
+                    {/* <button
+                      onClick={() => handleEstadoUsuario(user)}
                       className="text-red-600 hover:text-red-900 cursor-pointer"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-9">
                         <path fillRule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clipRule="evenodd" />
                       </svg>
 
-
-                    </button>
+                    </button> */}
+                    <Switch checked={user.IdEstado == 1 ? 'checked' : ''} onChange={() => handleEstadoUsuario(user)}/>
+                      {/* <Switch2/> */}
                   </div>
                 </div>
               ))

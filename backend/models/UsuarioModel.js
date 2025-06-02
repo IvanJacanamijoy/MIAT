@@ -54,7 +54,8 @@ class UsuarioModel {
                 contraseña: contraseñaHash,
                 direccion: UsuarioData.Direccion,
                 telefono: UsuarioData.Telefono,
-                IdRol: UsuarioData.IdRol
+                IdRol: UsuarioData.IdRol,
+                IdEstado: UsuarioData.IdEstado,
             });
             //guardamos la Usuario recien creada ejecutando una consulta
             const newUsuario = this.getUsuarioById(IdUsuario);

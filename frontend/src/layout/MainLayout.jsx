@@ -6,7 +6,7 @@ const MainLayout = ({children}) => {
     return (
         <div className="app">
             <Navbar />
-            <main>
+            <main className='min-h-screen'>
                 {children}
             </main>
             <Footer />

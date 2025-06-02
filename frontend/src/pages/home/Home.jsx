@@ -123,22 +123,23 @@ const Home = () => {
         <div
           className="
           absolute 
-          inset-0 bg-[url(src/assets/images/home/imagen_fondo.png)] 
+          inset-0 
+          bg-[url(src/assets/images/home/imagen_fondo.png)] 
           bg-local 
           bg-center 
           bg-cover
           h-auto
            
-          opacity-70"
+          opacity-80"
         ></div>
 
         {/* Contenido principal */}
-        <div className={ error != '' ? 'relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 md:py-14' : 'relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 md:py-22'}>
+        <div className={ error != '' ? 'relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 md:py-10' : 'relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 md:py-22'}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-2 gap-12 items-center h-full">
+            <div className="grid md:grid-cols-2 gap-4 md:gap-12 items-center h-full my-7 md:my-0">
               {/* Texto principal */}
               <div className="">
-                <h2 className="text-4xl font-bold text-gray-950 mb-6">Calidad y precisión en cada conexión</h2>
+                <h2 className="text-4xl font-bold text-gray-950 mb-6 text-shadow-lg">Calidad y precisión en cada conexión</h2>
                 <p className="text-lg text-white mb-8 font-semibold text-shadow-lg">
                   Cotiza y agenda tu servicio de manera rápida y confiable, con la mejor atención y el respaldo de técnicos altamente experimentados. Garantizamos soluciones eléctricas seguras y de calidad para tu tranquilidad.
                 </p>

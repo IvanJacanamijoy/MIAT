@@ -76,7 +76,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="shadow-md min-h-[60px] ">
+    <nav className="shadow-md min-h-[60px]">
       <div className="mx-auto w-full px-2 sm:px-5 lg:px-8">
         <div className="relative flex items-center justify-around">
           <div className="absolute inset-y-0 left-0 flex items-center xl:hidden">
@@ -120,10 +120,10 @@ const Navbar = () => {
               </div>
             </div>
             {/* boton de cerrar sesion */}
-            <div className="absolute inset-y-0 -right-3 xl:flex items-center pr-2 xl:static xl:inset-auto xl:ml-1 xl:pr-0 mt-3 xl:mt-0">
+            <div className="absolute inset-y-0 -right-3 xl:flex items-center pr-2 xl:static xl:inset-auto xl:ml-1 xl:pr-0 mt-2 xl:mt-0">
               <a
                 className={
-                  rol == null ? "hidden" : "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-2 border-gray-200 cursor-pointer rounded-4xl text-center"
+                  rol == null ? "hidden" : "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-700 hover:text-white border-2 border-gray-200 cursor-pointer rounded-4xl text-center"
                 }
                 role="menuitem"
                 onClick={(e) => {

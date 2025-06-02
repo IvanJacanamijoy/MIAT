@@ -15,6 +15,7 @@ const RegisterPage = () => {
         Direccion: '',
         Telefono: '',
         IdRol: 1,
+        IdEstado:1,
     });
 
     // Maneja cambios en los inputs y actualiza el estado
