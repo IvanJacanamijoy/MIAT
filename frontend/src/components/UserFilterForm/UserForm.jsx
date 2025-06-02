@@ -1,62 +1,127 @@
 import React, { useState, useEffect } from 'react';
 
 const UserForm = ({ userToEdit, onSubmit, onCancel }) => {
-    const [name, setName] = useState('');
-    const [identification, setIdentification] = useState('');
-    const [email, setEmail] = useState('');
-    const [phone, setPhone] = useState('');
+    const [formData, setFormData] = useState({
+        Nombres: '',
+        Apellidos: '',
+        Email: '',
+        Identificacion: '',
+        Direccion: '',
+        Telefono: '',
+        IdRol: 1,
+    });
 
+    // useEffect para cargar los datos del usuario cuando `userToEdit` cambie
     useEffect(() => {
         if (userToEdit) {
-            setName(userToEdit.name);
-            setIdentification(userToEdit.identification);
-            setEmail(userToEdit.email);
-            setPhone(userToEdit.phone || '');
+            setFormData(userToEdit);
         } else {
-            // Limpiar formulario si no hay usuario para editar
-            setName('');
-            setIdentification('');
-            setEmail('');
-            setPhone('');
+            // Si no hay userToEdit (para crear uno nuevo), resetea el formulario
+            setFormData({
+                Nombres: '',
+                Apellidos: '',
+                Email: '',
+                Identificacion: '',
+                Direccion: '',
+                Telefono: '',
+                IdRol: 1,
+            });
         }
     }, [userToEdit]);
 
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value,
+        });
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSubmit({ name, identification, email, phone });
-        setName('');
-        setIdentification('');
-        setEmail('');
-        setPhone('');
+        onSubmit(formData); // Llama a la función de envío que viene de UserManager
     };
 
     return (
-        <form onSubmit={handleSubmit} style={{ marginBottom: '20px', padding: '20px', border: '1px solid #ccc', borderRadius: '5px' }}>
-            <h2>{userToEdit ? 'Editar Usuario' : 'Crear Nuevo Usuario'}</h2>
-            <div>
-                <label>Nombre:</label>
-                <input type="text" value={name} onChange={(e) => setName(e.target.value)} required style={{ width: '100%', padding: '8px', margin: '5px 0' }} />
+        <form onSubmit={handleSubmit} className="p-4">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">
+                {userToEdit ? 'Editar Usuario' : 'Crear Nuevo Usuario'}
+            </h2>
+            <div className="mb-4">
+                <label htmlFor="Nombres" className="block text-gray-700 text-sm font-bold mb-2">Nombres:</label>
+                <input
+                    type="text"
+                    id="Nombres"
+                    name="Nombres"
+                    value={formData.Nombres}
+                    onChange={handleChange}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    required
+                />
             </div>
-            <div>
-                <label>Identificación:</label>
-                <input type="text" value={identification} onChange={(e) => setIdentification(e.target.value)} required style={{ width: '100%', padding: '8px', margin: '5px 0' }} />
+            <div className="mb-4">
+                <label htmlFor="Apellidos" className="block text-gray-700 text-sm font-bold mb-2">Apellidos:</label>
+                <input
+                    type="text"
+                    id="Apellidos"
+                    name="Apellidos"
+                    value={formData.Apellidos}
+                    onChange={handleChange}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    required
+                />
             </div>
-            <div>
-                <label>Email:</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ width: '100%', padding: '8px', margin: '5px 0' }} />
+            <div className="mb-6">
+                <label htmlFor="Identificacion" className="block text-gray-700 text-sm font-bold mb-2">Identificacion:</label>
+                <input
+                    type="text"
+                    id="Identificacion"
+                    name="Identificacion"
+                    value={formData.Identificacion}
+                    onChange={handleChange}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    required
+                />
             </div>
-            <div>
-                <label>Teléfono:</label>
-                <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} style={{ width: '100%', padding: '8px', margin: '5px 0' }} />
+            <div className="mb-6">
+                <label htmlFor="Direccion" className="block text-gray-700 text-sm font-bold mb-2">Direccion:</label>
+                <input
+                    type="text"
+                    id="Direccion"
+                    name="Direccion"
+                    value={formData.Direccion}
+                    onChange={handleChange}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    required
+                />
             </div>
-            <button type="submit" style={{ padding: '10px 15px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '10px' }}>
-                {userToEdit ? 'Guardar Cambios' : 'Crear Usuario'}
-            </button>
-            {userToEdit && (
-                <button type="button" onClick={onCancel} style={{ padding: '10px 15px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+            <div className="mb-6">
+                <label htmlFor="Telefono" className="block text-gray-700 text-sm font-bold mb-2">Telefono:</label>
+                <input
+                    type="text"
+                    id="Telefono"
+                    name="Telefono"
+                    value={formData.Telefono}
+                    onChange={handleChange}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    required
+                />
+            </div>
+            <div className="flex items-center justify-between">
+                <button
+                    type="submit"
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer"
+                >
+                    {userToEdit ? 'Guardar Cambios' : 'Crear Usuario'}
+                </button>
+                <button
+                    type="button"
+                    onClick={onCancel}
+                    className="bg-white hover:bg-gray-100 text-gray-600 font-bold py-2 px-4 border border-gray-400 rounded focus:outline-none focus:shadow-outline cursor-pointer"
+                >
                     Cancelar
                 </button>
-            )}
+            </div>
         </form>
     );
 };

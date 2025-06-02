@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+
+*{
+    font-family: "ADLaM Display", system-ui, sans-serif;
+    font-weight: 100;
+}

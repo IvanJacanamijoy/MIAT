@@ -2,13 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { Bars3Icon, XMarkIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 
-// Simulación de datos de usuario y roles (reemplazar con tu lógica de backend)
-const usuarios = [
-  { id: 1, email: 'admin@example.com', password: 'password', rol: 'admin', nombre: 'Admin' },
-  { id: 2, email: 'cliente@example.com', password: 'password', rol: 'cliente', nombre: 'Cliente' },
-  { id: 3, email: 'tecnico@example.com', password: 'password', rol: 'tecnico', nombre: 'Técnico' },
-];
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
@@ -83,14 +76,14 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="">
-      <div className="mx-auto w-full px-2 sm:px-5 lg:px-8 h-[76px] sm:h-auto">
+    <nav className="shadow-md min-h-[60px] ">
+      <div className="mx-auto w-full px-2 sm:px-5 lg:px-8">
         <div className="relative flex items-center justify-around">
-          <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
+          <div className="absolute inset-y-0 left-0 flex items-center xl:hidden">
             {/* Botón del menú móvil */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+              className="cursor-pointer inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white mt-3"
               aria-controls="mobile-menu"
               aria-expanded={isOpen}
             >
@@ -102,8 +95,8 @@ const Navbar = () => {
               )}
             </button>
           </div>
-          <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-around">
-            <div className="flex shrink-0 items-center mt-1">
+          <div className="flex flex-1 items-center justify-center xl:items-stretch xl:justify-around mt-3 xl:mt-0">
+            <div className="flex shrink-0 items-center">
               <img
                 alt="Logo miat"
                 src={images.logo_miat_rojo}
@@ -111,8 +104,8 @@ const Navbar = () => {
               />
               <p className="text-3xl font-bold">MIAT</p>
             </div>
-            <div className="hidden ml-2 sm:ml-6 sm:block bg-red-500 py-4 px-7 rounded-full">
-              <div className="flex space-x-4 items-center md:h-[40px]">
+            <div className="hidden ml-2 sm:ml-6 xl:block bg-red-500 py-3 px-7 rounded-full my-2">
+              <div className="flex space-x-4 items-center">
                 {navigation.map((item) => (
                   <Link
                     key={item.to}
@@ -127,7 +120,7 @@ const Navbar = () => {
               </div>
             </div>
             {/* boton de cerrar sesion */}
-            <div className="absolute inset-y-0 -right-3 mt-1 sm:flex items-center pr-2 sm:static sm:inset-auto sm:ml-1 sm:pr-0">
+            <div className="absolute inset-y-0 -right-3 xl:flex items-center pr-2 xl:static xl:inset-auto xl:ml-1 xl:pr-0 mt-3 xl:mt-0">
               <a
                 className={
                   rol == null ? "hidden" : "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border-2 border-gray-200 cursor-pointer rounded-4xl text-center"
@@ -138,8 +131,8 @@ const Navbar = () => {
                   handleLogout();
                 }}
               >
-                <span className='hidden sm:block'>Cerrar sesión</span>
-                <div className='block sm:hidden'>
+                <span className='hidden xl:block'>Cerrar sesión</span>
+                <div className='block xl:hidden'>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={0.9} stroke="currentColor" className="size-5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
                   </svg>
@@ -152,7 +145,7 @@ const Navbar = () => {
       </div>
 
       {/* Menú móvil */}
-      <div className={`xs:hidden ${isOpen ? 'block' : 'hidden'}`} id="mobile-menu">
+      <div className={`xl:hidden ${isOpen ? 'block' : 'hidden'}`} id="mobile-menu">
         <div className="space-y-1 px-2 pb-3 pt-2">
           {navigation.map((item) => (
             <Link
@@ -160,7 +153,7 @@ const Navbar = () => {
               to={item.to}
               className={isActive(item.to)
                 ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium block '
-                : 'text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium block cursor-pointer'}
+                : 'text-gray-700 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium block cursor-pointer'}
               onClick={() => setIsOpen(false)} // Cerrar el menú al hacer clic
             >
               {item.name}

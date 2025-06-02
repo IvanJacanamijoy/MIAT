@@ -43,10 +43,6 @@ const RegisterPage = () => {
                 body: JSON.stringify({ ...formData }),
             });
 
-            console.log(response);
-            console.log(formData)
-
-
             const data = await response.json();
 
             navigate('/login')
