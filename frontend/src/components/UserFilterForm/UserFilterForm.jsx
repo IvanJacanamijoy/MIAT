@@ -114,25 +114,25 @@ const UserFilterForm = () => {
 
   // Función para crear o actualizar un usuario
   const handleCreateOrUpdateUser = async (updatedUser) => {
-   
-      try {
-        // Conexión con tu API de backend
-        await fetch('http://localhost:3000/usuarios/' + updatedUser.IdUsuario, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ ...updatedUser }),
-        });
 
-        alert('Usuario actualizado')
-        fetchAllUsers();
+    try {
+      // Conexión con tu API de backend
+      await fetch('http://localhost:3000/usuarios/' + updatedUser.IdUsuario, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...updatedUser }),
+      });
 
-      } catch (error) {
-        // setErrors(`Error: ${error.message || 'Hubo un problema al registrar el usurio. Por favor, intenta de nuevo.'}`);
-      } finally {
-        // setIsLoading(false);
-      }
+      alert('Usuario actualizado')
+      fetchAllUsers();
+
+    } catch (error) {
+      // setErrors(`Error: ${error.message || 'Hubo un problema al registrar el usurio. Por favor, intenta de nuevo.'}`);
+    } finally {
+      // setIsLoading(false);
+    }
     handleCancelEdit(); // Cierra el modal y limpia el usuario a editar
   };
   // Función para cambiar el estado de un usuario
@@ -168,10 +168,10 @@ const UserFilterForm = () => {
   };
   return (
     <div className="px-4">
-      <form 
-      key='userFilterForm' 
-      onSubmit={handleFilterSubmit} 
-      className="relative z-10 space-y-4  p-2 rounded-xl border-gray-200 bg-white my-2">
+      <form
+        key='userFilterForm'
+        onSubmit={handleFilterSubmit}
+        className="relative z-10 space-y-4  p-2 rounded-xl border-gray-200 bg-white my-2">
         <div className="sm:flex">
           <div className='sm:w-[80%] sm:mr-5 sm:'>
             {fields.map((field) => (
@@ -214,11 +214,15 @@ const UserFilterForm = () => {
       {error && <p className="text-red-500">Error: {error}</p>}
       {!loading && !error && (
         <div>
-          <h2 className="text-2xl font-bold mb-4">Usuarios</h2>
+          <h2 className="text-2xl font-bold mb-4 text-white">Usuarios</h2>
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
             {filteredUsers.length > 0 ? (
               filteredUsers.map(user => ( // Aquí usamos filteredUsers
                 <div key={user.IdUsuario} className='bg-white rounded-2xl py-3 md:px-5'>
+                  <span
+                    className={`font-semibold border-2 px-2 rounded-2xl mx-auto ${user.IdRol == 1 ? ' text-blue-500 bg-blue-100' : user.IdRol == 2 ? ' bg-orange-100 text-orange-600' : 'bg-red-100 text-red-500'}`}
+                  >{user.IdRol == 3 ? 'Administrador' : user.IdRol == 2 ? 'Tecnico' : 'Usuario'}
+                  </span>
                   <img
                     src="/src/assets/images/userfilter/imagen_perfil.png"
                     alt="imagen de perfil"
@@ -254,8 +258,8 @@ const UserFilterForm = () => {
                       </svg>
 
                     </button> */}
-                    <Switch checked={user.IdEstado == 1 ? 'checked' : ''} onChange={() => handleEstadoUsuario(user)}/>
-                      {/* <Switch2/> */}
+                    <Switch checked={user.IdEstado == 1 ? 'checked' : ''} onChange={() => handleEstadoUsuario(user)} />
+                    {/* <Switch2/> */}
                   </div>
                 </div>
               ))

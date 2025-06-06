@@ -36,30 +36,25 @@ const Navbar = () => {
   if (rol === 'admin') {
     navigation = [
       { name: 'Inicio', to: '/admin' },
-      { name: 'Agendar Visitas', to: '/admin/agendar' },
       { name: 'Gestionar Usuarios', to: '/admin/usuarios' },
-      { name: 'Visitas tecnicas', to: '/admin/citasasignadas' },
-      { name: 'Servicios', to: '/admin/servicios' },
+      { name: 'Visitas Tecnicas', to: '/admin/visitatecnica' },
       { name: 'Cotizaciones', to: '/admin/cotizaciones' },
-      { name: 'Informes', to: '/admin/informes' },
+      { name: 'Servicios e Informes', to: '/admin/servicios' },
     ];
   } else if (rol === 'usuario') {
     navigation = [
       { name: 'Inicio', to: '/usuario' },
-      { name: 'Servicios', to: '/usuario/servicios' },
-      { name: 'Mis servicios', to: '/usuario/misservicios' },
+      { name: 'Visitas Tecnicas', to: '/usuario/visitatecnica' },
       { name: 'Cotizaciones', to: '/usuario/cotizaciones' },
-      { name: 'Informes', to: '/usuario/informes' },
-      { name: 'Visitas tecnicas', to: '/usuario/visitastecnicas' },
+      { name: 'Servicios e Informes', to: '/usuario/serviciosinformes' },
       { name: 'Contacto', to: '/contacto' },
     ];
   } else if (rol === 'tecnico') {
     navigation = [
-      { name: 'Dashboard', to: '/tecnico' },
+      { name: 'Inicio', to: '/tecnico' },
       { name: 'Visitas Asignadas', to: '/tecnico/visitasasignadas ' },
-      { name: 'Mis Servicios', to: '/tecnico/servicios' },
-      { name: 'Mis cotizaciones', to: '/tecnico/cotizaciones' },
-      { name: 'Mis Informes', to: '/tecnico/informes' },
+      { name: 'Cotizaciones', to: '/tecnico/cotizaciones' },
+      { name: 'Servicios e informes', to: '/tecnico/serviciosinformes' },
     ];
   } else {
     navigation = [
