@@ -2,14 +2,14 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext'; // Importa AuthProvider y useAuth
 
 //Vistas del layout (navbar y footer) e inicio de sesión
-import MainLayout from "./layout/MainLayout";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from './pages/RegisterPage';
+import Layout from "./components/Common/Layout";
+import LoginPage from "./pages/public/LoginPage";
+import RegisterPage from './pages/public/RegisterPage';
 //vistas del home
-import Home from './pages/home/Home';
-import Contact from './pages/home/Contact';
-import HomeService from './pages/home/HomeService';
-import Whoweare from './pages/home/Whoweare'
+import Home from './pages/public/Home';
+import Contact from './pages/public/Contact';
+import HomeService from './pages/public/HomeService';
+import Whoweare from './pages/public/Whoweare'
 
 //vistas de usuario
 import UserDashboard from './pages/user/UserDashboard'
@@ -64,30 +64,30 @@ const App = () => {
             {/* rutas del home */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route path="/" element={<MainLayout><Home /></MainLayout>} />
-            <Route path="/contacto" element={<MainLayout><Contact /></MainLayout>} />
-            <Route path="/servicios" element={<MainLayout><HomeService /></MainLayout>} />
-            <Route path="/quienessomos" element={<MainLayout><Whoweare /></MainLayout>} />
+            <Route path="/" element={<Layout><Home /></Layout>} />
+            <Route path="/contacto" element={<Layout><Contact /></Layout>} />
+            <Route path="/servicios" element={<Layout><HomeService /></Layout>} />
+            <Route path="/quienessomos" element={<Layout><Whoweare /></Layout>} />
 
-            {/* Rutas protegidas por rol, con MainLayout */}
-            <Route path="/usuario" element={<RequireAuth allowedRoles={['usuario']}><MainLayout><UserDashboard /></MainLayout></RequireAuth>} />
-            <Route path="/usuario/visitatecnica" element={<RequireAuth allowedRoles={['usuario']}><MainLayout><UserTechnicalVisits /></MainLayout></RequireAuth>} />
-            <Route path="/usuario/cotizaciones" element={<RequireAuth allowedRoles={['usuario']}><MainLayout><UserQuote /></MainLayout></RequireAuth>} />
-            <Route path="/usuario/serviciosinformes" element={<RequireAuth allowedRoles={['usuario']}><MainLayout><UserServicesReports /></MainLayout></RequireAuth>} />
-            <Route path="/usuario/contacto" element={<RequireAuth allowedRoles={['usuario']}><MainLayout><Contact /></MainLayout></RequireAuth>} />
+            {/* Rutas protegidas por rol, con Layout */}
+            <Route path="/usuario" element={<RequireAuth allowedRoles={['usuario']}><Layout><UserDashboard /></Layout></RequireAuth>} />
+            <Route path="/usuario/visitatecnica" element={<RequireAuth allowedRoles={['usuario']}><Layout><UserTechnicalVisits /></Layout></RequireAuth>} />
+            <Route path="/usuario/cotizaciones" element={<RequireAuth allowedRoles={['usuario']}><Layout><UserQuote /></Layout></RequireAuth>} />
+            <Route path="/usuario/serviciosinformes" element={<RequireAuth allowedRoles={['usuario']}><Layout><UserServicesReports /></Layout></RequireAuth>} />
+            <Route path="/usuario/contacto" element={<RequireAuth allowedRoles={['usuario']}><Layout><Contact /></Layout></RequireAuth>} />
 
-            {/* Rutas protegidas por rol, con MainLayout */}
-            <Route path="/tecnico" element={<RequireAuth allowedRoles={['tecnico']}><MainLayout><TechnicianDashboard /></MainLayout></RequireAuth>} />
-            <Route path="/tecnico/visitasasignadas" element={<RequireAuth allowedRoles={['tecnico']}><MainLayout><TechnicianTechnicalVisits /></MainLayout></RequireAuth>} />
-            <Route path="/tecnico/cotizaciones" element={<RequireAuth allowedRoles={['tecnico']}><MainLayout><TechnicianQuote /></MainLayout></RequireAuth>} />
-            <Route path="/tecnico/serviciosinformes" element={<RequireAuth allowedRoles={['tecnico']}><MainLayout><TechnicianServicesReports /></MainLayout></RequireAuth>} />
+            {/* Rutas protegidas por rol, con Layout */}
+            <Route path="/tecnico" element={<RequireAuth allowedRoles={['tecnico']}><Layout><TechnicianDashboard /></Layout></RequireAuth>} />
+            <Route path="/tecnico/visitasasignadas" element={<RequireAuth allowedRoles={['tecnico']}><Layout><TechnicianTechnicalVisits /></Layout></RequireAuth>} />
+            <Route path="/tecnico/cotizaciones" element={<RequireAuth allowedRoles={['tecnico']}><Layout><TechnicianQuote /></Layout></RequireAuth>} />
+            <Route path="/tecnico/serviciosinformes" element={<RequireAuth allowedRoles={['tecnico']}><Layout><TechnicianServicesReports /></Layout></RequireAuth>} />
 
-            {/* Rutas protegidas por rol, con MainLayout */}
-            <Route path="/admin" element={<RequireAuth allowedRoles={['admin']}><MainLayout><AdminDashboard /></MainLayout></RequireAuth>} />
-            <Route path="/admin/usuarios" element={<RequireAuth allowedRoles={['admin']}><MainLayout><UserManager /></MainLayout></RequireAuth>} />
-            <Route path="/admin/visitatecnica" element={<RequireAuth allowedRoles={['admin']}><MainLayout><AdminTechnicalVisits /></MainLayout></RequireAuth>} />
-            <Route path="/admin/cotizaciones" element={<RequireAuth allowedRoles={['admin']}><MainLayout><AdminQuote /></MainLayout></RequireAuth>} />
-            <Route path="/admin/servicios" element={<RequireAuth allowedRoles={['admin']}><MainLayout><AdminServicesReports /></MainLayout></RequireAuth>} />
+            {/* Rutas protegidas por rol, con Layout */}
+            <Route path="/admin" element={<RequireAuth allowedRoles={['admin']}><Layout><AdminDashboard /></Layout></RequireAuth>} />
+            <Route path="/admin/usuarios" element={<RequireAuth allowedRoles={['admin']}><Layout><UserManager /></Layout></RequireAuth>} />
+            <Route path="/admin/visitatecnica" element={<RequireAuth allowedRoles={['admin']}><Layout><AdminTechnicalVisits /></Layout></RequireAuth>} />
+            <Route path="/admin/cotizaciones" element={<RequireAuth allowedRoles={['admin']}><Layout><AdminQuote /></Layout></RequireAuth>} />
+            <Route path="/admin/servicios" element={<RequireAuth allowedRoles={['admin']}><Layout><AdminServicesReports /></Layout></RequireAuth>} />
             {/* Ruta para manejar cualquier otra ruta no definida */}
             <Route path="*" element={
               /* Vista que indica que la pagina no ha sido encontrada -- pendiente */

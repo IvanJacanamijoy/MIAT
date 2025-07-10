@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
 
+//------------------PENDIENTE AGREGAR EL ROL DENTRO DEL SISTEMA-------------------
 const UserForm = ({ userToEdit, onSubmit, onCancel }) => {
+    //importamos al usuario con la sesion activa
+    const { usuario } = useAuth();
     const [formData, setFormData] = useState({
         Nombres: '',
         Apellidos: '',
@@ -8,7 +12,7 @@ const UserForm = ({ userToEdit, onSubmit, onCancel }) => {
         Identificacion: '',
         Direccion: '',
         Telefono: '',
-        IdRol: 1,
+        IdRol: '',
     });
 
     // useEffect para cargar los datos del usuario cuando `userToEdit` cambie
@@ -24,7 +28,7 @@ const UserForm = ({ userToEdit, onSubmit, onCancel }) => {
                 Identificacion: '',
                 Direccion: '',
                 Telefono: '',
-                IdRol: 1,
+                IdRol: '',
             });
         }
     }, [userToEdit]);
@@ -106,6 +110,24 @@ const UserForm = ({ userToEdit, onSubmit, onCancel }) => {
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     required
                 />
+            </div>
+
+            <div className="mb-6">
+                {
+                    /* si el id del usuario a actualizar y el usuario usuario con la sesion activa son iguales no se muestra la opcion para cambiar al usuario*/
+                    userToEdit.IdUsuario == usuario.id ? '' :
+                        <select
+                            name="IdRol"
+                            id="IdRol"
+                            value={formData.IdRol}
+                            onChange={handleChange}
+                            className='shadow border rounded w-full py-2 px-2 text-gray-700 leading-tight focus:outline-none'
+                        >
+                            <option value="3">Administrador</option>
+                            <option value="2">Tecnico</option>
+                            <option value="1">Usuario</option>
+                        </select>
+                }
             </div>
             <div className="flex items-center justify-between">
                 <button

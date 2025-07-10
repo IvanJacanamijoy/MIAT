@@ -2,7 +2,7 @@
 const UsuarioModel = require('../models/UsuarioModel')
 //exportamos la clase Usuario
 class UsuarioController {
-    /* Manejando la solicitud para obtener una Usuario por su id
+    /* Manejando la solicitud para obtener un Usuario por su id
     metodo asincronico que obtiene un Usuario por su id */
     async getUsuarioById(req, res) {
         //obtenemos el id de los parametros de la request
@@ -25,33 +25,16 @@ class UsuarioController {
             res.status(500).json({ message: `Error buscando a la Usuario con id ${id}`, error: error.message })
         }
     }
-    async getTodosLosUsuarios(req, res) {
+    /* Manejando la solicitud para obtener todos los usuarios del sistema
+    metodo asincronico que obtiene todos los usuario del sistema */
+    async getAllUsuarios(req, res) {
         try {
-            const usuarios = await UsuarioModel.getTodosLosUsuarios();
+            //obtenemos todos los usuarios a traves del modelo del usuario y respondemos con el resultado
+            const usuarios = await UsuarioModel.getAllUsuarios();
             res.json(usuarios);
         } catch (error) {
+            //en caso de algun error retornamos un mensaje de error
             res.status(500).json({ message: 'Error al obtener los usuarios', error: error });
-        }
-    }
-    /* Manejando la solicitud para crear una Usuario
-    metodo asincronico que crea una Usuario */
-    async createUsuario(req, res) {
-        //obtenemos todos los datos del cuerpo de la request
-        const UsuarioData = req.body;
-        //-----------Pendiente validacion de datos------------
-        //Manejo de errores
-        //intentamos crear una Usuario
-        try {
-            //a partir de los datos enviados creamos una Usuario con el modelo de Usuario
-            const newUsuario = await UsuarioModel.createUsuario(UsuarioData);
-            //si al crear una Usuario no genera error, se envia una respuesta con 
-            //status 201 donde se encuentra los datos de la Usuario recien creada en formato json
-            res.status(201).json(newUsuario)
-        } catch (error) {
-            //-----------Pendiente - Manejar error de email duplicado en la base de datos------------
-            //si la request genera un error quedara con un status 500 
-            // y retornara un mensaje de error en formato json
-            res.status(500).json({ message: 'Error creando al Usuario ', error: error.message })
         }
     }
     /* Manejando la solicitud para actualizar una Usuario 
@@ -61,9 +44,11 @@ class UsuarioController {
         const id = req.params.id;
         //obtenemos todos los datos del cuerpo de la request
         const UsuarioData = req.body;
+
         //-----------Pendiente validacion de datos------------
+
         //Manejo de errores
-        //intenamos actualizar una Usuario
+        //intentamos actualizar una Usuario
         try {
             //guardamos el resultado de intentar actualizar a la Usuario, usando su id 
             // y los datos ingresados en la request
@@ -76,7 +61,6 @@ class UsuarioController {
                 res.status(404).json({ message: 'Usuario no encontrada' })
             }
         } catch (error) {
-            //-----------Pendiente - Manejar error de email duplicado en la base de datos------------
             //si la request genera un error quedara con un status 500 
             // y retornara un mensaje de error en formato json
             res.status(500).json({ message: `Error actualizando a la Usuario con el id ${id}`, error: error.message })
@@ -103,30 +87,6 @@ class UsuarioController {
             //si la request genera un error quedara con un status 500 
             // y retornara un mensaje de error en formato json
             res.status(500).json({ message: `Error eliminando a la Usuario con el id ${id}`, error: error.message })
-        }
-    }
-    /* Manejando la solicitud para inciar sesión del usuario
-        Metodo asincronico que logea al usuario*/
-    async loginUsuario(req, res) {
-        //obtenemos el usuario y la contraseña enviada como parametro de la solicitud
-        const email = req.body.email;
-        const password = req.body.password;
-        try {
-            //guardamos el resultado de inicio de sesion
-            const loginUsuario = await UsuarioModel.loginUsuario(email, password);
-
-            if (loginUsuario) {
-                res.json({
-                    id: loginUsuario.IdUsuario,
-                    email: loginUsuario.Email,
-                    rol: loginUsuario.IdRol,
-                    nombre: loginUsuario.Nombres,
-                })
-            } else {
-                res.status(404).json({ message: 'Usuario no encontrado' })
-            }
-        } catch (error) {
-            res.status(500).json({ message: `Usuario o contraseña incorrecto` })
         }
     }
 }

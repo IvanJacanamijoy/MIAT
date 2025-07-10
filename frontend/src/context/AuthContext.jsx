@@ -1,64 +1,92 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
-const AuthProvider = ({ children }) => {
-    const [usuario, setUsuario] = useState(null);
-    const [isLoading, setIsLoading] = useState(true); // Para manejar la carga inicial
+// Mapeo de IDs de rol a nombres de rol
+const roleIdToName = {
+    1: 'usuario', // Asegúrate que esto coincida con tus rutas (ej. /administrar)
+    2: 'tecnico',    // Asegúrate que esto coincida con tus rutas (ej. /tecnico)
+    3: 'admin'     // Asegúrate que esto coincida con tus rutas (ej. /usuario)
+};
+
+export const AuthProvider = ({ children }) => {
+    const [usuario, setUsuario] = useState(null); // Contendrá { id, email, rol: 'nombre_rol', nombre }
+    const [authToken, setAuthToken] = useState(localStorage.getItem('token')); // El token JWT en bruto
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const usuarioLogueado = localStorage.getItem('usuario');
-        if (usuarioLogueado) {
-            try {
-                setUsuario(JSON.parse(usuarioLogueado));
-            } catch (error) {
-                console.error("Error al parsear el usuario del localStorage:", error);
-                // Si hay un error al parsear, eliminamos la entrada inválida
-                localStorage.removeItem('usuario');
-            }
-        }
-        setIsLoading(false); // La carga inicial ha terminado
-    }, []);
-
-    const iniciarSesion = (datosUsuario) => {
-        localStorage.setItem('usuario', JSON.stringify(datosUsuario));
-        setUsuario(datosUsuario);
-        navigate(`/${datosUsuario.rol}`);
-    };
-
+    // Función de cierre de sesión centralizada
     const cerrarSesion = () => {
-        localStorage.removeItem('usuario');
-        setUsuario(null);
-        navigate('/');
-    };
-
-    const valorContexto = {
-        usuario,
-        iniciarSesion,
-        cerrarSesion,
-        isLoading // Exponemos el estado de carga
-    };
-
-    if (isLoading) {
-        // Puedes mostrar un indicador de carga aquí, por ejemplo:
-        return <div>Cargando...</div>; // O un componente más elaborado
+        console.log("Cerrando sesión...");
+        setAuthToken(null);
+        setUsuario(null); // Limpia el estado del usuario en el contexto
+        localStorage.removeItem('token'); // Solo remueve el token de localStorage
+        navigate('/'); // Redirige a la ruta raíz
     }
+    // Efecto para inicializar el estado del usuario al cargar la aplicación
+    useEffect(() => {
+        if (authToken) {
+            try {
+                const decoded = jwtDecode(authToken);
+                // Opcional: verificar expiración del token aquí
+                if (decoded.exp * 1000 < Date.now()) {
+                    console.log('Token expirado al cargar la aplicación.');
+                    cerrarSesion();
+                    return;
+                }
+                // Mapear el rol numérico a su nombre correspondiente
+                const userRoleName = roleIdToName[decoded.user.rol];
+                if (userRoleName) {
+                    setUsuario({
+                        ...decoded.user, // Copia el resto de las propiedades del payload
+                        rol: userRoleName // Sobrescribe el 'rol' con el nombre
+                    });
+                } else {
+                    console.error('Rol desconocido en el token:', decoded.user.rol);
+                    cerrarSesion();
+                }
+
+            } catch (error) {
+                console.error("Error decodificando token al iniciar:", error);
+                cerrarSesion(); // Limpiar token inválido
+            }
+        } else {
+            setUsuario(null); // Asegura que el usuario sea null si no hay token
+        }
+    }, [authToken]); // Vuelve a ejecutar si el authToken cambia (ej. al hacer login)
+
+    const iniciarSesion = (token) => {
+        setAuthToken(token); // Almacena el token en el estado local
+        localStorage.setItem('token', token); // Persiste el token en localStorage
+
+        try {
+            const decoded = jwtDecode(token);
+            // Mapear el rol numérico a su nombre
+            const userRoleName = roleIdToName[decoded.user.rol];
+            if (userRoleName) {
+                setUsuario({
+                    ...decoded.user,
+                    rol: userRoleName
+                });
+            } else {
+                console.error('Rol desconocido en el token recién recibido:', decoded.user.rol);
+                cerrarSesion(); // Invalidar sesión si el rol es desconocido
+            }
+        } catch (error) {
+            console.error("Error decodificando el nuevo token:", error);
+            cerrarSesion(); // Limpiar si el token es inválido
+        }
+    };
 
     return (
-        <AuthContext.Provider value={valorContexto}>
+        <AuthContext.Provider value={{ usuario, iniciarSesion, cerrarSesion, authToken }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-const useAuth = () => {
-    const contexto = useContext(AuthContext);
-    if (!contexto) {
-        throw new Error('useAuth debe ser usado dentro de un AuthProvider');
-    }
-    return contexto;
+export const useAuth = () => {
+    return useContext(AuthContext);
 };
-
-export { AuthProvider, useAuth };

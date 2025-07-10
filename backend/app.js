@@ -8,8 +8,15 @@ const cors = require('cors');
 const app = express();
 //importamos las rutas de usuario
 const usuarioRouter = require('./routes/usuarioRoutes');
+//importamos las rutas de usuario autenticacion
+const authRouter = require('./routes/authRoutes');
+//importamos las rutas de servicios
+const servicioRouter = require('./routes/servicioRoutes');
+//importamos las rutas de visitas tecnicas
+const visitaTecnicaRouter = require('./routes/VisitaTecnicaRoutes')
+
 //inicializamos knex
-const knex = require('knex')(require('./knexfile').development);
+const knex = require('knex')(require('./config/knexfile').development);
 //puerto del proyecto
 const PORT = process.env.PORT;
 
@@ -17,8 +24,14 @@ const PORT = process.env.PORT;
 app.use(cors());
 app.use(express.json());
 
+// Rutas de autenticacion (login, registro)
+app.use('/auth', authRouter)
 // Rutas de usuario
 app.use('/usuarios', usuarioRouter);
+// Rutas de servicios
+app.use('/servicios', servicioRouter);
+// Rutas de visitas tecnicas
+app.use('/visitatecnica', visitaTecnicaRouter);
 
 // Probando ruta de prueba
 app.use('/prueba', (req, res) => {
@@ -47,8 +60,8 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({
         message: 'Hay algun error en la ruta ingresada'
-    })
-})
+    });
+});
 
 
 

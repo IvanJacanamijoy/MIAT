@@ -1,5 +1,5 @@
 //importamos knex y pasamos la configuracion para la conexion a la base de datos
-const knex = require('knex')(require('../knexfile').development);
+const knex = require('knex')(require('../config/knexfile').development);
 //importamos bcrypt para encriptar las contraseñas
 const bcrypt = require('bcrypt')
 
@@ -18,9 +18,27 @@ class UsuarioModel {
             return 'Error buscando Usuario con id ' + id + ': ' + error;
         }
     }
+    /*Obtener una Usuario por su email 
+    funcion asincrona que busca a un usuario por su email*/
+    async getUsuarioByEmail(email) {
+        /* Manejamos algun posible error */
+        try {
+            // lanzamos la consulta y en caso de que haya algun resultado se retornara el resultado de dicha consulta
+            const resultQuery = knex('usuario').where({ Email: email }).first();
+            if (resultQuery) {
+                return resultQuery;
+            } else {
+                // en caso de que no se haya encontrado ningun usuario retornara un mensaje indicando que no se encontro ningun usuario
+                return false;
+            }
+        } catch (error) {
+            return error;
+        }
+    }
+
     /* Obtener todos los usuarios
     funcion asincrona que espera todos los usuarios*/
-    async getTodosLosUsuarios(){
+    async getAllUsuarios() {
         try {
             const dataUsers = await knex('usuario').select('*');
             return dataUsers;
@@ -55,7 +73,7 @@ class UsuarioModel {
                 direccion: UsuarioData.Direccion,
                 telefono: UsuarioData.Telefono,
                 IdRol: UsuarioData.IdRol,
-                IdEstado: UsuarioData.IdEstado,
+                IdEstado: 1,
             });
             //guardamos la Usuario recien creada ejecutando una consulta
             const newUsuario = this.getUsuarioById(IdUsuario);
@@ -97,8 +115,7 @@ class UsuarioModel {
             return 'Error al eliminar la Usuario con el ' + id + ': ' + error;
         }
     }
-
-    /* Lugin del usuario
+    /* Login del usuario
         funcion asincrona para buscar un usuario por email y verificar contraseña */
     async loginUsuario(email, password) {
         try {
@@ -112,12 +129,10 @@ class UsuarioModel {
 
             // 2. Comparar la contraseña ingresada con el hash almacenado en la base de datos.
             const contraseñaCoincide = await bcrypt.compare(password, usuario.Contraseña);
-
             // Si las contraseñas coinciden, retornar la información del usuario.
             if (contraseñaCoincide) {
                 return this.getUsuarioById(usuario.IdUsuario); // Asumiendo que tienes este método
             }
-
             // Si la contraseña no coincide, retornar false.
             return false;
         } catch (error) {
