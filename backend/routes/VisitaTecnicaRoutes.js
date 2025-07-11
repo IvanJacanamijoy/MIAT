@@ -13,7 +13,7 @@ const { authenticateToken, authorizeRoles } = require('../middleware/authMiddlew
 router.get(
     '/',
     authenticateToken,
-    authorizeRoles([3]),
+    authorizeRoles([3,2,1]),
     VisitaTecnicaController.getAllVisitasTecnicas
 );
 
