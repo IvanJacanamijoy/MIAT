@@ -11,27 +11,23 @@ import { fetchVisitasTecnicasApi } from '../../service/visitasTecnicas';
 const AdminTechnicalVisits = () => {
   const { usuario, authToken } = useAuth();
   const [visits, setVisits] = useState([]);
-  const [filteredVisits, setFilteredVisits] = useState([]);
   const [selectedVisit, setSelectedVisit] = useState(null);
   const [modalType, setModalType] = useState('');
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     fetchVisitasTecnicasApi(authToken,{}).then((data) => {
+      console.log(data);
       setVisits(data);
-      setFilteredVisits(data);
     });
   }, []);
 
   const handleFilter = (filters) => {
-    const result = visits.filter((visit) => {
-      const matchDate = filters.fecha ? visit.fecha === filters.fecha : true;
-      const matchAddress = filters.direccion
-        ? visit.direccion.toLowerCase().includes(filters.direccion.toLowerCase())
-        : true;
-      return matchDate && matchAddress;
-    });
-    setFilteredVisits(result);
+    console.log(filters)
+    fetchVisitasTecnicasApi(authToken, filters).then((data)=>{
+      setVisits(data);
+      console.log(data.map((visita) => visita.Ident))
+    }).catch('Hubo un error');
   };
 
   const handleOpenModal = (visit, type) => {
@@ -51,7 +47,7 @@ const AdminTechnicalVisits = () => {
       v.id === visitId ? { ...v, estado: "Cancelada" } : v
     );
     setVisits(updated);
-    setFilteredVisits(updated);
+    
   };
 
   const handleReprogramVisit = (updatedVisit) => {
@@ -59,7 +55,7 @@ const AdminTechnicalVisits = () => {
       v.id === updatedVisit.id ? updatedVisit : v
     );
     setVisits(updated);
-    setFilteredVisits(updated);
+    
     handleCloseModal();
   };
 
@@ -68,7 +64,7 @@ const AdminTechnicalVisits = () => {
       v.id === updatedVisit.id ? updatedVisit : v
     );
     setVisits(updated);
-    setFilteredVisits(updated);
+    
     handleCloseModal();
   };
 
@@ -90,14 +86,15 @@ const AdminTechnicalVisits = () => {
         </div>
       </div>
 
-      <div className="relative z-10 bg-black rounded-t-3xl -mt-24 px-4 py-10 mx-10 sm:mx-20 xl:mx-30 text-white shadow-xl">
+      <div className="relative z-10 rounded-t-3xl -mt-24 px-4 py-10 mx-10 text-white">
         <VisitFilterForm onFilter={handleFilter} />
 
         <div className="grid gap-6 mt-6">
-          {filteredVisits.length === 0 ? (
+          {visits.length === 0 ? (
             <p className="text-white">No hay visitas técnicas registradas.</p>
           ) : (
-            filteredVisits.map((visit) => (
+            visits.map((visit) => (
+              
               <VisitCard
                 key={visit.id}
                 visit={visit}

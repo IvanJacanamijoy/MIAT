@@ -17,6 +17,7 @@ class VisitaTecnicaModel {
                 'CS.IdCliente',
                 'CS.IdTecnico',
                 'CS.IdEstado',
+                'Cliente.Identificacion as ClienteIdentificacion',
                 'Cliente.Nombres as ClienteNombres',
                 'Cliente.Apellidos as ClienteApellidos',
                 'Cliente.Email as ClienteEmail',
@@ -36,22 +37,13 @@ class VisitaTecnicaModel {
             .leftJoin('TipoServicio as TS', 'CTS.IdTipoServicio', '=', 'TS.IdTipoServicio');
 
         // Aplicar filtros
-        if (filters.clienteId) {
-            query.where('CS.IdCliente', filters.clienteId);
-        }
-        if (filters.tecnicoId) {
-            // Si el filtro es para un técnico específico (incluyendo null), se aplica.
-            // Si filters.tecnicoId es null, Knex generará `WHERE CS.IdTecnico IS NULL`.
-            query.where('CS.IdTecnico', filters.tecnicoId);
-        }
-        if (filters.estadoId) {
-            query.where('CS.IdEstado', filters.estadoId);
-        }
-        if (filters.citaId) {
-            query.where('CS.IdCita', filters.citaId);
-        }
-        if (filters.tipoServicioId) {
-            query.where('TS.IdTipoServicio', filters.tipoServicioId);
+
+        if (Array.isArray(filters.tipoServicioId) && filters.tipoServicioId.length > 0) {
+            query.whereIn('CS.IdCita', function () {
+                this.select('CTS.IdCita')
+                    .from('CitaTipoServicio as CTS')
+                    .whereIn('CTS.IdTipoServicio', filters.tipoServicioId);
+            });
         }
         if (filters.fecha) {
             query.where('CS.Fecha', filters.fecha);
@@ -59,12 +51,12 @@ class VisitaTecnicaModel {
         if (filters.direccion) {
             query.where('CS.Direccion', 'like', `%${filters.direccion}%`);
         }
-        if (filters.clienteNombres) {
-            query.where('Cliente.Nombres', 'like', `%${filters.clienteNombres}%`);
+        if (filters.clienteIdentificacion && typeof filters.clienteIdentificacion === 'string') {
+            query.whereRaw('LOWER(Cliente.Identificacion) LIKE ?', [`%${filters.clienteIdentificacion.toLowerCase()}%`]);
         }
-        if (filters.tecnicoNombres) {
-            query.where('Tecnico.Nombres', 'like', `%${filters.tecnicoNombres}%`);
-        }
+
+
+
 
 
         // Agrupar por todas las columnas seleccionadas que no son agregaciones
@@ -84,7 +76,8 @@ class VisitaTecnicaModel {
             'Tecnico.Apellidos',
             'Tecnico.Email',
             'Tecnico.Telefono',
-            'EstadoCita.Descripcion'
+            'EstadoCita.Descripcion',
+            'Cliente.Identificacion'
         );
 
         // Ordenamiento
@@ -105,6 +98,8 @@ class VisitaTecnicaModel {
 
         try {
             // console.log('Generated SQL Query (getAll):', query.toString()); // Log de la consulta SQL generada
+            console.log('Consulta SQL generada:', query.toString());
+
             const rows = await query;
             return rows;
         } catch (error) {

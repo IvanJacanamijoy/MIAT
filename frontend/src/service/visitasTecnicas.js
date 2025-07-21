@@ -9,7 +9,6 @@ export const fetchVisitasTecnicasApi = async (authToken, filters = {}) => {
             headers: { Authorization: `Bearer ${authToken}` },
             params: filters // Esto enviará los filtros como query params
         });
-        console.log(response.data)
         return response.data;
     } catch (error) {
         console.error('Error fetching visitas técnicas:', error);
