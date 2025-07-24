@@ -17,7 +17,10 @@ INSERT INTO Estado (Descripcion) VALUES
 ('Activo'),
 ('Inactivo'),
 ('En proceso'),
-('Finalizado');
+('Finalizado'),
+('Pendiente'),
+('Aceptada'),
+('Cancelada');
 
 -- Tabla de usuarios
 CREATE TABLE Usuario (
@@ -40,15 +43,6 @@ INSERT INTO Rol (Descripcion) VALUES
 ('Usuario'),
 ('Técnico'),
 ('Administrador');
-
--- Insertar usuarios (6)
-INSERT INTO Usuario (Nombres, Apellidos, Email, Identificacion, Contraseña, Direccion, Telefono, IdRol, IdEstado) VALUES
-('Ana', 'Lopez', 'ana@example.com', '1001', '$2b$10$uRnbONOXIMeMDN0mlehlUeptx6MrddjFZxJxwhzU2NBnXqeKOwb7K', 'Calle 10 #5', '3120000001', 1, 1),
-('Luis', 'Martinez', 'luis@example.com', '1002', '$2b$10$uRnbONOXIMeMDN0mlehlUeptx6MrddjFZxJxwhzU2NBnXqeKOwb7K', 'Carrera 20 #10', '3120000002', 2, 1),
-('Carla', 'Rojas', 'carla@example.com', '1003', '$2b$10$uRnbONOXIMeMDN0mlehlUeptx6MrddjFZxJxwhzU2NBnXqeKOwb7K', 'Avenida 1 #30', '3120000003', 1, 1),
-('Jorge', 'Gomez', 'jorge@example.com', '1004', '$2b$10$uRnbONOXIMeMDN0mlehlUeptx6MrddjFZxJxwhzU2NBnXqeKOwb7K', 'Transversal 8 #45', '3120000004', 2, 1),
-('Sofia', 'Torres', 'sofia@example.com', '1005', '$2b$10$uRnbONOXIMeMDN0mlehlUeptx6MrddjFZxJxwhzU2NBnXqeKOwb7K', 'Diagonal 12 #60', '3120000005', 1, 1),
-('Andrés', 'Vargas', 'andres@example.com', '1006', '$2b$10$uRnbONOXIMeMDN0mlehlUeptx6MrddjFZxJxwhzU2NBnXqeKOwb7K', 'Calle 15 #90', '3120000006', 2, 1);
 
 -- Tabla de tipos de servicio
 CREATE TABLE TipoServicio (
@@ -133,6 +127,14 @@ CREATE TABLE Servicio (
     FOREIGN KEY (IdEstado) REFERENCES Estado(IdEstado)
 );
 
+INSERT INTO Usuario (Nombres, Apellidos, Email, Identificacion, Contraseña, Direccion, Telefono, IdRol, IdEstado) VALUES
+('Ana', 'Lopez', 'ana@example.com', '1001', '$2b$10$uRnbONOXIMeMDN0mlehlUeptx6MrddjFZxJxwhzU2NBnXqeKOwb7K', 'Calle 10 #5', '3120000001', 1, 1),
+('Luis', 'Martinez', 'luis@example.com', '1002', '$2b$10$uRnbONOXIMeMDN0mlehlUeptx6MrddjFZxJxwhzU2NBnXqeKOwb7K', 'Carrera 20 #10', '3120000002', 2, 1),
+('Carla', 'Rojas', 'carla@example.com', '1003', '$2b$10$uRnbONOXIMeMDN0mlehlUeptx6MrddjFZxJxwhzU2NBnXqeKOwb7K', 'Avenida 1 #30', '3120000003', 1, 1),
+('Jorge', 'Gomez', 'jorge@example.com', '1004', '$2b$10$uRnbONOXIMeMDN0mlehlUeptx6MrddjFZxJxwhzU2NBnXqeKOwb7K', 'Transversal 8 #45', '3120000004', 2, 1),
+('Sofia', 'Torres', 'sofia@example.com', '1005', '$2b$10$uRnbONOXIMeMDN0mlehlUeptx6MrddjFZxJxwhzU2NBnXqeKOwb7K', 'Diagonal 12 #60', '3120000005', 1, 1),
+('Andrés', 'Vargas', 'andres@example.com', '1006', '$2b$10$uRnbONOXIMeMDN0mlehlUeptx6MrddjFZxJxwhzU2NBnXqeKOwb7K', 'Calle 15 #90', '3120000006', 2, 1);
+
 -- Tipos de servicio por servicio
 CREATE TABLE ServicioTipoServicio (
     IdServicio INT,
@@ -197,7 +199,10 @@ INSERT INTO Usuario (Nombres, Apellidos, Email, Identificacion, Contraseña, Dir
 ('Diego', 'Morales', 'diego@example.com', '1013', '$2b$10$uRnbONOXIMeMDN0mlehlUeptx6MrddjFZxJxwhzU2NBnXqeKOwb7K', 'Carrera 40 #2-55', '3120000013', 1, 1),
 ('Paula', 'Jimenez', 'paula@example.com', '1014', '$2b$10$uRnbONOXIMeMDN0mlehlUeptx6MrddjFZxJxwhzU2NBnXqeKOwb7K', 'Avenida 10 #70-20', '3120000014', 2, 1),
 ('Juan', 'Herrera', 'juan@example.com', '1015', '$2b$10$uRnbONOXIMeMDN0mlehlUeptx6MrddjFZxJxwhzU2NBnXqeKOwb7K', 'Transversal 25 #3-01', '3120000015', 1, 1),
-('Gabriela', 'Castro', 'gabriela@example.com', '1016', '$2b$10$uRnbONOXIMeMDN0mlehlUeptx6MrddjFZxJxwhzU2NBnXqeKOwb7K', 'Diagonal 30 #8-75', '3120000016', 3, 1); -- Rol 3 para Administrador
+('Gabriela', 'Castro', 'gabriela@example.com', '1016', '$2b$10$uRnbONOXIMeMDN0mlehlUeptx6MrddjFZxJxwhzU2NBnXqeKOwb7K', 'Diagonal 30 #8-75', '3120000016', 3, 1),
+('Juan', 'Perez Gomez', 'admin@admin.com', '1010101010', '$2b$10$gIGIJUxPIF113akSMaxALuWRTGOSoKrKB8MPHXhiDJRU31dEATPeS', 'Calle Falsa 123, Ciudad', '3001112233', 3, 1), -- Administrador
+('Maria', 'Lopez Rodriguez', 'usuario@usuario.com', '2020202020', '$2b$10$m8UDA.AAbfcpRH9NfJcdxuunfTSsXwWo9AE4Y1X7YdNFPluh2qZxO', 'Avenida Siempre Viva 456, Pueblo', '3104445566', 1, 1), -- Usuario
+('Carlos', 'Garcia Fernandez', 'tecnico@tecnico.com', '3030303030', '$2b$10$Vo.rYFkLqtzJqJJOyyr0SOslC6GlP92UYwgkaT4U2VXu4bcFEbBca', 'Carrera Inventada 789, Villa', '3207778899', 2, 1); -- Tecnico
 
 -- Insertar 15 registros completos de servicios con sus dependencias
 -- Los IDs de inicio para CitaServicio, Diagnostico, Cotizacion y Servicio se ajustan a los datos existentes.
@@ -208,7 +213,7 @@ INSERT INTO Usuario (Nombres, Apellidos, Email, Identificacion, Contraseña, Dir
 
 -- Servicio 1 (IdServicio 5)
 INSERT INTO CitaServicio (Fecha, Hora, Direccion, IdCliente, IdTecnico, IdEstado) VALUES
-('2025-08-05', '09:30:00', 'Calle 10 #5, Apto 201', 7, 8, 3); -- Cliente: Pedro Diaz, Tecnico: Laura Perez
+('2025-08-05', '09:30:00', 'Calle 10 #5, Apto 201', 18, 19, 3); -- Cliente: Pedro Diaz, Tecnico: Laura Perez
 INSERT INTO CitaTipoServicio (IdCita, IdTipoServicio) VALUES (5, 1), (5, 5);
 INSERT INTO Diagnostico (Descripcion, Medidas, Materiales, FotoDiagnostico, IdCita) VALUES
 ('Inspección por bajo voltaje', 'Medición de tensión en puntos clave', 'Multímetro, cables de prueba', 'diag_bajo_voltaje.jpg', 5);
@@ -220,7 +225,7 @@ INSERT INTO ServicioTipoServicio (IdServicio, IdTipoServicio) VALUES (5, 1), (5,
 
 -- Servicio 2 (IdServicio 6)
 INSERT INTO CitaServicio (Fecha, Hora, Direccion, IdCliente, IdTecnico, IdEstado) VALUES
-('2025-08-06', '14:00:00', 'Carrera 30 #5-20, Casa 1', 9, 10, 3); -- Cliente: Carlos Ramirez, Tecnico: Maria Sanchez
+('2025-08-06', '14:00:00', 'Carrera 30 #5-20, Casa 1', 18, 10, 3); -- Cliente: Carlos Ramirez, Tecnico: Maria Sanchez
 INSERT INTO CitaTipoServicio (IdCita, IdTipoServicio) VALUES (6, 2);
 INSERT INTO Diagnostico (Descripcion, Medidas, Materiales, FotoDiagnostico, IdCita) VALUES
 ('Revisión de acometida principal dañada', 'Verificación de empalmes y aislamiento', 'Cinta aislante, conectores', 'diag_acometida_danada.jpg', 6);
@@ -244,7 +249,7 @@ INSERT INTO ServicioTipoServicio (IdServicio, IdTipoServicio) VALUES (7, 3), (7,
 
 -- Servicio 4 (IdServicio 8)
 INSERT INTO CitaServicio (Fecha, Hora, Direccion, IdCliente, IdTecnico, IdEstado) VALUES
-('2024-08-08', '08:00:00', 'Transversal 15 #25-30, Oficina 502', 13, 14, 3); -- Cliente: Diego Morales, Tecnico: Paula Jimenez
+('2024-08-08', '08:00:00', 'Transversal 15 #25-30, Oficina 502', 18, 14, 3); -- Cliente: Diego Morales, Tecnico: Paula Jimenez
 INSERT INTO CitaTipoServicio (IdCita, IdTipoServicio) VALUES (8, 4);
 INSERT INTO Diagnostico (Descripcion, Medidas, Materiales, FotoDiagnostico, IdCita) VALUES
 ('Instalación de puntos de red y tomas', 'Cableado estructurado, canaletas', 'Tomas RJ45, cable UTP', 'diag_red_tomas.jpg', 8);
@@ -268,7 +273,7 @@ INSERT INTO ServicioTipoServicio (IdServicio, IdTipoServicio) VALUES (9, 5);
 
 -- Servicio 6 (IdServicio 10)
 INSERT INTO CitaServicio (Fecha, Hora, Direccion, IdCliente, IdTecnico, IdEstado) VALUES
-('2025-08-10', '09:00:00', 'Calle 35 #50-10, Edificio Principal', 3, 4, 3); -- Cliente: Carla Rojas, Tecnico: Jorge Gomez
+('2025-08-10', '09:00:00', 'Calle 35 #50-10, Edificio Principal', 3, 19, 3); -- Cliente: Carla Rojas, Tecnico: Jorge Gomez
 INSERT INTO CitaTipoServicio (IdCita, IdTipoServicio) VALUES (10, 6);
 INSERT INTO Diagnostico (Descripcion, Medidas, Materiales, FotoDiagnostico, IdCita) VALUES
 ('Mantenimiento preventivo de redes internas', 'Revisión de cableado, limpieza de tableros', 'Limpiador de contactos, bridas', 'diag_mantenimiento.jpg', 10);
@@ -385,9 +390,3 @@ INSERT INTO Cotizacion (CostoMateriales, CostoManoObra, PrecioTotal, Garantia, O
 INSERT INTO Servicio (Descripcion, FotosAntes, FotosDespues, HoraInicial, HoraFinal, Observaciones, IdCliente, IdTecnico, IdCotizacion, IdEstado) VALUES
 ('Adecuación y modernización a normativa', 'antes_normativa.jpg', 'despues_normativa.jpg', '11:00:00', '16:00:00', 'Instalaciones actualizadas y certificadas.', 7, 14, 19, 4);
 INSERT INTO ServicioTipoServicio (IdServicio, IdTipoServicio) VALUES (19, 7), (19, 8);
-
-
-INSERT INTO usuario (Nombres, Apellidos, Email, Identificacion, Contraseña, Direccion, Telefono, IdRol, IdEstado) VALUES
-('Juan', 'Perez Gomez', 'admin@admin.com', '1010101010', '$2b$10$gIGIJUxPIF113akSMaxALuWRTGOSoKrKB8MPHXhiDJRU31dEATPeS', 'Calle Falsa 123, Ciudad', '3001112233', 3, 1), -- Administrador
-('Maria', 'Lopez Rodriguez', 'usuario@usuario.com', '2020202020', '$2b$10$m8UDA.AAbfcpRH9NfJcdxuunfTSsXwWo9AE4Y1X7YdNFPluh2qZxO', 'Avenida Siempre Viva 456, Pueblo', '3104445566', 1, 1), -- Usuario
-('Carlos', 'Garcia Fernandez', 'tecnico@tecnico.com', '3030303030', '$2b$10$Vo.rYFkLqtzJqJJOyyr0SOslC6GlP92UYwgkaT4U2VXu4bcFEbBca', 'Carrera Inventada 789, Villa', '3207778899', 2, 1); -- Tecnico

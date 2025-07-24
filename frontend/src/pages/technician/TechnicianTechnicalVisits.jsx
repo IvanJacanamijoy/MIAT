@@ -8,26 +8,21 @@ import { fetchVisitasTecnicasApi } from '../../service/visitasTecnicas';
 const TechnicianTechnicalVisits = () => {
   const { usuario, authToken } = useAuth();
   const [visits, setVisits] = useState([]);
-  const [filteredVisits, setFilteredVisits] = useState([]);
 
   useEffect(() => {
     if (usuario?.id) {
       fetchVisitasTecnicasApi(authToken,{tecnicoId:usuario.id}).then((data) => {
         setVisits(data);
-        setFilteredVisits(data);
       });
     }
   }, [usuario]);
 
   const handleFilter = (filters) => {
-    const result = visits.filter((visit) => {
-      const matchDate = filters.fecha ? visit.fecha === filters.fecha : true;
-      const matchAddress = filters.direccion
-        ? visit.direccion.toLowerCase().includes(filters.direccion.toLowerCase())
-        : true;
-      return matchDate && matchAddress;
-    });
-    setFilteredVisits(result);
+    console.log(filters)
+    fetchVisitasTecnicasApi(authToken, filters).then((data)=>{
+      setVisits(data);
+      console.log(data.map((visita) => visita.Ident))
+    }).catch('Hubo un error');
   };
 
   return (
@@ -55,10 +50,10 @@ const TechnicianTechnicalVisits = () => {
         <VisitFilterForm onFilter={handleFilter} />
 
         <div className="grid gap-6 mt-6">
-          {filteredVisits.length === 0 ? (
+          {visits.length === 0 ? (
             <p className="text-white">No tienes visitas asignadas.</p>
           ) : (
-            filteredVisits.map((visit) => (
+            visits.map((visit) => (
               <VisitCard
                 key={visit.IdCita}
                 visit={visit}

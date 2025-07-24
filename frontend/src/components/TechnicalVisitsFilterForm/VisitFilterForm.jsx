@@ -1,12 +1,32 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Select from 'react-select';
+import { useAuth } from '../../context/AuthContext';
 
 const VisitFilterForm = ({ onFilter }) => {
-  const [filters, setFilters] = useState({
+  const { usuario } = useAuth();
+  const [admin, setAdmin] = useState(false);
+  const [tecnico, setTecnico] = useState(false);
+
+  //verificamos si el rol del usuario es admin (muestra un filtro mas el cual es el filtro de identificación)
+  useEffect(() => {
+    if (usuario.rol == 'admin') {
+      setAdmin(true);
+    } else if (usuario.rol == 'tecnico') {
+      setTecnico(true);
+    }
+  }, [usuario])
+
+  const [filters, setFilters] = useState(admin ? {
     fecha: '',
     clienteIdentificacion: '',
     tipoServicioId: []
-  });
+  }
+    :
+    {
+      fecha: '',
+      tipoServicioId: []
+    }
+  );
 
   const handleChange = (e) => {
     setFilters({
@@ -21,11 +41,21 @@ const VisitFilterForm = ({ onFilter }) => {
   };
 
   const handleReset = () => {
-    const resetFilters = {
+    //para formatear los filtros verificamos primero si el usuario con la sesion iniciada es admin
+    const resetFilters = admin ? {
       fecha: '',
       clienteIdentificacion: '',
       tipoServicioId: []
-    };
+    }
+      :
+      //si no es admin y su rol es cliente se envia como filtro clienteId: "id del cliente", sino se envia este filtro vacio
+      //si no es admin y su rol es tecnico se envia como filtro tecnicoId: "id del tecnico", sino se envia este filtro vacio
+      {
+        fecha: '',
+        tipoServicioId: [],
+        tecnicoId: tecnico ? usuario.id : '',
+        clienteId: tecnico ? '' : usuario.id,
+      };
     setFilters(resetFilters);
     onFilter(resetFilters);
   };
@@ -64,7 +94,7 @@ const VisitFilterForm = ({ onFilter }) => {
           ? '#e0f2fe' // azul-100
           : 'white',
       color: state.isSelected ? 'white' : '#1f2937', // text-gray-800
-      
+
       padding: '8px 12px',
       cursor: 'pointer',
     }),
@@ -94,7 +124,7 @@ const VisitFilterForm = ({ onFilter }) => {
   return (
     <form onSubmit={handleSubmit} className=" flex flex-col xl:flex-row items-center gap-4 mb-6 bg-gray-700 p-4 rounded-lg text-white">
       <div className="flex flex-col w-full">
-        <label className="mb-1">Filtrar por fecha:</label>
+        <label className="mb-1" >Filtrar por fecha:</label>
         <input
           type="date"
           name="fecha"
@@ -103,18 +133,20 @@ const VisitFilterForm = ({ onFilter }) => {
           className="p-2 bg-white rounded-sm text-neutral-700 w-full"
         />
       </div>
+      {
+        admin ? <div className="flex flex-col w-full">
+          <label className="mb-1">Filtrar por identificación:</label>
+          <input
+            type="text"
+            name="clienteIdentificacion"
+            value={filters.clienteIdentificacion}
+            onChange={handleChange}
+            placeholder="Numero de identificación"
+            className="p-2 bg-white rounded-sm placeholder:text-neutral-500 text-neutral-700"
+          />
+        </div> : ''
+      }
 
-      <div className="flex flex-col w-full">
-        <label className="mb-1">Filtrar por identificación:</label>
-        <input
-          type="text"
-          name="clienteIdentificacion"
-          value={filters.clienteIdentificacion}
-          onChange={handleChange}
-          placeholder="Numero de identificación"
-          className="p-2 bg-white rounded-sm placeholder:text-neutral-500 text-neutral-700"
-        />
-      </div>
       <div className='flex flex-col w-full'>
         <label className="block font-semibold mb-1">Tipo(s) de Servicio</label>
         <Select
@@ -132,14 +164,14 @@ const VisitFilterForm = ({ onFilter }) => {
       <div className="flex gap-2 mt-4 md:mt-6">
         <button
           type="submit"
-          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-bold"
+          className="bg-red-500 hover:bg-red-700 px-4 py-4 rounded font-bold cursor-pointer"
         >
           Filtrar
         </button>
         <button
           type="button"
           onClick={handleReset}
-          className="bg-gray-500 hover:bg-gray-600 px-4 py-2 rounded font-bold"
+          className="bg-gray-500 hover:bg-gray-600 px-4 py-4 rounded font-bold cursor-pointer"
         >
           Limpiar
         </button>

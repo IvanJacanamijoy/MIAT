@@ -12,7 +12,6 @@ import { fetchVisitasTecnicasApi } from '../../service/visitasTecnicas';
 const UserTechnicalVisits = () => {
   const { usuario, authToken } = useAuth();
   const [visits, setVisits] = useState([]);
-  const [filteredVisits, setFilteredVisits] = useState([]);
   const [selectedVisit, setSelectedVisit] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showFormModal, setShowFormModal] = useState(false);
@@ -21,17 +20,35 @@ const UserTechnicalVisits = () => {
     if (usuario?.id) {
       fetchVisitasTecnicasApi(authToken,{clienteId: usuario.id}).then((data) => {
         setVisits(data);
-        setFilteredVisits(data);
       });
     }
   }, [usuario]);
+
+  const handleFilter = (filters) => {
+    console.log(filters)
+    fetchVisitasTecnicasApi(authToken, filters).then((data)=>{
+      setVisits(data);
+    }).catch('Hubo un error');
+  };
+
+  const handleOpenModal = (visit, type) => {
+    setSelectedVisit(visit);
+    setModalType(type);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setModalType('');
+    setSelectedVisit(null);
+  };
 
   const handleCancelVisit = (visitId) => {
     const updated = visits.map((v) =>
       v.id === visitId ? { ...v, estado: "Cancelada" } : v
     );
     setVisits(updated);
-    setFilteredVisits(updated);
+    
   };
 
   const handleReprogramVisit = (updatedVisit) => {
@@ -39,19 +56,8 @@ const UserTechnicalVisits = () => {
       v.id === updatedVisit.id ? updatedVisit : v
     );
     setVisits(updated);
-    setFilteredVisits(updated);
-    setShowModal(false);
-  };
-
-  const handleFilter = (filters) => {
-    const result = visits.filter((visit) => {
-      const matchDate = filters.fecha ? visit.fecha === filters.fecha : true;
-      const matchAddress = filters.direccion
-        ? visit.direccion.toLowerCase().includes(filters.direccion.toLowerCase())
-        : true;
-      return matchDate && matchAddress;
-    });
-    setFilteredVisits(result);
+    
+    handleCloseModal();
   };
 
   const handleSubmitVisit = async (data) => {
@@ -99,19 +105,16 @@ const UserTechnicalVisits = () => {
 
         {/* Lista de visitas */}
         <div className="grid gap-6 mt-6">
-          {filteredVisits.length === 0 ? (
+          {visits.length === 0 ? (
             <p className="text-white">No hay visitas registradas.</p>
           ) : (
-            filteredVisits.map((visit) => (
+            visits.map((visit) => (
               <VisitCard
                 key={visit.id}
                 visit={visit}
                 rol="usuario"
                 onCancel={() => handleCancelVisit(visit.id)}
-                onReprogram={() => {
-                  setSelectedVisit(visit);
-                  setShowModal(true);
-                }}
+                onReprogram={() => handleOpenModal(visit, "reprogramar")}
               />
             ))
           )}

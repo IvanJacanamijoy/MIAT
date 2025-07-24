@@ -48,7 +48,7 @@ const UserFilterForm = () => {
 
     // Filtra por Identificacion
     // 'identificacion' es un string, así que .toLowerCase() funciona
-    const searchTerm = identificacion.toLowerCase(); 
+    const searchTerm = identificacion.toLowerCase();
 
     const result = allUsers.filter(user => {
       // ... el resto de tu lógica de filtro ...
@@ -60,7 +60,7 @@ const UserFilterForm = () => {
     return result;
   }, [allUsers, identificacion, loading]);
 
-   // Manejadores de eventos del formulario
+  // Manejadores de eventos del formulario
   const handleInputChange = useCallback((event) => {
     // Aquí es donde cambiamos la lógica
     // Como solo hay un input manejado por 'identificacion', podemos asignar directamente el 'value'
@@ -122,16 +122,16 @@ const UserFilterForm = () => {
     setUserToEdit(null); // Limpia el usuario a editar
   };
   return (
-    <div className="px-4">
+    <div>
       <form
         key='userFilterForm'
         onSubmit={handleFilterSubmit}
-        className="relative z-10 space-y-4  p-2 rounded-xl border-gray-200 bg-white my-2">
-        <div className="sm:flex">
+        className="relative z-10 space-y-4 mb-6 bg-gray-700 p-4 pt-4 rounded-lg text-white w-full">
+        <div className="sm:flex mt-1">
           <div className='sm:w-[80%] sm:mr-5 sm:'>
             <div key='identificacion' className="space-y-1">
-              <label htmlFor='identificacion' className="block text-md font-semibold text-black">
-                Identificación
+              <label htmlFor='identificacion' className="block mb-1 text-white">
+                Filtrar por identificación:
               </label>
               <input
                 type='text'
@@ -140,21 +140,21 @@ const UserFilterForm = () => {
                 name='identificacion'
                 onChange={handleInputChange}
                 placeholder='Filtrar por identificación'
-                className="mt-1 focus:ring-red-500 focus:border-red-500 block w-full shadow-sm shadow- sm:text-sm border-gray-500 rounded-md placeholder-gray-400 px-2 py-1 bg-white"
+                className="p-2 bg-white rounded-sm placeholder:text-neutral-500 text-neutral-700 w-full"
               />
             </div>
           </div>
-          <div className="flex justify-end gap-2 w-full my-3 h-9 sm:my-0 sm:h-auto sm:w-auto">
+          <div className="flex justify-end gap-2 w-full mt-4 h-9 sm:my-0 sm:h-auto sm:w-auto">
             <button
               type="submit"
-              className={`font-medium bg-red-500 hover:bg-red-600 cursor-pointer text-white h-full px-6 rounded-md transition-colors ${isFilterActive ? 'ring-2 ring-red-500 ring-opacity-50 py-2 sm:m-0' : ''}`}
+              className={`font-medium bg-red-500 hover:bg-red-600 cursor-pointer text-white h-full px-6 rounded-md transition-colors ${isFilterActive ? 'ring-2 ring-red-500 ring-opacity-50 sm:m-0' : ''}`}
             >
               Filtrar
             </button>
             <button
               type="button"
               onClick={handleResetFilters}
-              className="font-medium text-gray-700 hover:bg-gray-200 hover:text-black h-full px-4 rounded-md transition-colors border cursor-pointer border-gray-700 sm:m-0"
+              className="bg-gray-500 hover:bg-gray-600 px-4 rounded-md font-bold cursor-pointer transition-colors"
             >
               Limpiar
             </button>
@@ -166,24 +166,23 @@ const UserFilterForm = () => {
       {loading && <p>Cargando usuarios...</p>}
       {error && <p className="text-red-500">Error: {error}</p>}
       {!loading && !error && (
-        <div>
-          <h2 className="text-2xl font-bold mb-4 text-white">Usuarios</h2>
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-            {filteredUsers.length > 0 ? (
-              filteredUsers.map(user => ( // Aquí usamos filteredUsers
-                <UserCard
-                  key={user.IdUsuario}
-                  user={user} // <--- Pasar 'user' individualmente a UserCard
-                  onEditClick={() => { handleEditClick(user) }}
-                  onToggleStatus={() => { handleEstadoUsuario(user) }}
-                />
 
-              ))
-            ) : (
-              <p>No se han encontrado usuarios que coincidan con los filtros.</p>
-            )}
-          </div>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+          {filteredUsers.length > 0 ? (
+            filteredUsers.map(user => ( // Aquí usamos filteredUsers
+              <UserCard
+                key={user.IdUsuario}
+                user={user} // <--- Pasar 'user' individualmente a UserCard
+                onEditClick={() => { handleEditClick(user) }}
+                onToggleStatus={() => { handleEstadoUsuario(user) }}
+              />
+
+            ))
+          ) : (
+            <p>No se han encontrado usuarios que coincidan con los filtros.</p>
+          )}
         </div>
+
       )}
       <Modal isOpen={isModalOpen} onClose={handleCancelEdit}>
         <UserForm

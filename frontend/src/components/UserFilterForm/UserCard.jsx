@@ -5,7 +5,8 @@ const UserCard = ({ user, onEditClick, onToggleStatus }) => {
     return (
         //importamos los datos del usuario de la sesion
 
-        <div key={user.IdUsuario} className='bg-white rounded-2xl py-4 px-4'>
+        <div key={user.IdUsuario} className='bg-white rounded-2xl py-4 px-4 shadow shadow
+        '>
             <span
                 className={`font-semibold border-2 px-2 rounded-2xl mx-auto ${user.IdRol == 1 ? ' text-blue-500 bg-blue-100' : user.IdRol == 2 ? ' bg-orange-100 text-orange-600' : 'bg-red-100 text-red-500'}`}
             >

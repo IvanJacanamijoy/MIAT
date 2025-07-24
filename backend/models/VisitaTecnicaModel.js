@@ -38,6 +38,14 @@ class VisitaTecnicaModel {
 
         // Aplicar filtros
 
+        if (filters.tecnicoId) {
+            // Si el filtro es para un técnico específico (incluyendo null), se aplica.
+            // Si filters.tecnicoId es null, Knex generará `WHERE CS.IdTecnico IS NULL`.
+            query.where('CS.IdTecnico', filters.tecnicoId);
+        }
+        if (filters.clienteId) {
+            query.where('CS.IdCliente', filters.clienteId);
+        }
         if (Array.isArray(filters.tipoServicioId) && filters.tipoServicioId.length > 0) {
             query.whereIn('CS.IdCita', function () {
                 this.select('CTS.IdCita')
