@@ -2,9 +2,11 @@ import { useState } from "react";
 import Modal from "../../components/common/Modal"; // Asegúrate de que la ruta sea correcta
 import AssignTechnicianForm from "./AssignTechnicianForm"; // Asegúrate de que la ruta sea correcta
 import servicio1 from "../../assets/images/servicecarousel/servicio_1.png"; // Asegúrate de que la ruta sea correcta
+import QuoteForm from "../QuoteFilterForm/QuoteForm";
 
 const VisitCard = ({ visit, rol, onCancel, onReprogram, onAssign }) => {
   const [showModal, setShowModal] = useState(false);
+  const [showModalQuote, setShowModalQuote] = useState(false);
   const [modalType, setModalType] = useState("");
 
   // Safely construct visitDateTime
@@ -42,20 +44,20 @@ const VisitCard = ({ visit, rol, onCancel, onReprogram, onAssign }) => {
   // Formatear la fecha para la visualización
   const formattedDate = visitDateTime && !isNaN(visitDateTime.getTime())
     ? visitDateTime.toLocaleDateString('es-CO', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
     : 'Fecha no disponible';
 
   // Formatear la hora para la visualización
   // La hora se extrae del objeto Date completo, que ahora se construye en la zona horaria local
   const formattedTime = visitDateTime && !isNaN(visitDateTime.getTime())
     ? visitDateTime.toLocaleTimeString('es-CO', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true // Muestra AM/PM
-      })
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true // Muestra AM/PM
+    })
     : 'Hora no disponible';
 
   const handleOpenModal = (type) => {
@@ -63,9 +65,17 @@ const VisitCard = ({ visit, rol, onCancel, onReprogram, onAssign }) => {
     setShowModal(true);
   };
 
+  const handleOpenModalQuote = () => {
+    setShowModalQuote(true);
+  };
+
   const handleCloseModal = () => {
     setShowModal(false);
     setModalType("");
+  };
+
+  const handleCloseModalQuote = () => {
+    setShowModalQuote(false);
   };
 
   // Determinar el nombre completo del cliente
@@ -94,16 +104,15 @@ const VisitCard = ({ visit, rol, onCancel, onReprogram, onAssign }) => {
             </h3>
             <span
               className={`inline-block text-xl px-2 py-1 rounded-full mt-1
-                ${
-                  visit.estado === "En proceso"
-                    ? "bg-blue-200 text-blue-800"
-                    : visit.estado === "Finalizado" // Usar "Finalizado" si ese es el valor de la base de datos
+                ${visit.estado === "En proceso"
+                  ? "bg-blue-200 text-blue-800"
+                  : visit.estado === "Finalizado" // Usar "Finalizado" si ese es el valor de la base de datos
                     ? "bg-green-200 text-green-800"
                     : visit.estado === "Inactivo" // Usar "Inactivo" si ese es el valor de la base de datos para cancelada
-                    ? "bg-red-200 text-red-800"
-                    : visit.estado === "Activo" // Usar "Activo" si ese es el valor de la base de datos para pendiente
-                    ? "bg-yellow-200 text-yellow-800"
-                    : "bg-gray-200 text-gray-800"
+                      ? "bg-red-200 text-red-800"
+                      : visit.estado === "Activo" // Usar "Activo" si ese es el valor de la base de datos para pendiente
+                        ? "bg-yellow-200 text-yellow-800"
+                        : "bg-gray-200 text-gray-800"
                 }
               `}
             >
@@ -132,15 +141,14 @@ const VisitCard = ({ visit, rol, onCancel, onReprogram, onAssign }) => {
         </div>
 
         {/* Botones */}
-        <div className="flex flex-wrap gap-3 mt-4">
+        <div className="flex flex-wrap gap-3 mt-4 justify-around">
           {(rol === "admin" || rol === "usuario") && (
             <>
               <button
-                className={`px-4 py-2 rounded font-bold ${
-                  canModify
+                className={`px-4 py-2 rounded font-bold ${canModify
                     ? "bg-red-500 hover:bg-red-700 text-white cursor-pointer"
                     : "bg-gray-400 text-white cursor-not-allowed"
-                }`}
+                  }`}
                 disabled={!canModify}
                 onClick={() => onCancel?.(visit.IdCita)}
               >
@@ -148,17 +156,24 @@ const VisitCard = ({ visit, rol, onCancel, onReprogram, onAssign }) => {
               </button>
 
               <button
-                className={`px-4 py-2 rounded font-bold ${
-                  canModify
+                className={`px-4 py-2 rounded font-bold ${canModify
                     ? "bg-blue-500 hover:bg-blue-700 cursor-pointer text-white"
                     : "bg-gray-400 text-white cursor-not-allowed"
-                }`}
+                  }`}
                 disabled={!canModify}
                 onClick={() => onReprogram?.(visit)}
               >
                 Reprogramar
               </button>
             </>
+          )}
+          {(rol === "admin" || rol === "tecnico") && (
+            <button className="bg-green-700 hover:bg-green-700/80 text-white cursor-pointer p-2 rounded-md"
+              onClick={() =>
+                handleOpenModalQuote()
+              }>
+              Generar Cotización
+            </button>
           )}
 
           {rol === "admin" && (
@@ -193,6 +208,10 @@ const VisitCard = ({ visit, rol, onCancel, onReprogram, onAssign }) => {
             onCancel={handleCloseModal}
           />
         </div>
+      </Modal>
+      {/* Modal de para generar la cotización */}
+      <Modal isOpen={showModalQuote} onClose={handleCloseModalQuote}>
+        <QuoteForm/>
       </Modal>
     </div>
   );

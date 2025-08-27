@@ -53,7 +53,7 @@ const Navbar = () => {
   } else if (rol === 'tecnico') {
     navigation = [
       { name: 'Inicio', to: '/tecnico' },
-      { name: 'Visitas Asignadas', to: '/tecnico/visitasasignadas ' },
+      { name: 'Visitas Asignadas', to: '/tecnico/visitasasignadas' },
       { name: 'Cotizaciones', to: '/tecnico/cotizaciones' },
       { name: 'Servicios e informes', to: '/tecnico/serviciosinformes' },
     ];
@@ -100,15 +100,15 @@ const Navbar = () => {
               />
               <p className="text-3xl font-bold">MIAT</p>
             </div>
-            <div className="hidden ml-2 sm:ml-6 xl:block bg-red-500 py-3 px-7 rounded-full my-2">
-              <div className="flex space-x-4 items-center">
+            <div className="hidden ml-2 sm:ml-6 xl:block bg-red-700/80 py-3 px-7 rounded-full my-2">
+              <div className="flex space-x-4 items-center px-4">
                 {navigation.map((item) => (
                   <Link
                     key={item.to}
                     to={item.to}
                     className={isActive(item.to)
-                      ? 'bg-white text-black rounded-sm px-2 text-sm font-semibold text-center'
-                      : 'text-black hover:bg-white rounded-sm px-2 text-sm font-semibold text-center '}
+                      ? 'bg-white text-black rounded-sm px-2 text-sm font-semibold text-center py-2'
+                      : 'text-black hover:bg-white rounded-sm px-2 text-sm font-semibold text-center py-2'}
                   >
                     {item.name}
                   </Link>

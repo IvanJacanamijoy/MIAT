@@ -100,7 +100,7 @@ const UserTechnicalVisits = () => {
         </div>
       </div>
 
-      <div className="relative z-10 bg-black rounded-t-3xl -mt-24 px-4 py-10 mx-10 sm:mx-20 xl:mx-30 text-white shadow-xl">
+      <div className="relative z-10 rounded-t-3xl -mt-24 px-4 py-10 mx-10 text-white">
         <VisitFilterForm onFilter={handleFilter} />
 
         {/* Lista de visitas */}
