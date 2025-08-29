@@ -3,6 +3,7 @@ import QuoteCard from "../../components/QuoteFilterForm/QuoteCard";
 import QuoteFilterForm from "../../components/QuoteFilterForm/QuoteFilterForm";
 import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
 import { toast } from "react-toastify";
+import ButtonTechnicalVisits from "../../components/ButtonTechnicalVisits";
 
 const mockQuotes = [
   {
@@ -109,6 +110,7 @@ const AdminQuote = () => {
 
       {/* Filtros + lista */}
       <div className="relative z-10 rounded-t-3xl -mt-24 px-4 py-10 mx-10 text-white">
+    
         
         {/*Formulario de filtros */}
         <QuoteFilterForm onFilter={handleFilter} />
