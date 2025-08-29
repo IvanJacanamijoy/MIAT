@@ -7,6 +7,8 @@ import AssignTechnicianForm from '../../components/TechnicalVisitsFilterForm/Ass
 import { useAuth } from '../../context/AuthContext';
 import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
 import { fetchVisitasTecnicasApi } from '../../service/visitasTecnicas';
+import ButtonTechnicalVisits from '../../components/ButtonTechnicalVisits';
+import { updateVisitaTecnicaApi } from '../../service/visitasTecnicas';
 
 const AdminTechnicalVisits = () => {
   const { usuario, authToken } = useAuth();
@@ -42,20 +44,49 @@ const AdminTechnicalVisits = () => {
     setSelectedVisit(null);
   };
 
-  const handleCancelVisit = (visitId) => {
-    const updated = visits.map((v) =>
-      v.id === visitId ? { ...v, estado: "Cancelada" } : v
-    );
-    setVisits(updated);
-    
+  const handleCancelVisit = async (visitId) => {
+    console.log('Cancel visit with ID:', visitId);
+    const confirmCancel = window.confirm('¿Está seguro que desea cancelar esta visita técnica?');
+    if (!confirmCancel) return;
+
+    try {
+      const response = await updateVisitaTecnicaApi(visitId, { IdEstado: 7 }, authToken);
+      if (response && response.message) {
+        alert(response.message);
+      } else {
+        alert('Visita cancelada.');
+      }
+      // Opcional: refresca la lista de visitas
+      fetchVisitasTecnicasApi(authToken,{}).then((data) => setVisits(data));
+    } catch (error) {
+      alert('Error al cancelar la visita.');
+      console.error(error);
+    }
   };
 
-  const handleReprogramVisit = (updatedVisit) => {
-    const updated = visits.map((v) =>
-      v.id === updatedVisit.id ? updatedVisit : v
-    );
-    setVisits(updated);
-    
+  const handleReprogramVisit = async (updatedVisit) => {
+    try {
+      // Actualiza la visita en el backend
+      const response = await updateVisitaTecnicaApi(
+        updatedVisit.IdCita,
+        {
+          Fecha: updatedVisit.fecha,
+          Hora: updatedVisit.hora,
+        },
+        authToken
+      );
+      if (response && response.message) {
+        alert(response.message);
+      } else {
+        alert('Visita reprogramada.');
+      }
+      // Refresca la lista de visitas
+      const data = await fetchVisitasTecnicasApi(authToken, {});
+      setVisits(data);
+    } catch (error) {
+      alert('Error al reprogramar la visita.');
+      console.error(error);
+    }
     handleCloseModal();
   };
 
@@ -87,6 +118,7 @@ const AdminTechnicalVisits = () => {
       </div>
 
       <div className="relative z-10 rounded-t-3xl -mt-24 px-4 py-10 mx-10 text-white">
+        <ButtonTechnicalVisits/>
         <VisitFilterForm onFilter={handleFilter} />
 
         <div className="grid gap-6 mt-6">
@@ -99,7 +131,7 @@ const AdminTechnicalVisits = () => {
                 key={visit.id}
                 visit={visit}
                 rol="admin"
-                onCancel={() => handleCancelVisit(visit.id)}
+                onCancel={() => handleCancelVisit(visit.IdCita)}
                 onReprogram={() => handleOpenModal(visit, "reprogramar")}
                 onAssign={handleAssignTechnician}
                 onOpenAssignModal={() => handleOpenModal(visit, "asignar")}

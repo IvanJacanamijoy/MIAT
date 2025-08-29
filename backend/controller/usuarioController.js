@@ -89,6 +89,18 @@ class UsuarioController {
             res.status(500).json({ message: `Error eliminando a la Usuario con el id ${id}`, error: error.message })
         }
     }
+    /* Manejando la solicitud para obtener todos los tecnicos del sistema
+    metodo asincronico que obtiene todos los tecnicos del sistema */
+    async getAllTecnicos(req, res) {
+        try {
+            //obtenemos todos los tecnicos a traves del modelo del usuario y respondemos con el resultado
+            const tecnicos = await UsuarioModel.getAllTecnicos();
+            res.json(tecnicos);
+        } catch (error) {
+            //en caso de algun error retornamos un mensaje de error
+            res.status(500).json({ error: 'Error al obtener técnicos.' });
+        }
+    }
 }
 //exportamos una instancia de la clase UsuarioController
 module.exports = new UsuarioController();

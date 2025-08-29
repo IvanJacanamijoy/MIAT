@@ -84,6 +84,16 @@ const VisitCard = ({ visit, rol, onCancel, onReprogram, onAssign }) => {
   // Determinar el nombre completo del técnico
   const tecnicoNombreCompleto = visit.tecnico?.nombre || (visit.TecnicoNombres && visit.TecnicoApellidos ? `${visit.TecnicoNombres} ${visit.TecnicoApellidos}` : 'Por asignar');
 
+  // Mapeo de estados por IdEstado
+  const estadoMap = {
+    3: { label: "En proceso", color: "bg-blue-200 text-blue-800" },
+    4: { label: "Finalizado", color: "bg-green-200 text-green-800" },
+    5: { label: "Pendiente", color: "bg-yellow-200 text-yellow-800" },
+    6: { label: "Aceptada", color: "bg-purple-200 text-purple-800" },
+    7: { label: "Cancelada", color: "bg-red-200 text-red-800" },
+  };
+
+  const estadoActual = estadoMap[visit.IdEstado] || { label: "Desconocido", color: "bg-gray-200 text-gray-800" };
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col md:flex-row">
@@ -98,31 +108,19 @@ const VisitCard = ({ visit, rol, onCancel, onReprogram, onAssign }) => {
       <div className="w-full md:w-2/3 p-4 flex flex-col justify-between">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3">
           <div>
-            {/* Asumiendo que `visit.TiposServicioCita` es el nombre del servicio o una lista */}
             <h3 className="font-semibold text-lg text-black">
               {visit.TiposServicioCita || "Servicio General"}
             </h3>
             <span
-              className={`inline-block text-xl px-2 py-1 rounded-full mt-1
-                ${visit.estado === "En proceso"
-                  ? "bg-blue-200 text-blue-800"
-                  : visit.estado === "Finalizado" // Usar "Finalizado" si ese es el valor de la base de datos
-                    ? "bg-green-200 text-green-800"
-                    : visit.estado === "Inactivo" // Usar "Inactivo" si ese es el valor de la base de datos para cancelada
-                      ? "bg-red-200 text-red-800"
-                      : visit.estado === "Activo" // Usar "Activo" si ese es el valor de la base de datos para pendiente
-                        ? "bg-yellow-200 text-yellow-800"
-                        : "bg-gray-200 text-gray-800"
-                }
-              `}
+              className={`inline-block text-xl px-2 py-1 rounded-full mt-1 ${estadoActual.color}`}
             >
-              {visit.estado || "Pendiente"}
+              {estadoActual.label}
             </span>
           </div>
         </div>
 
         {/* Información */}
-        <div className="bg-gray-200 p-3 rounded text-base">
+        <div className="bg-gray-200 p-3 rounded text-base my-auto">
           <p className="text-black">
             <strong>Dirección:</strong> {visit.Direccion}
           </p>
@@ -141,52 +139,56 @@ const VisitCard = ({ visit, rol, onCancel, onReprogram, onAssign }) => {
         </div>
 
         {/* Botones */}
-        <div className="flex flex-wrap gap-3 mt-4 justify-around">
-          {(rol === "admin" || rol === "usuario") && (
-            <>
-              <button
-                className={`px-4 py-2 rounded font-bold ${canModify
+        {visit.IdEstado !== 7 && (
+          <div className="flex flex-wrap gap-3 mt-4 justify-around">
+
+
+            {(rol === "admin" || rol === "usuario") && (
+              <>
+                <button
+                  className={`px-4 py-2 rounded font-bold ${canModify
                     ? "bg-red-500 hover:bg-red-700 text-white cursor-pointer"
                     : "bg-gray-400 text-white cursor-not-allowed"
-                  }`}
-                disabled={!canModify}
-                onClick={() => onCancel?.(visit.IdCita)}
-              >
-                Cancelar
-              </button>
+                    }`}
+                  disabled={!canModify}
+                  onClick={() => onCancel?.(visit.IdCita)}
+                >
+                  Cancelar
+                </button>
 
-              <button
-                className={`px-4 py-2 rounded font-bold ${canModify
+                <button
+                  className={`px-4 py-2 rounded font-bold ${canModify
                     ? "bg-blue-500 hover:bg-blue-700 cursor-pointer text-white"
                     : "bg-gray-400 text-white cursor-not-allowed"
-                  }`}
-                disabled={!canModify}
-                onClick={() => onReprogram?.(visit)}
-              >
-                Reprogramar
+                    }`}
+                  disabled={!canModify}
+                  onClick={() => onReprogram?.(visit)}
+                >
+                  Reprogramar
+                </button>
+              </>
+            )}
+            {(rol === "admin" || rol === "tecnico") && (
+              <button className="bg-green-700 hover:bg-green-700/80 text-white cursor-pointer p-2 rounded-md"
+                onClick={() =>
+                  handleOpenModalQuote()
+                }>
+                Generar Cotización
               </button>
-            </>
-          )}
-          {(rol === "admin" || rol === "tecnico") && (
-            <button className="bg-green-700 hover:bg-green-700/80 text-white cursor-pointer p-2 rounded-md"
-              onClick={() =>
-                handleOpenModalQuote()
-              }>
-              Generar Cotización
-            </button>
-          )}
+            )}
 
-          {rol === "admin" && (
-            <button
-              className="px-4 py-2 rounded font-bold bg-blue-500 hover:bg-blue-700 cursor-pointer text-white"
-              onClick={() =>
-                handleOpenModal(visit.IdTecnico ? "reasignar" : "asignar")
-              }
-            >
-              {visit.IdTecnico ? "Reasignar técnico" : "Asignar técnico"}
-            </button>
-          )}
-        </div>
+            {rol === "admin" && (
+              <button
+                className="px-4 py-2 rounded font-bold bg-blue-500 hover:bg-blue-700 cursor-pointer text-white"
+                onClick={() =>
+                  handleOpenModal(visit.IdTecnico ? "reasignar" : "asignar")
+                }
+              >
+                {visit.IdTecnico ? "Reasignar técnico" : "Asignar técnico"}
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Modal de asignación/reasignación */}
@@ -211,7 +213,7 @@ const VisitCard = ({ visit, rol, onCancel, onReprogram, onAssign }) => {
       </Modal>
       {/* Modal de para generar la cotización */}
       <Modal isOpen={showModalQuote} onClose={handleCloseModalQuote}>
-        <QuoteForm/>
+        <QuoteForm />
       </Modal>
     </div>
   );

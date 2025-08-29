@@ -1,6 +1,9 @@
 const knex = require('knex')(require('../config/knexfile').development);
 
 class VisitaTecnicaModel {
+    constructor() {
+        this.tableName = 'CitaServicio';
+    }
     /**
  * Obtiene todas las citas de servicio con filtros y opciones de ordenamiento.
  * @param {object} filters - Objeto con los filtros a aplicar (e.g., { clienteId: 1, tecnicoId: 2, estadoId: 1, citaId: 5 }).

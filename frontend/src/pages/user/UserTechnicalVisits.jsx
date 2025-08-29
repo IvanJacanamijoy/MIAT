@@ -7,6 +7,7 @@ import Modal from "../../components/common/Modal";
 import ReprogramVisitForm from "../../components/TechnicalVisitsFilterForm/ReprogramVisitForm";
 import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
 import { fetchVisitasTecnicasApi } from '../../service/visitasTecnicas';
+import ButtonTechnicalVisits from "../../components/ButtonTechnicalVisits";
 
 
 const UserTechnicalVisits = () => {
@@ -101,6 +102,7 @@ const UserTechnicalVisits = () => {
       </div>
 
       <div className="relative z-10 rounded-t-3xl -mt-24 px-4 py-10 mx-10 text-white">
+        <ButtonTechnicalVisits />
         <VisitFilterForm onFilter={handleFilter} />
 
         {/* Lista de visitas */}

@@ -16,6 +16,8 @@ router.get('/:id',authenticateToken, authorizeRoles([3]), usuarioController.getU
 router.put('/:id',authenticateToken, authorizeRoles([3]), usuarioController.updateUsuario);
 // DELETE -> ruta para eliminar un usuario por su id
 router.delete('/:id',authenticateToken, authorizeRoles([3]), usuarioController.deleteUsuario);
+// GET -> ruta que obtiene todos los tecnicos
+router.get('/tecnicos', usuarioController.getAllTecnicos);
 
 //exportamos el modulo router
 module.exports = router;

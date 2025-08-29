@@ -30,7 +30,7 @@ router.get(
 // Acceso: Administrador o Cliente (para sí mismo)
 router.post(
     '/',
-    authenticateToken, authorizeRoles([3]),
+    authenticateToken, authorizeRoles([3,1]),
     authorizeRoles([3, 1]), // Un cliente puede crear una cita, pero el controlador valida que sea para sí mismo
     VisitaTecnicaController.createVisitaTecnica
 );
