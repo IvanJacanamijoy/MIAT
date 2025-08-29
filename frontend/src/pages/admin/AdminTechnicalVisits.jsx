@@ -9,6 +9,7 @@ import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
 import { fetchVisitasTecnicasApi } from '../../service/visitasTecnicas';
 import ButtonTechnicalVisits from '../../components/ButtonTechnicalVisits';
 import { updateVisitaTecnicaApi } from '../../service/visitasTecnicas';
+import { fetchTecnicosApi } from '..//../service/users';
 
 const AdminTechnicalVisits = () => {
   const { usuario, authToken } = useAuth();
@@ -16,11 +17,17 @@ const AdminTechnicalVisits = () => {
   const [selectedVisit, setSelectedVisit] = useState(null);
   const [modalType, setModalType] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [technicians, setTechnicians] = useState([]);
 
   useEffect(() => {
     fetchVisitasTecnicasApi(authToken,{}).then((data) => {
-      console.log(data);
       setVisits(data);
+    });
+    fetchTecnicosApi(authToken).then((data) => {
+      console.log('Fetched technicians:', data);
+      setTechnicians(data);
+    }).catch((error) => {
+      console.error('Error fetching technicians:', error);
     });
   }, []);
 
@@ -90,13 +97,42 @@ const AdminTechnicalVisits = () => {
     handleCloseModal();
   };
 
-  const handleAssignTechnician = (updatedVisit) => {
-    const updated = visits.map((v) =>
-      v.id === updatedVisit.id ? updatedVisit : v
-    );
-    setVisits(updated);
-    
+  // Función para asignar técnico
+  const handleAssignTechnician = async (updatedVisit) => {
+    try {
+      const response = await updateVisitaTecnicaApi(
+        updatedVisit.IdCita,
+        {
+          IdTecnico: updatedVisit.tecnico.IdUsuario,
+          IdEstado: 3 // "En proceso" o el estado que corresponda
+        },
+        authToken
+      );
+      if (response && response.message) {
+        alert(response.message);
+      } else {
+        alert('Técnico asignado.');
+      }
+      // Refresca la lista de visitas
+      const data = await fetchVisitasTecnicasApi(authToken, {});
+      setVisits(data);
+    } catch (error) {
+      alert('Error al asignar el técnico.');
+      console.error(error);
+    }
     handleCloseModal();
+  };
+
+  const handleOpenAssignModal = (visit) => {
+    setSelectedVisit(visit);
+    setModalType("asignar");
+    setShowModal(true);
+  };
+
+  const handleOpenModalQuote = (visit) => {
+    setSelectedVisit(visit);
+    setModalType("cotizacion");
+    setShowModal(true);
   };
 
   return (
@@ -126,22 +162,25 @@ const AdminTechnicalVisits = () => {
             <p className="text-white">No hay visitas técnicas registradas.</p>
           ) : (
             visits.map((visit) => (
-              
               <VisitCard
-                key={visit.id}
+                key={visit.IdCita}
                 visit={visit}
                 rol="admin"
                 onCancel={() => handleCancelVisit(visit.IdCita)}
                 onReprogram={() => handleOpenModal(visit, "reprogramar")}
-                onAssign={handleAssignTechnician}
-                onOpenAssignModal={() => handleOpenModal(visit, "asignar")}
+                onOpenAssignModal={handleOpenAssignModal} // <-- aquí
+                technicians={technicians}
+                selectedVisit={selectedVisit}
+                handleReprogramVisit={handleReprogramVisit}
+                handleAssignTechnician={handleAssignTechnician}
+                handleCloseModal={handleCloseModal}
               />
             ))
           )}
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Modal para reprogramar o asignar técnico */}
       <Modal isOpen={showModal} onClose={handleCloseModal}>
         {modalType === "reprogramar" && selectedVisit && (
           <ReprogramVisitForm
@@ -150,14 +189,10 @@ const AdminTechnicalVisits = () => {
             onCancel={handleCloseModal}
           />
         )}
-
         {modalType === "asignar" && selectedVisit && (
           <AssignTechnicianForm
+            technicians={technicians}
             currentVisit={selectedVisit}
-            technicians={[
-              { id: 1, nombre: "Técnico A" },
-              { id: 2, nombre: "Técnico B" },
-            ]}
             onSubmit={handleAssignTechnician}
             onCancel={handleCloseModal}
           />

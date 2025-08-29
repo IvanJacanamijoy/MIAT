@@ -10,14 +10,14 @@ const { authenticateToken, authorizeRoles } = require('../middleware/authMiddlew
 /* Cada ruta esta protegida con un token de autenticacion y segun el rol que lo solicita*/
 // GET -> ruta que obtiene todos los usuarios
 router.get('/',authenticateToken, authorizeRoles([3]), usuarioController.getAllUsuarios);
+// GET -> ruta que obtiene todos los tecnicos
+router.get('/tecnicos',authenticateToken, authorizeRoles([3]), usuarioController.getAllTecnicos);
 // GET -> ruta para obtener un usuario por id
 router.get('/:id',authenticateToken, authorizeRoles([3]), usuarioController.getUsuarioById);
 // PUT -> ruta para actualizar los datos de un usuario
 router.put('/:id',authenticateToken, authorizeRoles([3]), usuarioController.updateUsuario);
 // DELETE -> ruta para eliminar un usuario por su id
 router.delete('/:id',authenticateToken, authorizeRoles([3]), usuarioController.deleteUsuario);
-// GET -> ruta que obtiene todos los tecnicos
-router.get('/tecnicos', usuarioController.getAllTecnicos);
 
 //exportamos el modulo router
 module.exports = router;

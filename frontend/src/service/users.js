@@ -1,4 +1,3 @@
-
 // src/api/users.js
 const API_BASE_URL = 'http://localhost:3000';
 
@@ -58,7 +57,7 @@ export const updateUserDataApi = async (updatedUser, authToken, currentUser) => 
   const updatedUserRol = updatedUser.IdRol == 3 ? 'admin': 2 ? 'tecnico':'usuario';
   // si el usuario a actualizar es el mismo administrador y el rol es diferente lanzamos un error indicando que no se puede cambiar el rol del usuario con la sesion activa
   if (updatedUser.IdUsuario === currentUser.id && currentUser.rol !== updatedUserRol) {
-    return alert('No puedes cambiar el rol de tu propio usuario, vuelve a interntarlo.');
+    return alert('No puedes cambiar el rol de tu propio usuario, vuelve a interntalo.');
   }
   //realizamos la solicitud al backend con los datos actualizados
   const response = await fetch(`${API_BASE_URL}/usuarios/${updatedUser.IdUsuario}`, {
@@ -89,6 +88,28 @@ export const toggleUserStatusApi = async (user, authToken) => {
   });
   if (!response.ok) {
     throw new Error(`Error al cambiar el estado del usuario: ${response.statusText}`);
+  }
+};
+
+// Función para obtener todos los usuarios con rol de técnico
+export const fetchTecnicosApi = async (authToken) => {
+  const response = await fetch(`${API_BASE_URL}/usuarios/tecnicos`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${authToken}`,
+      'Content-Type': 'application/json',
+    }
+  });
+  if (!response.ok) {
+    throw new Error(`Error al obtener los técnicos: ${response.status} - ${response.statusText}`);
+  }
+  const data = await response.json();
+  if (Array.isArray(data)) {
+    return data;
+  } else if (data && Array.isArray(data.tecnicos)) {
+    return data.tecnicos;
+  } else {
+    throw new Error('Formato de respuesta de la API incorrecto: Se esperaba un array o un objeto con la propiedad "tecnicos".');
   }
 };
 

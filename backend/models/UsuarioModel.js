@@ -51,6 +51,7 @@ class UsuarioModel {
         try {
             // Asumiendo que el IdRol para técnico es 2 (ajusta si es diferente)
             const tecnicos = await knex('usuario').where({ IdRol: 2 }).select('*');
+            
             return tecnicos;
         } catch (error) {
             return 'Error buscando técnicos: ' + error;

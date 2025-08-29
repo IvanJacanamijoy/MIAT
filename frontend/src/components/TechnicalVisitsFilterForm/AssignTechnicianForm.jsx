@@ -12,7 +12,7 @@ const AssignTechnicianForm = ({ technicians = [], currentVisit, onSubmit, onCanc
       return;
     }
 
-    const assignedTech = technicians.find((t) => t.id === selectedTechId);
+    const assignedTech = technicians.find((t) => String(t.IdUsuario) === selectedTechId);
     onSubmit({ ...currentVisit, tecnico: assignedTech });
   };
 
@@ -28,15 +28,15 @@ const AssignTechnicianForm = ({ technicians = [], currentVisit, onSubmit, onCanc
       <div>
         <label className="block font-bold mb-1">Selecciona un técnico:</label>
         <select
+          name="tecnico"
           value={selectedTechId}
-          onChange={(e) => setSelectedTechId(e.target.value)}
-          className="p-2 w-full rounded border"
+          onChange={e => setSelectedTechId(e.target.value)}
           required
         >
-          <option value="">-- Selecciona --</option>
-          {technicians.map((tech) => (
-            <option key={tech.id} value={tech.id}>
-              {tech.nombre}
+          <option value="">Selecciona un técnico</option>
+          {technicians.map(tech => (
+            <option key={tech.IdUsuario} value={String(tech.IdUsuario)}>
+              {tech.Nombres}
             </option>
           ))}
         </select>
