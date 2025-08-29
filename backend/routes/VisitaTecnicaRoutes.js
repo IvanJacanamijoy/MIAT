@@ -52,6 +52,14 @@ router.patch(
     authorizeRoles([3, 2, 1]),
     VisitaTecnicaController.updateVisitaTecnicaStatus
 );
+// PATCH /api/quotes/:id/asignar-tecnico - Asignar o reasignar técnico a una cita
+// Acceso: Técnico (si está disponible), Administrador
+router.patch(
+  '/:id/asignar-tecnico',
+  authenticateToken,
+  authorizeRoles([2, 3]),
+  VisitaTecnicaController.assignTechnicianToVisit
+);
 
 // DELETE /api/quotes/:id - Eliminar una cita
 // Acceso: Solo Administrador

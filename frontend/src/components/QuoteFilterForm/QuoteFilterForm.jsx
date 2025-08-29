@@ -44,13 +44,15 @@ const QuoteFilterForm = ({ onFilter }) => {
     const resetFilters = {
       fecha: "",
       tipoServicioId: [],
-      clienteIdentificacion: admin || tecnico ? "" : undefined,
-      tecnicoId: tecnico ? usuario.id : "",
-      clienteId: cliente ? usuario.id : "",
+      clienteIdentificacion: (admin || tecnico) ? "" : "", // Se limpia siempre como string vacío
+      tecnicoId: tecnico ? usuario.id : null,
+      clienteId: cliente ? usuario.id : null
     };
+
     setFilters(resetFilters);
     onFilter(resetFilters);
   };
+
 
   const opcionesTipoServicio = [
     { value: 1, label: "Aumento de carga" },
@@ -85,8 +87,8 @@ const QuoteFilterForm = ({ onFilter }) => {
       backgroundColor: state.isSelected
         ? "#3b82f6"
         : state.isFocused
-        ? "#e0f2fe"
-        : "white",
+          ? "#e0f2fe"
+          : "white",
       color: state.isSelected ? "white" : "#1f2937",
       padding: "8px 12px",
       cursor: "pointer",

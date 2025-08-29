@@ -1,6 +1,6 @@
 import { useState } from "react";
 import servicio1 from "../../assets/images/servicecarousel/servicio_1.png";
-import Modal from "../common/Modal"; // Ajusta la ruta según dónde tengas el componente Modal
+import Modal from "../common/Modal";
 
 const QuoteCard = ({ quote, rol, onAccept, onReject, onEdit, onComplete, onViewMore }) => {
   const [accionesVisibles, setAccionesVisibles] = useState(true);
@@ -12,36 +12,41 @@ const QuoteCard = ({ quote, rol, onAccept, onReject, onEdit, onComplete, onViewM
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const [isViewMoreModalOpen, setIsViewMoreModalOpen] = useState(false);
 
-  // Extraer datos de la visita técnica
-  const visita = quote.visitaTecnica || {};
-  const clienteNombre = visita.clienteNombre || "No disponible";
-  const direccion = visita.direccion || "No disponible";
-  const tecnico = visita.tecnicoNombre || "No asignado";
-  const servicios = Array.isArray(visita.servicio)
-    ? visita.servicio.join(", ")
-    : visita.servicio || "No especificado";
+  // Datos extraídos directamente del modelo
+  const clienteNombre = `${quote.ClienteNombres || ""} ${quote.ClienteApellidos || ""}`.trim() || "No disponible";
+  const tecnicoNombre = quote.TecnicoNombres ? `${quote.TecnicoNombres} ${quote.TecnicoApellidos}` : "No asignado";
+  const direccion = quote.Direccion || "No disponible";
+  const servicios = quote.TiposServicioCita || "No especificado";
+  const estado = quote.EstadoDescripcion || "Desconocido";
 
-  // Formatear fecha y hora
-  let visitDateTime = null;
-  if (visita.fecha && visita.hora) {
-    const datePart = visita.fecha.split("T")[0] || visita.fecha;
-    const timePart = visita.hora || "";
-    const parsedDate = new Date(`${datePart}T${timePart}`);
-    if (!isNaN(parsedDate.getTime())) {
-      visitDateTime = parsedDate;
+  // ✅ Formatear fecha y hora correctamente
+  let formattedDate = "Fecha no disponible";
+  let formattedTime = "Hora no disponible";
+
+  if (quote.Fecha && quote.Hora) {
+    try {
+      const baseDate = new Date(quote.Fecha); // ISO con zona horaria
+      const [hours, minutes, seconds] = quote.Hora.split(":").map(Number);
+
+      baseDate.setHours(hours);
+      baseDate.setMinutes(minutes);
+      baseDate.setSeconds(seconds || 0);
+
+      formattedDate = baseDate.toLocaleDateString("es-CO", {
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      });
+
+      formattedTime = baseDate.toLocaleTimeString("es-CO", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
+      });
+    } catch (error) {
+      console.warn("Error al formatear fecha/hora:", error);
     }
   }
-
-  const formattedDate = visitDateTime
-    ? visitDateTime.toLocaleDateString("es-CO", { year: "numeric", month: "long", day: "numeric" })
-    : "Fecha no disponible";
-
-  const formattedTime = visitDateTime
-    ? visitDateTime.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit", hour12: true })
-    : "Hora no disponible";
-
-  // Estado de la cotización (puede venir como `status` o `estado`)
-  const estado = quote.status || quote.estado || "Desconocido";
 
   // Colores de estado
   const estadoColor =
@@ -49,7 +54,7 @@ const QuoteCard = ({ quote, rol, onAccept, onReject, onEdit, onComplete, onViewM
       ? "bg-blue-200 text-blue-800"
       : estado === "Completada" || estado === "Finalizado"
       ? "bg-green-200 text-green-800"
-      : estado === "Rechazada" || estado === "Inactivo"
+      : estado === "Rechazada" || estado === "Cancelada" || estado === "Inactivo"
       ? "bg-red-200 text-red-800"
       : estado === "Aceptada" || estado === "Activo"
       ? "bg-yellow-200 text-yellow-800"
@@ -79,8 +84,8 @@ const QuoteCard = ({ quote, rol, onAccept, onReject, onEdit, onComplete, onViewM
         {/* Información */}
         <div className="bg-gray-200 p-3 rounded text-base">
           {rol === "cliente" && (
-            <p className={tecnico === "No asignado" ? "text-red-500" : "text-black"}>
-              <strong>Técnico:</strong> {tecnico}
+            <p className={tecnicoNombre === "No asignado" ? "text-red-500" : "text-black"}>
+              <strong>Técnico:</strong> {tecnicoNombre}
             </p>
           )}
           {rol === "admin" && (
@@ -88,8 +93,8 @@ const QuoteCard = ({ quote, rol, onAccept, onReject, onEdit, onComplete, onViewM
               <p className="text-black">
                 <strong>Solicitante:</strong> {clienteNombre}
               </p>
-              <p className={tecnico === "No asignado" ? "text-red-500" : "text-black"}>
-                <strong>Técnico:</strong> {tecnico}
+              <p className={tecnicoNombre === "No asignado" ? "text-red-500" : "text-black"}>
+                <strong>Técnico:</strong> {tecnicoNombre}
               </p>
             </>
           )}
@@ -162,23 +167,27 @@ const QuoteCard = ({ quote, rol, onAccept, onReject, onEdit, onComplete, onViewM
       </Modal>
 
       <Modal isOpen={isRejectModalOpen} onClose={() => setIsRejectModalOpen(false)}>
-        <h2 className="text-lg font-bold mb-4">Rechazar cotización</h2>
-        <p>¿Confirmas que deseas rechazar esta cotización?</p>
+        <h2 className="text-lg font-bold mb-4 text-black">Rechazar cotización</h2>
+        <p className="text-black">¿Confirmas que deseas rechazar esta cotización?</p>
       </Modal>
 
       <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
-        <h2 className="text-lg font-bold mb-4">Editar cotización</h2>
-        <p>Aquí irá el formulario de edición de la cotización.</p>
+        <h2 className="text-lg font-bold mb-4 text-black">Editar cotización</h2>
+        <p className="text-black">Aquí irá el formulario de edición de la cotización.</p>
       </Modal>
 
       <Modal isOpen={isCompleteModalOpen} onClose={() => setIsCompleteModalOpen(false)}>
-        <h2 className="text-lg font-bold mb-4">Completar servicio</h2>
-        <p>¿Deseas marcar este servicio como completado?</p>
+        <h2 className="text-lg font-bold mb-4 text-black">Completar servicio</h2>
+        <p className="text-black">¿Deseas marcar este servicio como completado?</p>
       </Modal>
 
       <Modal isOpen={isViewMoreModalOpen} onClose={() => setIsViewMoreModalOpen(false)}>
-        <h2 className="text-lg font-bold mb-4">Detalles de la cotización</h2>
-        <p>Aquí se mostrarán más detalles de la cotización.</p>
+        <h2 className="text-lg font-bold mb-4 text-black">Detalles de la cotización</h2>
+        <p className="text-black"><strong>Diagnóstico:</strong> {quote.DiagnosticoDescripcion}</p>
+        <p className="text-black"><strong>Materiales:</strong> {quote.Materiales}</p>
+        <p className="text-black"><strong>Medidas:</strong> {quote.Medidas}</p>
+        <p className="text-black"><strong>Garantía:</strong> {quote.Garantia}</p>
+        <p className="text-black"><strong>Observaciones:</strong> {quote.Observaciones}</p>
       </Modal>
     </div>
   );

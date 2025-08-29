@@ -255,6 +255,12 @@ class VisitaTecnicaModel {
             throw error;
         }
     }
+    // Asignar técnico a una cita
+    async assignTechnician(IdCita, IdTecnico) {
+        return await knex('CitaServicio')
+            .where('IdCita', IdCita)
+            .update({ IdTecnico });
+    }
 
 }
 module.exports = new VisitaTecnicaModel();

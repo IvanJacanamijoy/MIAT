@@ -14,16 +14,10 @@ const authRouter = require('./routes/authRoutes');
 const servicioRouter = require('./routes/servicioRoutes');
 //importamos las rutas de visitas tecnicas
 const visitaTecnicaRouter = require('./routes/VisitaTecnicaRoutes')
-<<<<<<< HEAD
 //importamos las rutas de diagnostico
 const diagnosticoRouter = require('./routes/diagnosticoRoutes');
 //importamos las rutas de cotizacion
 const cotizacionRouter = require('./routes/cotizacionRoutes');
-=======
-//importamos las rutas de cotizaciones
-const quoteRouter = require('./routes/QuoteRoutes');
-
->>>>>>> 25ae640b1856a7b9cb70bb5ad887baf352efd09f
 
 //inicializamos knex
 const knex = require('knex')(require('./config/knexfile').development);
@@ -42,15 +36,10 @@ app.use('/usuarios', usuarioRouter);
 app.use('/servicios', servicioRouter);
 // Rutas de visitas tecnicas
 app.use('/visitatecnica', visitaTecnicaRouter);
-<<<<<<< HEAD
 // Rutas de diagnostico
 app.use('/diagnostico', diagnosticoRouter);
 // Rutas de cotizacion
 app.use('/cotizaciones', cotizacionRouter);
-=======
-// Rutas de cotizaciones
-app.use('/cotizaciones', quoteRouter);
->>>>>>> 25ae640b1856a7b9cb70bb5ad887baf352efd09f
 
 // Probando ruta de prueba
 app.use('/prueba', (req, res) => {

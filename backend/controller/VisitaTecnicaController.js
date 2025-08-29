@@ -1,4 +1,5 @@
 const visitaTecnicaModel = require('../models/VisitaTecnicaModel'); // Importa tu modelo de citas
+const usuario = require('../models/UsuarioModel'); // Importa tu modelo de usuarios
 
 class VisitaTecnicaController {
     /**
@@ -45,20 +46,20 @@ class VisitaTecnicaController {
      */
     async getAllVisitasTecnicas(req, res) {
         try {
-        const filters = req.query; // Aquí se capturan los query params
-        const options = {
-            orderBy: req.query.orderBy,
-            orderDirection: req.query.orderDirection,
-            limit: req.query.limit ? parseInt(req.query.limit) : undefined,
-            offset: req.query.offset ? parseInt(req.query.offset) : undefined,
-        };
+            const filters = req.query; // Aquí se capturan los query params
+            const options = {
+                orderBy: req.query.orderBy,
+                orderDirection: req.query.orderDirection,
+                limit: req.query.limit ? parseInt(req.query.limit) : undefined,
+                offset: req.query.offset ? parseInt(req.query.offset) : undefined,
+            };
 
-        const citas = await visitaTecnicaModel.getAll(filters, options);
-        return res.status(200).json(citas);
-    } catch (error) {
-        console.error('Error al obtener citas de servicio:', error);
-        return res.status(500).json({ message: 'Error interno del servidor al obtener citas de servicio', error: error.message });
-    }
+            const citas = await visitaTecnicaModel.getAll(filters, options);
+            return res.status(200).json(citas);
+        } catch (error) {
+            console.error('Error al obtener citas de servicio:', error);
+            return res.status(500).json({ message: 'Error interno del servidor al obtener citas de servicio', error: error.message });
+        }
     }
 
     /**
@@ -72,7 +73,7 @@ class VisitaTecnicaController {
             // Extraemos solo las propiedades que corresponden directamente a la tabla CitaServicio
             // Esto es crucial para evitar que campos como 'tipoServicioIds' se incluyan en el objeto de inserción principal.
             const { Fecha, Hora, Direccion, IdCliente, IdTecnico, IdEstado } = req.body;
-            
+
             // Extraemos tipoServicioIds por separado, ya que va a la tabla intermedia CitaTipoServicio
             const tipoServicioIds = req.body.tipoServicioIds;
 
@@ -172,6 +173,44 @@ class VisitaTecnicaController {
             res.status(500).json({ message: 'Error interno del servidor al actualizar la cita.' });
         }
     }
+
+    async assignTechnicianToVisit(req, res) {
+        console.log(req.body);
+        const { id } = req.params;
+        const { IdTecnico } = req.body;
+
+        try {
+            // Validación básica
+            if (!IdTecnico || isNaN(IdTecnico)) {
+                return res.status(400).json({ message: 'IdTecnico es requerido y debe ser un número válido' });
+            }
+
+            // Verificar existencia de la cita
+            const cita = await visitaTecnicaModel.getById(id);
+            if (!cita) {
+                return res.status(404).json({ message: 'La cita no existe' });
+            }
+
+            // Verificar existencia del técnico y rol
+            const tecnico = await usuario.getUsuarioById(IdTecnico);
+            if (!tecnico || tecnico.IdRol !== 2) {
+                return res.status(404).json({ message: 'El técnico no existe o no tiene el rol adecuado' });
+            }
+
+            // Asignar técnico
+            await visitaTecnicaModel.assignTechnician(id, IdTecnico);
+
+            return res.status(200).json({ message: 'Técnico asignado correctamente' });
+        } catch (error) {
+            console.error('Error al asignar técnico a la cita:', error);
+            return res.status(500).json({
+                message: 'Error interno del servidor al asignar técnico',
+                error: error.message
+            });
+        }
+    }
+
+
 
     /**
      * Actualiza el estado de una cita.

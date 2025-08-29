@@ -20,7 +20,7 @@ const AdminTechnicalVisits = () => {
   const [technicians, setTechnicians] = useState([]);
 
   useEffect(() => {
-    fetchVisitasTecnicasApi(authToken,{}).then((data) => {
+    fetchVisitasTecnicasApi(authToken, {}).then((data) => {
       setVisits(data);
     });
     fetchTecnicosApi(authToken).then((data) => {
@@ -33,7 +33,7 @@ const AdminTechnicalVisits = () => {
 
   const handleFilter = (filters) => {
     console.log(filters)
-    fetchVisitasTecnicasApi(authToken, filters).then((data)=>{
+    fetchVisitasTecnicasApi(authToken, filters).then((data) => {
       setVisits(data);
       console.log(data.map((visita) => visita.Ident))
     }).catch('Hubo un error');
@@ -64,7 +64,7 @@ const AdminTechnicalVisits = () => {
         alert('Visita cancelada.');
       }
       // Opcional: refresca la lista de visitas
-      fetchVisitasTecnicasApi(authToken,{}).then((data) => setVisits(data));
+      fetchVisitasTecnicasApi(authToken, {}).then((data) => setVisits(data));
     } catch (error) {
       alert('Error al cancelar la visita.');
       console.error(error);
@@ -154,7 +154,7 @@ const AdminTechnicalVisits = () => {
       </div>
 
       <div className="relative z-10 rounded-t-3xl -mt-24 px-4 py-10 mx-10 text-white">
-        <ButtonTechnicalVisits/>
+        <ButtonTechnicalVisits />
         <VisitFilterForm onFilter={handleFilter} />
 
         <div className="grid gap-6 mt-6">
@@ -193,9 +193,24 @@ const AdminTechnicalVisits = () => {
           <AssignTechnicianForm
             technicians={technicians}
             currentVisit={selectedVisit}
-            onSubmit={handleAssignTechnician}
+            onSuccess={async () => {
+              try {
+                const updatedVisits = await fetchVisitasTecnicasApi(authToken, {});
+                setVisits(updatedVisits);
+                toast.success("Técnico asignado correctamente");
+              } catch (error) {
+                toast.error("Error al actualizar la lista de visitas");
+                console.error(error);
+              } finally {
+                handleCloseModal(); // Asegura que el modal se cierre pase lo que pase
+              }
+            }}
+
             onCancel={handleCloseModal}
           />
+
+
+
         )}
       </Modal>
     </div>

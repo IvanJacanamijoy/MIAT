@@ -1,20 +1,51 @@
 const express = require('express');
 const router = express.Router();
 const CotizacionController = require('../controller/CotizacionController');
+const { authenticateToken, authorizeRoles } = require('../middleware/authMiddleware');
 
-// Obtener todas las cotizaciones
-router.get('/', CotizacionController.getAllCotizaciones.bind(CotizacionController));
+// 🧾 GET /api/cotizaciones - Obtener todas las cotizaciones
+// Acceso: Cliente, Técnico, Administrador
+router.get(
+  '/',
+  authenticateToken,
+  authorizeRoles([1, 2, 3]),
+  CotizacionController.getAllCotizaciones
+);
 
-// Obtener una cotización por ID
-router.get('/:id', CotizacionController.getCotizacionById.bind(CotizacionController));
+// 📄 GET /api/cotizaciones/:id - Obtener cotización por ID
+// Acceso: Cliente (si es suya), Técnico (si la generó), Administrador
+router.get(
+  '/:id',
+  authenticateToken,
+  authorizeRoles([1, 2, 3]),
+  CotizacionController.getCotizacionById
+);
 
-// Crear una cotización
-router.post('/', CotizacionController.createCotizacion.bind(CotizacionController));
+// 📝 POST /api/cotizaciones - Crear una nueva cotización
+// Acceso: Técnico, Administrador
+router.post(
+  '/',
+  authenticateToken,
+  authorizeRoles([2, 3]),
+  CotizacionController.createCotizacion
+);
 
-// Actualizar una cotización
-router.put('/:id', CotizacionController.updateCotizacion.bind(CotizacionController));
+// ✏️ PUT /api/cotizaciones/:id - Actualizar una cotización
+// Acceso: Técnico (si es el autor), Administrador
+router.put(
+  '/:id',
+  authenticateToken,
+  authorizeRoles([2, 3]),
+  CotizacionController.updateCotizacion
+);
 
-// Eliminar una cotización
-router.delete('/:id', CotizacionController.deleteCotizacion.bind(CotizacionController));
+// ❌ DELETE /api/cotizaciones/:id - Eliminar una cotización
+// Acceso: Solo Administrador
+router.delete(
+  '/:id',
+  authenticateToken,
+  authorizeRoles([3]),
+  CotizacionController.deleteCotizacion
+);
 
 module.exports = router;

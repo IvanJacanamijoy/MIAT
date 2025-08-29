@@ -1,19 +1,41 @@
 import { useState } from 'react';
 import logomiat from "../../assets/images/navbar/logo_miat_rojo.png";
+import { assignTechnicianToVisitApi } from "../../service/visitasTecnicas";
+import { useAuth } from "../../context/AuthContext";
+import { toast } from "react-toastify";
 
-const AssignTechnicianForm = ({ technicians = [], currentVisit, onSubmit, onCancel }) => {
+const AssignTechnicianForm = ({
+  technicians = [],
+  currentVisit,
+  onSuccess,
+  onCancel
+}) => {
   const [selectedTechId, setSelectedTechId] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { authToken } = useAuth();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!selectedTechId) {
-      alert('Debe seleccionar un técnico');
+      toast.warning('Debe seleccionar un técnico');
       return;
     }
 
-    const assignedTech = technicians.find((t) => String(t.IdUsuario) === selectedTechId);
-    onSubmit({ ...currentVisit, tecnico: assignedTech });
+    setLoading(true);
+    try {
+      await assignTechnicianToVisitApi(currentVisit.IdCita, parseInt(selectedTechId), authToken);
+      toast.success('Técnico asignado con éxito');
+
+      if (typeof onSuccess === 'function') {
+        await onSuccess(); // Recarga visitas y cierra modal
+      }
+    } catch (error) {
+      console.error('Asignación fallida:', error);
+      toast.error('Error al asignar técnico');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,11 +54,13 @@ const AssignTechnicianForm = ({ technicians = [], currentVisit, onSubmit, onCanc
           value={selectedTechId}
           onChange={e => setSelectedTechId(e.target.value)}
           required
+          className="w-full p-2 border rounded"
+          disabled={loading}
         >
           <option value="">Selecciona un técnico</option>
           {technicians.map(tech => (
             <option key={tech.IdUsuario} value={String(tech.IdUsuario)}>
-              {tech.Nombres}
+              {tech.Nombres + " " + tech.Apellidos}
             </option>
           ))}
         </select>
@@ -48,14 +72,16 @@ const AssignTechnicianForm = ({ technicians = [], currentVisit, onSubmit, onCanc
           type="button"
           onClick={onCancel}
           className="bg-gray-400 hover:bg-red-500 text-white px-4 py-2 rounded"
+          disabled={loading}
         >
           Cancelar
         </button>
         <button
           type="submit"
-          className="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded"
+          className={`px-4 py-2 rounded text-white ${loading ? 'bg-blue-300' : 'bg-blue-600 hover:bg-blue-800'}`}
+          disabled={loading}
         >
-          {currentVisit.tecnico ? 'Reasignar' : 'Asignar'}
+          {loading ? 'Asignando...' : currentVisit.tecnico ? 'Reasignar' : 'Asignar'}
         </button>
       </div>
     </form>
