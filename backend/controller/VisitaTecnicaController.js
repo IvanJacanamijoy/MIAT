@@ -1,5 +1,6 @@
 const visitaTecnicaModel = require('../models/VisitaTecnicaModel'); // Importa tu modelo de citas
 const usuario = require('../models/UsuarioModel'); // Importa tu modelo de usuarios
+// const diagnostico
 
 class VisitaTecnicaController {
     /**
@@ -78,7 +79,7 @@ class VisitaTecnicaController {
             const tipoServicioIds = req.body.tipoServicioIds;
 
             // Log para depuración: Ver qué se recibe en el body completo
-            console.log('Request Body received:', req.body);
+            // console.log('Request Body received:', req.body);
 
             // Validaciones básicas (puedes expandirlas con librerías como Joi o Express-validator)
             if (!Fecha || !Hora || !Direccion || !IdCliente || !IdEstado) {

@@ -75,6 +75,7 @@ class CotizacionModel {
         }
         if (filters.IdTecnico) {
             query.where('CS.IdTecnico', filters.IdTecnico);
+            console.log('Filtro IdTecnico aplicado:', filters.IdTecnico);
         }
         if (filters.Materiales) {
             query.where('D.Materiales', 'like', `%${filters.Materiales}%`);
@@ -142,7 +143,7 @@ class CotizacionModel {
         }
 
         try {
-            console.log('Consulta SQL generada:', query.toString());
+            // console.log('Consulta SQL generada:', query.toString());
             const rows = await query;
             return rows;
         } catch (error) {

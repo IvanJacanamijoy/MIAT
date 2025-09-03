@@ -14,6 +14,8 @@ const AssignTechnicianForm = ({
   const [loading, setLoading] = useState(false);
   const { authToken } = useAuth();
 
+  const tecnicoActualId = currentVisit?.IdTecnico;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -22,17 +24,24 @@ const AssignTechnicianForm = ({
       return;
     }
 
+    const IdTecnico = parseInt(selectedTechId);
+    if (IdTecnico === tecnicoActualId) {
+      toast.info('Este técnico ya está asignado a la visita');
+      return;
+    }
+
     setLoading(true);
     try {
-      await assignTechnicianToVisitApi(currentVisit.IdCita, parseInt(selectedTechId), authToken);
-      toast.success('Técnico asignado con éxito');
+      await assignTechnicianToVisitApi(currentVisit.IdCita, IdTecnico, authToken);
+      toast.success('Técnico asignado correctamente');
 
       if (typeof onSuccess === 'function') {
-        await onSuccess(); // Recarga visitas y cierra modal
+        console.log("Ejecutando onSuccess desde el formulario");
+        await onSuccess(); // ← padre se encarga de cerrar y recargar
       }
     } catch (error) {
-      console.error('Asignación fallida:', error);
       toast.error('Error al asignar técnico');
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -43,8 +52,16 @@ const AssignTechnicianForm = ({
       <div className="flex flex-col items-center text-center mb-4">
         <img src={logomiat} alt="Logo Miat" className="w-20 h-auto mb-2" />
         <h2 className="text-xl font-bold">
-          {currentVisit.tecnico ? 'Reasignar técnico' : 'Asignar técnico'}
+          {tecnicoActualId ? 'Reasignar técnico' : 'Asignar técnico'}
         </h2>
+        {tecnicoActualId && (
+          <p className="text-sm text-gray-700 mt-1">
+            <strong>Actual:</strong>{" "}
+            {currentVisit.TecnicoNombres
+              ? `${currentVisit.TecnicoNombres} ${currentVisit.TecnicoApellidos}`
+              : "Sin nombre registrado"}
+          </p>
+        )}
       </div>
 
       <div>
@@ -66,7 +83,6 @@ const AssignTechnicianForm = ({
         </select>
       </div>
 
-      {/* Botones */}
       <div className="flex justify-end gap-2 mt-4">
         <button
           type="button"
@@ -78,10 +94,16 @@ const AssignTechnicianForm = ({
         </button>
         <button
           type="submit"
-          className={`px-4 py-2 rounded text-white ${loading ? 'bg-blue-300' : 'bg-blue-600 hover:bg-blue-800'}`}
-          disabled={loading}
+          className={`px-4 py-2 rounded text-white ${
+            loading || (parseInt(selectedTechId) === tecnicoActualId)
+              ? 'bg-blue-300 cursor-not-allowed'
+              : 'bg-blue-600 hover:bg-blue-800'
+          }`}
+          disabled={
+            loading || !selectedTechId || parseInt(selectedTechId) === tecnicoActualId
+          }
         >
-          {loading ? 'Asignando...' : currentVisit.tecnico ? 'Reasignar' : 'Asignar'}
+          {loading ? 'Asignando...' : tecnicoActualId ? 'Reasignar' : 'Asignar'}
         </button>
       </div>
     </form>

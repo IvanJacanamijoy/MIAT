@@ -4,42 +4,63 @@ import VisitFilterForm from '../../components/TechnicalVisitsFilterForm/VisitFil
 import Modal from '../../components/common/Modal';
 import ReprogramVisitForm from '../../components/TechnicalVisitsFilterForm/ReprogramVisitForm';
 import AssignTechnicianForm from '../../components/TechnicalVisitsFilterForm/AssignTechnicianForm';
+import DiagnosticOrQuoteForm from '../../components/DiagnosticOrQuoteForm';
 import { useAuth } from '../../context/AuthContext';
 import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
-import { fetchVisitasTecnicasApi } from '../../service/visitasTecnicas';
+import { fetchVisitasTecnicasApi, updateVisitaTecnicaApi } from '../../service/visitasTecnicas';
+import { fetchTecnicosApi } from '../../service/users';
+import { createDiagnosticoApi } from '../../service/diagnostico';
+import { createCotizacionApi } from '../../service/cotizacion';
 import ButtonTechnicalVisits from '../../components/ButtonTechnicalVisits';
-import { updateVisitaTecnicaApi } from '../../service/visitasTecnicas';
-import { fetchTecnicosApi } from '..//../service/users';
+import { toast } from 'react-toastify';
 
 const AdminTechnicalVisits = () => {
-  const { usuario, authToken } = useAuth();
+  const { authToken } = useAuth();
   const [visits, setVisits] = useState([]);
   const [selectedVisit, setSelectedVisit] = useState(null);
   const [modalType, setModalType] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [technicians, setTechnicians] = useState([]);
+  const [loadingVisits, setLoadingVisits] = useState(false);
+
 
   useEffect(() => {
-    fetchVisitasTecnicasApi(authToken, {}).then((data) => {
-      setVisits(data);
-    });
-    fetchTecnicosApi(authToken).then((data) => {
-      console.log('Fetched technicians:', data);
-      setTechnicians(data);
-    }).catch((error) => {
-      console.error('Error fetching technicians:', error);
-    });
+    refreshVisits();
+    fetchTecnicosApi(authToken)
+      .then(setTechnicians)
+      .catch((error) => {
+        toast.error("Error al cargar técnicos");
+        console.error(error);
+      });
   }, []);
 
-  const handleFilter = (filters) => {
-    console.log(filters)
-    fetchVisitasTecnicasApi(authToken, filters).then((data) => {
-      setVisits(data);
-      console.log(data.map((visita) => visita.Ident))
-    }).catch('Hubo un error');
+  const refreshVisits = async () => {
+    setLoadingVisits(true);
+    try {
+      const updated = await fetchVisitasTecnicasApi(authToken, {});
+      setVisits(updated);
+    } catch (error) {
+      toast.error("Error al actualizar la lista de visitas");
+      console.error(error);
+    } finally {
+      setLoadingVisits(false);
+    }
+  };
+
+
+
+  const handleFilter = async (filters) => {
+    try {
+      const filtered = await fetchVisitasTecnicasApi(authToken, filters);
+      setVisits(filtered);
+    } catch (error) {
+      toast.error("Hubo un error al aplicar los filtros");
+      console.error(error);
+    }
   };
 
   const handleOpenModal = (visit, type) => {
+    console.log("Modal abierto con tipo:", type);
     setSelectedVisit(visit);
     setModalType(type);
     setShowModal(true);
@@ -52,91 +73,79 @@ const AdminTechnicalVisits = () => {
   };
 
   const handleCancelVisit = async (visitId) => {
-    console.log('Cancel visit with ID:', visitId);
-    const confirmCancel = window.confirm('¿Está seguro que desea cancelar esta visita técnica?');
-    if (!confirmCancel) return;
+    const confirm = window.confirm('¿Está seguro que desea cancelar esta visita técnica?');
+    if (!confirm) return;
 
     try {
-      const response = await updateVisitaTecnicaApi(visitId, { IdEstado: 7 }, authToken);
-      if (response && response.message) {
-        alert(response.message);
-      } else {
-        alert('Visita cancelada.');
-      }
-      // Opcional: refresca la lista de visitas
-      fetchVisitasTecnicasApi(authToken, {}).then((data) => setVisits(data));
+      await updateVisitaTecnicaApi(visitId, { IdEstado: 7 }, authToken);
+      toast.success("Visita cancelada");
+      await refreshVisits();
     } catch (error) {
-      alert('Error al cancelar la visita.');
+      toast.error("Error al cancelar la visita");
       console.error(error);
     }
   };
 
   const handleReprogramVisit = async (updatedVisit) => {
     try {
-      // Actualiza la visita en el backend
-      const response = await updateVisitaTecnicaApi(
-        updatedVisit.IdCita,
-        {
-          Fecha: updatedVisit.fecha,
-          Hora: updatedVisit.hora,
-        },
-        authToken
-      );
-      if (response && response.message) {
-        alert(response.message);
-      } else {
-        alert('Visita reprogramada.');
-      }
-      // Refresca la lista de visitas
-      const data = await fetchVisitasTecnicasApi(authToken, {});
-      setVisits(data);
+      await updateVisitaTecnicaApi(updatedVisit.IdCita, {
+        Fecha: updatedVisit.fecha,
+        Hora: updatedVisit.hora,
+      }, authToken);
+      toast.success("Visita reprogramada");
+      await refreshVisits();
     } catch (error) {
-      alert('Error al reprogramar la visita.');
+      toast.error("Error al reprogramar la visita");
       console.error(error);
     }
     handleCloseModal();
   };
 
-  // Función para asignar técnico
-  const handleAssignTechnician = async (updatedVisit) => {
+  const handleAssignTechnician = async ({ IdCita, IdTecnico }) => {
     try {
-      const response = await updateVisitaTecnicaApi(
-        updatedVisit.IdCita,
-        {
-          IdTecnico: updatedVisit.tecnico.IdUsuario,
-          IdEstado: 3 // "En proceso" o el estado que corresponda
-        },
-        authToken
-      );
-      if (response && response.message) {
-        alert(response.message);
-      } else {
-        alert('Técnico asignado.');
-      }
-      // Refresca la lista de visitas
-      const data = await fetchVisitasTecnicasApi(authToken, {});
-      setVisits(data);
+      console.log("Asignando técnico...");
+      await updateVisitaTecnicaApi(IdCita, {
+        IdTecnico,
+        IdEstado: 3,
+      }, authToken);
+      console.log("tecnico asignado");
+      toast.success("Técnico asignado correctamente");
+      await refreshVisits();
+      handleCloseModal();
     } catch (error) {
-      alert('Error al asignar el técnico.');
+      toast.error("Error al asignar el técnico");
       console.error(error);
     }
-    handleCloseModal();
   };
 
-  const handleOpenAssignModal = (visit) => {
-    setSelectedVisit(visit);
-    setModalType("asignar");
-    setShowModal(true);
-  };
 
-  const handleOpenModalQuote = (visit) => {
-    setSelectedVisit(visit);
-    setModalType("cotizacion");
-    setShowModal(true);
+
+  const handleGenerateDiagnosisOrQuote = async (data) => {
+    if (!data?.tipo) {
+      toast.warning("Tipo de acción no definido");
+      return;
+    }
+
+    try {
+      if (data.tipo === "diagnostico") {
+        const response = await createDiagnosticoApi(data, authToken);
+        toast.success(response?.message || "Diagnóstico guardado");
+      } else {
+        const response = await createCotizacionApi(data, authToken);
+        toast.success(response?.message || "Cotización guardada");
+      }
+      await refreshVisits();
+    } catch (error) {
+      toast.error("Error al guardar información");
+      console.error(error);
+    } finally {
+      handleCloseModal();
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-200 relative max-w-7xl mx-auto">
+      {/* Banner */}
       <div className="relative">
         <img
           src={fondo1}
@@ -153,13 +162,17 @@ const AdminTechnicalVisits = () => {
         </div>
       </div>
 
-      <div className="relative z-10 rounded-t-3xl -mt-24 px-4 py-10 mx-10 text-white">
+      {/* Filtros + lista */}
+      <div className="relative z-10 rounded-t-3xl -mt-24 px-4 py-10 mx-10 text-black">
         <ButtonTechnicalVisits />
         <VisitFilterForm onFilter={handleFilter} />
 
         <div className="grid gap-6 mt-6">
-          {visits.length === 0 ? (
-            <p className="text-white">No hay visitas técnicas registradas.</p>
+
+          {loadingVisits ? (
+            <div className="text-center text-gray-700 font-semibold">Actualizando visitas...</div>
+          ) : visits.length === 0 ? (
+            <p>No hay visitas técnicas registradas.</p>
           ) : (
             visits.map((visit) => (
               <VisitCard
@@ -168,19 +181,18 @@ const AdminTechnicalVisits = () => {
                 rol="admin"
                 onCancel={() => handleCancelVisit(visit.IdCita)}
                 onReprogram={() => handleOpenModal(visit, "reprogramar")}
-                onOpenAssignModal={handleOpenAssignModal} // <-- aquí
+                onAssignTechnician={() => handleOpenModal(visit, "asignar")}
+                onGenerateDiagnosis={() => handleOpenModal(visit, "diagnostico")}
+                onGenerateQuote={() => handleOpenModal(visit, "cotizacion")}
                 technicians={technicians}
-                selectedVisit={selectedVisit}
-                handleReprogramVisit={handleReprogramVisit}
-                handleAssignTechnician={handleAssignTechnician}
-                handleCloseModal={handleCloseModal}
               />
             ))
           )}
         </div>
       </div>
 
-      {/* Modal para reprogramar o asignar técnico */}
+      {/* Modal */}
+      {console.log("Renderizando modal tipo:", modalType)}
       <Modal isOpen={showModal} onClose={handleCloseModal}>
         {modalType === "reprogramar" && selectedVisit && (
           <ReprogramVisitForm
@@ -189,30 +201,34 @@ const AdminTechnicalVisits = () => {
             onCancel={handleCloseModal}
           />
         )}
+
         {modalType === "asignar" && selectedVisit && (
           <AssignTechnicianForm
             technicians={technicians}
             currentVisit={selectedVisit}
             onSuccess={async () => {
-              try {
-                const updatedVisits = await fetchVisitasTecnicasApi(authToken, {});
-                setVisits(updatedVisits);
-                toast.success("Técnico asignado correctamente");
-              } catch (error) {
-                toast.error("Error al actualizar la lista de visitas");
-                console.error(error);
-              } finally {
-                handleCloseModal(); // Asegura que el modal se cierre pase lo que pase
-              }
+              console.log("onSuccess ejecutado desde el padre");
+              await refreshVisits();     // ✅ recarga visitas
+              handleCloseModal();        // ✅ cierra el modal
             }}
-
             onCancel={handleCloseModal}
           />
+        )}
 
-
-
+        {["diagnostico", "cotizacion"].includes(modalType) && selectedVisit && (
+          <DiagnosticOrQuoteForm
+            citaId={selectedVisit.IdCita}
+            tipo={modalType}
+            tieneDiagnostico={selectedVisit.TieneDiagnostico}
+            tieneCotizacion={selectedVisit.TieneCotizacion}
+            onSubmit={handleGenerateDiagnosisOrQuote}
+            onCancel={handleCloseModal}
+          />
         )}
       </Modal>
+
+
+
     </div>
   );
 };
