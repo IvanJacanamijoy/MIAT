@@ -11,7 +11,9 @@ class VisitaTecnicaModel {
  * @returns {Promise<Array>} - Una promesa que resuelve con un array de objetos de citas de servicio.
  */
     async getAll(filters = {}, options = {}) {
-        const query = knex(`CitaServicio as CS`)
+        console.log("filtros de las visitas: " + JSON.stringify(filters));
+    
+        const query = knex('CitaServicio as CS')
             .select(
                 'CS.IdCita',
                 'CS.Fecha',
@@ -30,20 +32,35 @@ class VisitaTecnicaModel {
                 'Tecnico.Email as TecnicoEmail',
                 'Tecnico.Telefono as TecnicoTelefono',
                 'EstadoCita.Descripcion as EstadoCitaDescripcion',
-                knex.raw('GROUP_CONCAT(TS.Descripcion SEPARATOR \', \') AS TiposServicioCita')
+                knex.raw('GROUP_CONCAT(TS.Descripcion SEPARATOR \', \') AS TiposServicioCita'),
+                // 👇 Diagnóstico
+                knex.raw(`
+                    EXISTS (
+                        SELECT 1
+                        FROM CitaTipoServicio CTS2
+                        JOIN Diagnostico D ON D.IdCita = CTS2.IdCita
+                        WHERE CTS2.IdCita = CS.IdCita
+                    ) AS TieneDiagnostico
+                `),
+                // 👇 Cotización
+                knex.raw(`
+                    EXISTS (
+                        SELECT 1
+                        FROM CitaTipoServicio CTS2
+                        JOIN Diagnostico D ON D.IdCita = CTS2.IdCita
+                        JOIN Cotizacion C ON C.IdDiagnostico = D.IdDiagnostico
+                        WHERE CTS2.IdCita = CS.IdCita
+                    ) AS TieneCotizacion
+                `)
             )
             .join('Usuario as Cliente', 'CS.IdCliente', '=', 'Cliente.IdUsuario')
-            // CAMBIO CLAVE AQUÍ: De INNER JOIN a LEFT JOIN para incluir citas sin técnico asignado
             .leftJoin('Usuario as Tecnico', 'CS.IdTecnico', '=', 'Tecnico.IdUsuario')
             .join('Estado as EstadoCita', 'CS.IdEstado', '=', 'EstadoCita.IdEstado')
             .leftJoin('CitaTipoServicio as CTS', 'CS.IdCita', '=', 'CTS.IdCita')
             .leftJoin('TipoServicio as TS', 'CTS.IdTipoServicio', '=', 'TS.IdTipoServicio');
-
-        // Aplicar filtros
-
-        if (filters.tecnicoId) {
-            // Si el filtro es para un técnico específico (incluyendo null), se aplica.
-            // Si filters.tecnicoId es null, Knex generará `WHERE CS.IdTecnico IS NULL`.
+    
+        // Filtros
+        if (filters.tecnicoId !== undefined) {
             query.where('CS.IdTecnico', filters.tecnicoId);
         }
         if (filters.clienteId) {
@@ -65,12 +82,44 @@ class VisitaTecnicaModel {
         if (filters.clienteIdentificacion && typeof filters.clienteIdentificacion === 'string') {
             query.whereRaw('LOWER(Cliente.Identificacion) LIKE ?', [`%${filters.clienteIdentificacion.toLowerCase()}%`]);
         }
-
-
-
-
-
-        // Agrupar por todas las columnas seleccionadas que no son agregaciones
+    
+        // Filtro por diagnóstico
+        if (filters.tieneDiagnostico === true) {
+            query.whereExists(function () {
+                this.select('*')
+                    .from('CitaTipoServicio as CTS2')
+                    .join('Diagnostico as D', 'D.IdCita', '=', 'CTS2.IdCita')
+                    .whereRaw('CTS2.IdCita = CS.IdCita');
+            });
+        } else if (filters.tieneDiagnostico === false) {
+            query.whereNotExists(function () {
+                this.select('*')
+                    .from('CitaTipoServicio as CTS2')
+                    .join('Diagnostico as D', 'D.IdCita', '=', 'CTS2.IdCita')
+                    .whereRaw('CTS2.IdCita = CS.IdCita');
+            });
+        }
+    
+        // Filtro por cotización
+        if (filters.tieneCotizacion === true) {
+            query.whereExists(function () {
+                this.select('*')
+                    .from('CitaTipoServicio as CTS2')
+                    .join('Diagnostico as D', 'D.IdCita', '=', 'CTS2.IdCita')
+                    .join('Cotizacion as C', 'C.IdDiagnostico', '=', 'D.IdDiagnostico')
+                    .whereRaw('CTS2.IdCita = CS.IdCita');
+            });
+        } else if (filters.tieneCotizacion === false) {
+            query.whereNotExists(function () {
+                this.select('*')
+                    .from('CitaTipoServicio as CTS2')
+                    .join('Diagnostico as D', 'D.IdCita', '=', 'CTS2.IdCita')
+                    .join('Cotizacion as C', 'C.IdDiagnostico', '=', 'D.IdDiagnostico')
+                    .whereRaw('CTS2.IdCita = CS.IdCita');
+            });
+        }
+    
+        // Agrupamiento
         query.groupBy(
             'CS.IdCita',
             'CS.Fecha',
@@ -90,7 +139,7 @@ class VisitaTecnicaModel {
             'EstadoCita.Descripcion',
             'Cliente.Identificacion'
         );
-
+    
         // Ordenamiento
         const orderBy = options.orderBy || 'CS.Fecha';
         const orderDirection = options.orderDirection || 'DESC';
@@ -98,19 +147,12 @@ class VisitaTecnicaModel {
         if (orderBy === 'CS.Fecha') {
             query.orderBy('CS.Hora', orderDirection);
         }
-
+    
         // Paginación
-        if (options.limit) {
-            query.limit(options.limit);
-        }
-        if (options.offset) {
-            query.offset(options.offset);
-        }
-
+        if (options.limit) query.limit(options.limit);
+        if (options.offset) query.offset(options.offset);
+    
         try {
-            // console.log('Generated SQL Query (getAll):', query.toString()); // Log de la consulta SQL generada
-            console.log('Consulta SQL generada:', query.toString());
-
             const rows = await query;
             return rows;
         } catch (error) {
@@ -118,6 +160,8 @@ class VisitaTecnicaModel {
             throw error;
         }
     }
+    
+    
     /**
      * Obtiene una cita de servicio por su ID.
      * @param {number} id - El ID de la cita.

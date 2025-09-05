@@ -4,6 +4,7 @@ const API_COTIZACIONES_URL = 'http://localhost:3000/cotizaciones'; // Ajusta seg
 
 // 🔍 Obtener cotizaciones con filtros
 export const fetchCotizacionesApi = async (authToken, filters = {}) => {
+  console.log("Estos son los filtros: "  + filters)
   try {
     const response = await axios.get(API_COTIZACIONES_URL, {
       headers: { Authorization: `Bearer ${authToken}` },

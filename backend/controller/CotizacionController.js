@@ -3,7 +3,14 @@ const CotizacionModel = require('../models/CotizacionModel');
 class CotizacionController {
     async getAllCotizaciones(req, res) {
         try {
-            const cotizaciones = await CotizacionModel.getAllCotizaciones();
+            const filters = req.params;
+            const options = {
+                orderBy: req.query.orderBy,
+                orderDirection: req.query.orderDirection,
+                limit: req.query.limit ? parseInt(req.query.limit) : undefined,
+                offset: req.query.offset ? parseInt(req.query.offset) : undefined,
+            };
+            const cotizaciones = await CotizacionModel.getAllCotizaciones(filters, options);
             res.json(cotizaciones);
         } catch (error) {
             res.status(500).json({ message: 'Error al obtener cotizaciones', error });

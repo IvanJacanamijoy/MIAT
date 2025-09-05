@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import QuoteCard from "../../components/QuoteFilterForm/QuoteCard";
 import QuoteFilterForm from "../../components/QuoteFilterForm/QuoteFilterForm";
 import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
@@ -39,8 +39,25 @@ const mockQuotes = [
 ];
 
 const TechnicianQuote = () => {
-  const [quotes, setQuotes] = useState(mockQuotes);
-  const [filteredQuotes, setFilteredQuotes] = useState(mockQuotes);
+  const [quotes, setQuotes] = useState([]);
+  const [filteredQuotes, setFilteredQuotes] = useState([]);
+  const { usuario, authToken } = useAuth();
+  // 🔄 Buscar cotizaciones al cargar
+  useEffect(() => {
+    const fetchQuotes = async () => {
+      try {
+        const data = await fetchCotizacionesApi(authToken, { IdTecnico: usuario.id });
+        console.log("Cotizaciones obtenidas:", data);
+        setQuotes(data);
+        setFilteredQuotes(data);
+      } catch (error) {
+        toast.error("Error al cargar cotizaciones");
+        console.error("Error al obtener cotizaciones:", error);
+      }
+    };
+
+    fetchQuotes();
+  }, [authToken]);
 
   const handleEdit = (id) => {
     console.log("Editar cotización:", id);
@@ -60,20 +77,21 @@ const TechnicianQuote = () => {
     // Aquí abrir modal o navegar a detalle
   };
 
-  // 🔎 Función para filtrar
+  // 🔎 Filtro
   const handleFilter = (filters) => {
     let result = [...quotes];
 
     if (filters.fecha) {
-      result = result.filter((q) => q.visitaTecnica.fecha === filters.fecha);
+      result = result.filter((q) => {
+        const fechaBase = new Date(q.Fecha).toISOString().split("T")[0];
+        return fechaBase === filters.fecha;
+      });
     }
 
     if (filters.tipoServicioId?.length > 0) {
       result = result.filter((q) =>
         filters.tipoServicioId.some((id) =>
-          q.visitaTecnica.servicio
-            .toLowerCase()
-            .includes(String(id).toLowerCase())
+          q.TiposServicioCita?.toLowerCase().includes(String(id).toLowerCase())
         )
       );
     }
@@ -81,8 +99,8 @@ const TechnicianQuote = () => {
     if (filters.clienteIdentificacion) {
       result = result.filter(
         (q) =>
-          q.visitaTecnica.clienteIdentificacion ===
-          filters.clienteIdentificacion
+          q.ClienteIdentificacion?.toLowerCase() ===
+          filters.clienteIdentificacion.toLowerCase()
       );
     }
 
@@ -108,7 +126,7 @@ const TechnicianQuote = () => {
 
       {/* Filtros + lista de cotizaciones */}
       <div className="relative z-10 rounded-t-3xl -mt-24 px-4 py-10 mx-10 text-white">
-        
+
         {/* 🔽 Formulario de filtros */}
         <QuoteFilterForm onFilter={handleFilter} />
 

@@ -20,6 +20,8 @@ const AdminTechnicalVisits = () => {
   const [modalType, setModalType] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [technicians, setTechnicians] = useState([]);
+  const [loadingVisits, setLoadingVisits] = useState(false);
+
 
   useEffect(() => {
     fetchVisitasTecnicasApi(authToken, {}).then((data) => {
@@ -37,6 +39,7 @@ const AdminTechnicalVisits = () => {
   };
 
   const handleOpenModal = (visit, type) => {
+    console.log("Modal abierto con tipo:", type);
     setSelectedVisit(visit);
     setModalType(type);
     setShowModal(true);
@@ -99,7 +102,6 @@ const AdminTechnicalVisits = () => {
       toast.error("Error al asignar técnico.");
       console.error(error);
     }
-    handleCloseModal();
   };
 
   return (
@@ -160,6 +162,7 @@ const AdminTechnicalVisits = () => {
             onCancel={handleCloseModal}
           />
         )}
+
         {modalType === "asignar" && selectedVisit && (
           <AssignTechnicianForm
             technicians={technicians}
@@ -197,6 +200,9 @@ const AdminTechnicalVisits = () => {
           />
         )}
       </Modal>
+
+
+
     </div>
   );
 };

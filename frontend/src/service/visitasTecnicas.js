@@ -4,6 +4,7 @@ const API_VISITAS_URL = 'http://localhost:3000/visitatecnica';
 
 export const fetchVisitasTecnicasApi = async (authToken, filters = {}) => {
   try {
+    console.log("filtros: " + filters)
     const response = await axios.get(API_VISITAS_URL, {
       headers: { Authorization: `Bearer ${authToken}` },
       params: filters
