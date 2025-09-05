@@ -3,6 +3,7 @@ import QuoteCard from "../../components/QuoteFilterForm/QuoteCard";
 import QuoteFilterForm from "../../components/QuoteFilterForm/QuoteFilterForm";
 import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
 import { toast } from "react-toastify";
+import EmptyState from "../../components/Common/EmptyState";
 
 const mockQuotes = [
   {
@@ -116,7 +117,11 @@ const UserQuotes = () => {
         {/* Lista */}
         <div className="grid gap-6 mt-6">
           {filteredQuotes.length === 0 ? (
-            <p>No hay cotizaciones que coincidan con los filtros.</p>
+            <EmptyState
+              title="No existe cotización"
+              description="la cotización que buscas no ha sido generada"
+              icon="quotes"
+            />
           ) : (
             filteredQuotes.map((q) => (
               <QuoteCard

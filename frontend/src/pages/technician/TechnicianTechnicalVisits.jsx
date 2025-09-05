@@ -4,6 +4,7 @@ import VisitFilterForm from '../../components/TechnicalVisitsFilterForm/VisitFil
 import { useAuth } from '../../context/AuthContext';
 import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
 import { fetchVisitasTecnicasApi } from '../../service/visitasTecnicas';
+import EmptyState from "../../components/Common/EmptyState";
 
 const TechnicianTechnicalVisits = () => {
   const { usuario, authToken } = useAuth();
@@ -51,7 +52,11 @@ const TechnicianTechnicalVisits = () => {
 
         <div className="grid gap-6 mt-6">
           {visits.length === 0 ? (
-            <p className="text-white">No tienes visitas asignadas.</p>
+            <EmptyState
+              title="No existe visita técnica"
+              description="No hay visitas tecnicas asignadas que coincidan con los filtros."
+              icon="visits"
+            />
           ) : (
             visits.map((visit) => (
               <VisitCard

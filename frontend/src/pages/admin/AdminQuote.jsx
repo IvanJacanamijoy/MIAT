@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import ButtonTechnicalVisits from "../../components/ButtonTechnicalVisits";
 import { useAuth } from "../../context/AuthContext";
 import { fetchCotizacionesApi } from "../../service/quotes";
+import EmptyState from "../../components/Common/EmptyState";
 
 const AdminQuote = () => {
   const [quotes, setQuotes] = useState([]);
@@ -90,7 +91,8 @@ const AdminQuote = () => {
         <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 text-center text-gray-200">
           <h1 className="font-bold md:text-6xl">Cotizaciones Administrador</h1>
           <p className="md:text-xl py-4">
-            Gestione todas las cotizaciones, edítelas o márcalas como completadas.
+            Gestione todas las cotizaciones, edítelas o márcalas como
+            completadas.
           </p>
         </div>
       </div>
@@ -101,7 +103,11 @@ const AdminQuote = () => {
 
         <div className="grid gap-6 mt-6">
           {filteredQuotes.length === 0 ? (
-            <p>No hay cotizaciones que coincidan con los filtros.</p>
+            <EmptyState
+              title="No hay cotizaciones disponibles"
+              description="Aún no se han generado cotizaciones o no coinciden con los filtros aplicados."
+              icon="quotes"
+            />
           ) : (
             filteredQuotes.map((q) => (
               <QuoteCard

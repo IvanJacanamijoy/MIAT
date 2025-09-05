@@ -1,21 +1,23 @@
-import { useEffect, useState } from 'react';
-import VisitCard from '../../components/TechnicalVisitsFilterForm/VisitCard';
-import VisitFilterForm from '../../components/TechnicalVisitsFilterForm/VisitFilterForm';
-import Modal from '../../components/common/Modal';
-import ReprogramVisitForm from '../../components/TechnicalVisitsFilterForm/ReprogramVisitForm';
-import AssignTechnicianForm from '../../components/TechnicalVisitsFilterForm/AssignTechnicianForm';
-import { useAuth } from '../../context/AuthContext';
+import { useEffect, useState } from "react";
+import VisitCard from "../../components/TechnicalVisitsFilterForm/VisitCard";
+import VisitFilterForm from "../../components/TechnicalVisitsFilterForm/VisitFilterForm";
+import VisitForm from "../../components/TechnicalVisitsFilterForm/VisitForm";
+import Modal from "../../components/common/Modal";
+import ReprogramVisitForm from "../../components/TechnicalVisitsFilterForm/ReprogramVisitForm";
+import AssignTechnicianForm from "../../components/TechnicalVisitsFilterForm/AssignTechnicianForm";
+import { useAuth } from "../../context/AuthContext";
 import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
-import { fetchVisitasTecnicasApi } from '../../service/visitasTecnicas';
-import ButtonTechnicalVisits from '../../components/ButtonTechnicalVisits';
-import { updateVisitaTecnicaApi } from '../../service/visitasTecnicas';
-import { fetchTecnicosApi } from '..//../service/users';
+import { fetchVisitasTecnicasApi, updateVisitaTecnicaApi } from "../../service/visitasTecnicas";
+import { fetchTecnicosApi } from "../../service/users";
+import ButtonTechnicalVisits from "../../components/ButtonTechnicalVisits";
+import EmptyState from "../../components/Common/EmptyState";
+import { toast } from "react-toastify";
 
 const AdminTechnicalVisits = () => {
-  const { usuario, authToken } = useAuth();
+  const { authToken } = useAuth();
   const [visits, setVisits] = useState([]);
   const [selectedVisit, setSelectedVisit] = useState(null);
-  const [modalType, setModalType] = useState('');
+  const [modalType, setModalType] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [technicians, setTechnicians] = useState([]);
 
@@ -23,20 +25,15 @@ const AdminTechnicalVisits = () => {
     fetchVisitasTecnicasApi(authToken, {}).then((data) => {
       setVisits(data);
     });
-    fetchTecnicosApi(authToken).then((data) => {
-      console.log('Fetched technicians:', data);
-      setTechnicians(data);
-    }).catch((error) => {
-      console.error('Error fetching technicians:', error);
-    });
-  }, []);
+    fetchTecnicosApi(authToken)
+      .then((data) => setTechnicians(data))
+      .catch((error) => console.error("Error fetching technicians:", error));
+  }, [authToken]);
 
   const handleFilter = (filters) => {
-    console.log(filters)
-    fetchVisitasTecnicasApi(authToken, filters).then((data) => {
-      setVisits(data);
-      console.log(data.map((visita) => visita.Ident))
-    }).catch('Hubo un error');
+    fetchVisitasTecnicasApi(authToken, filters)
+      .then((data) => setVisits(data))
+      .catch(() => toast.error("Hubo un error al filtrar"));
   };
 
   const handleOpenModal = (visit, type) => {
@@ -45,98 +42,69 @@ const AdminTechnicalVisits = () => {
     setShowModal(true);
   };
 
+  const handleOpenNewVisit = () => {
+    setModalType("nueva");
+    setShowModal(true);
+  };
+
   const handleCloseModal = () => {
     setShowModal(false);
-    setModalType('');
+    setModalType("");
     setSelectedVisit(null);
   };
 
   const handleCancelVisit = async (visitId) => {
-    console.log('Cancel visit with ID:', visitId);
-    const confirmCancel = window.confirm('¿Está seguro que desea cancelar esta visita técnica?');
+    const confirmCancel = window.confirm("¿Está seguro que desea cancelar esta visita técnica?");
     if (!confirmCancel) return;
 
     try {
-      const response = await updateVisitaTecnicaApi(visitId, { IdEstado: 7 }, authToken);
-      if (response && response.message) {
-        alert(response.message);
-      } else {
-        alert('Visita cancelada.');
-      }
-      // Opcional: refresca la lista de visitas
-      fetchVisitasTecnicasApi(authToken, {}).then((data) => setVisits(data));
+      await updateVisitaTecnicaApi(visitId, { IdEstado: 7 }, authToken);
+      toast.success("Visita cancelada.");
+      const data = await fetchVisitasTecnicasApi(authToken, {});
+      setVisits(data);
     } catch (error) {
-      alert('Error al cancelar la visita.');
+      toast.error("Error al cancelar la visita.");
       console.error(error);
     }
   };
 
   const handleReprogramVisit = async (updatedVisit) => {
     try {
-      // Actualiza la visita en el backend
-      const response = await updateVisitaTecnicaApi(
-        updatedVisit.IdCita,
-        {
-          Fecha: updatedVisit.fecha,
-          Hora: updatedVisit.hora,
-        },
-        authToken
-      );
-      if (response && response.message) {
-        alert(response.message);
-      } else {
-        alert('Visita reprogramada.');
-      }
-      // Refresca la lista de visitas
+      await updateVisitaTecnicaApi(updatedVisit.IdCita, {
+        Fecha: updatedVisit.fecha,
+        Hora: updatedVisit.hora,
+      }, authToken);
+
+      toast.success("Visita reprogramada.");
       const data = await fetchVisitasTecnicasApi(authToken, {});
       setVisits(data);
     } catch (error) {
-      alert('Error al reprogramar la visita.');
+      toast.error("Error al reprogramar la visita.");
       console.error(error);
     }
     handleCloseModal();
   };
 
-  // Función para asignar técnico
   const handleAssignTechnician = async (updatedVisit) => {
     try {
-      const response = await updateVisitaTecnicaApi(
-        updatedVisit.IdCita,
-        {
-          IdTecnico: updatedVisit.tecnico.IdUsuario,
-          IdEstado: 3 // "En proceso" o el estado que corresponda
-        },
-        authToken
-      );
-      if (response && response.message) {
-        alert(response.message);
-      } else {
-        alert('Técnico asignado.');
-      }
-      // Refresca la lista de visitas
+      await updateVisitaTecnicaApi(updatedVisit.IdCita, {
+        IdTecnico: updatedVisit.tecnico.IdUsuario,
+        IdEstado: 3,
+      }, authToken);
+
+      toast.success("Técnico asignado.");
       const data = await fetchVisitasTecnicasApi(authToken, {});
       setVisits(data);
     } catch (error) {
-      alert('Error al asignar el técnico.');
+      toast.error("Error al asignar técnico.");
       console.error(error);
     }
     handleCloseModal();
-  };
-
-  const handleOpenAssignModal = (visit) => {
-    setSelectedVisit(visit);
-    setModalType("asignar");
-    setShowModal(true);
-  };
-
-  const handleOpenModalQuote = (visit) => {
-    setSelectedVisit(visit);
-    setModalType("cotizacion");
-    setShowModal(true);
   };
 
   return (
     <div className="min-h-screen bg-gray-200 relative max-w-7xl mx-auto">
+      {/* Banner */}
       <div className="relative">
         <img
           src={fondo1}
@@ -153,13 +121,20 @@ const AdminTechnicalVisits = () => {
         </div>
       </div>
 
+      {/* Contenido */}
       <div className="relative z-10 rounded-t-3xl -mt-24 px-4 py-10 mx-10 text-white">
         <ButtonTechnicalVisits />
         <VisitFilterForm onFilter={handleFilter} />
 
         <div className="grid gap-6 mt-6">
           {visits.length === 0 ? (
-            <p className="text-white">No hay visitas técnicas registradas.</p>
+            <EmptyState
+              title="No hay visitas técnicas registradas"
+              description="Cuando se agenden visitas, aparecerán automáticamente en este panel."
+              icon="visits"
+              actionLabel="Agendar nueva visita"
+              onAction={handleOpenNewVisit}
+            />
           ) : (
             visits.map((visit) => (
               <VisitCard
@@ -168,19 +143,15 @@ const AdminTechnicalVisits = () => {
                 rol="admin"
                 onCancel={() => handleCancelVisit(visit.IdCita)}
                 onReprogram={() => handleOpenModal(visit, "reprogramar")}
-                onOpenAssignModal={handleOpenAssignModal} // <-- aquí
+                onOpenAssignModal={() => handleOpenModal(visit, "asignar")}
                 technicians={technicians}
-                selectedVisit={selectedVisit}
-                handleReprogramVisit={handleReprogramVisit}
-                handleAssignTechnician={handleAssignTechnician}
-                handleCloseModal={handleCloseModal}
               />
             ))
           )}
         </div>
       </div>
 
-      {/* Modal para reprogramar o asignar técnico */}
+      {/* Modales */}
       <Modal isOpen={showModal} onClose={handleCloseModal}>
         {modalType === "reprogramar" && selectedVisit && (
           <ReprogramVisitForm
@@ -202,15 +173,28 @@ const AdminTechnicalVisits = () => {
                 toast.error("Error al actualizar la lista de visitas");
                 console.error(error);
               } finally {
-                handleCloseModal(); // Asegura que el modal se cierre pase lo que pase
+                handleCloseModal();
               }
             }}
-
             onCancel={handleCloseModal}
           />
-
-
-
+        )}
+        {modalType === "nueva" && (
+          <VisitForm
+            onSuccess={async () => {
+              try {
+                const updatedVisits = await fetchVisitasTecnicasApi(authToken, {});
+                setVisits(updatedVisits);
+                toast.success("Visita creada correctamente");
+              } catch (error) {
+                toast.error("Error al registrar la visita");
+                console.error(error);
+              } finally {
+                handleCloseModal();
+              }
+            }}
+            onCancel={handleCloseModal}
+          />
         )}
       </Modal>
     </div>

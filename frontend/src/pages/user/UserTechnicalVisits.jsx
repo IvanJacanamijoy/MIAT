@@ -8,6 +8,7 @@ import ReprogramVisitForm from "../../components/TechnicalVisitsFilterForm/Repro
 import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
 import { fetchVisitasTecnicasApi } from '../../service/visitasTecnicas';
 import ButtonTechnicalVisits from "../../components/ButtonTechnicalVisits";
+import EmptyState from "../../components/Common/EmptyState";
 
 
 const UserTechnicalVisits = () => {
@@ -108,7 +109,11 @@ const UserTechnicalVisits = () => {
         {/* Lista de visitas */}
         <div className="grid gap-6 mt-6">
           {visits.length === 0 ? (
-            <p className="text-white">No hay visitas registradas.</p>
+            <EmptyState
+              title="No hay visitas técnicas registradas"
+              description="Cuando se agenden visitas, aparecerán automáticamente en este panel."
+              icon="visits"
+            />
           ) : (
             visits.map((visit) => (
               <VisitCard
