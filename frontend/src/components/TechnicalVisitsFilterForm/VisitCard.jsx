@@ -27,18 +27,18 @@ const VisitCard = ({
   const formattedDate =
     visitDateTime && !isNaN(visitDateTime.getTime())
       ? visitDateTime.toLocaleDateString("es-CO", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
       : "Fecha no disponible";
   const formattedTime =
     visitDateTime && !isNaN(visitDateTime.getTime())
       ? visitDateTime.toLocaleTimeString("es-CO", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        })
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      })
       : "Hora no disponible";
 
   const estadoMap = {
@@ -95,9 +95,8 @@ const VisitCard = ({
           <p className="text-black"><strong>Solicitante:</strong> {clienteNombreCompleto}</p>
           <p className="text-black">
             <strong>Técnico:</strong>{" "}
-            <span className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
-              visit.TecnicoNombres ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-            }`}>
+            <span className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${visit.TecnicoNombres ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+              }`}>
               {visit.TecnicoNombres
                 ? `${visit.TecnicoNombres} ${visit.TecnicoApellidos}`
                 : "No asignado"}
@@ -123,22 +122,20 @@ const VisitCard = ({
             {(rol === "admin" || rol === "usuario") && (
               <>
                 <button
-                  className={`px-4 py-2 rounded font-bold ${
-                    canModify
+                  className={`px-4 py-2 rounded font-bold ${canModify
                       ? "bg-red-500 hover:bg-red-700 text-white cursor-pointer"
                       : "bg-gray-400 text-white cursor-not-allowed"
-                  }`}
+                    }`}
                   disabled={!canModify}
                   onClick={() => onCancel?.(visit.IdCita)}
                 >
                   Cancelar
                 </button>
                 <button
-                  className={`px-4 py-2 rounded font-bold ${
-                    canModify
+                  className={`px-4 py-2 rounded font-bold ${canModify
                       ? "bg-blue-500 hover:bg-blue-700 cursor-pointer text-white"
                       : "bg-gray-400 text-white cursor-not-allowed"
-                  }`}
+                    }`}
                   disabled={!canModify}
                   onClick={() => onReprogram?.(visit)}
                 >
@@ -146,15 +143,27 @@ const VisitCard = ({
                 </button>
               </>
             )}
-            {(rol === "admin" || rol === "tecnico") &&
-              (!tieneDiagnostico || !tieneCotizacion) && (
-                <button
-                  className="bg-yellow-600 hover:bg-yellow-700 text-white cursor-pointer p-2 rounded-md"
-                  onClick={() => onGenerateDiagnosis?.(visit)}
-                >
-                  {tieneDiagnostico ? "Generar cotización" : "Generar diagnóstico / cotización"}
-                </button>
-              )}
+            {(rol === "admin" || rol === "tecnico") && (
+              <>
+                {!tieneDiagnostico && (
+                  <button
+                    className="bg-yellow-600 hover:bg-yellow-700 text-white cursor-pointer p-2 rounded-md"
+                    onClick={() => onGenerateDiagnosis?.(visit)}
+                  >
+                    Generar diagnóstico
+                  </button>
+                )}
+                {tieneDiagnostico && !tieneCotizacion && (
+                  <button
+                    className="bg-green-600 hover:bg-green-700 text-white cursor-pointer p-2 rounded-md"
+                    onClick={() => onGenerateQuote?.(visit)}
+                  >
+                    Generar cotización
+                  </button>
+                )}
+              </>
+            )}
+
             {rol === "admin" && (
               <button
                 className="px-4 py-2 rounded font-bold bg-blue-500 hover:bg-blue-700 cursor-pointer text-white"

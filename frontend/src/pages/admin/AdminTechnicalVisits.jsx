@@ -4,7 +4,8 @@ import VisitFilterForm from '../../components/TechnicalVisitsFilterForm/VisitFil
 import Modal from '../../components/common/Modal';
 import ReprogramVisitForm from '../../components/TechnicalVisitsFilterForm/ReprogramVisitForm';
 import AssignTechnicianForm from '../../components/TechnicalVisitsFilterForm/AssignTechnicianForm';
-import DiagnosticOrQuoteForm from '../../components/DiagnosticOrQuoteForm';
+import DiagnosticForm from '../../components/DiagnosticForm';
+import QuoteForm from '../../components/QuoteForm';
 import { useAuth } from '../../context/AuthContext';
 import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
 import { fetchVisitasTecnicasApi, updateVisitaTecnicaApi } from '../../service/visitasTecnicas';
@@ -120,28 +121,32 @@ const AdminTechnicalVisits = () => {
 
 
 
-  const handleGenerateDiagnosisOrQuote = async (data) => {
-    if (!data?.tipo) {
-      toast.warning("Tipo de acción no definido");
-      return;
-    }
-
+  const handleSaveDiagnostico = async (data) => {
     try {
-      if (data.tipo === "diagnostico") {
-        const response = await createDiagnosticoApi(data, authToken);
-        toast.success(response?.message || "Diagnóstico guardado");
-      } else {
-        const response = await createCotizacionApi(data, authToken);
-        toast.success(response?.message || "Cotización guardada");
-      }
+      const response = await createDiagnosticoApi(data, authToken);
+      toast.success(response?.message || "Diagnóstico guardado");
       await refreshVisits();
     } catch (error) {
-      toast.error("Error al guardar información");
+      toast.error("Error al guardar diagnóstico");
       console.error(error);
     } finally {
       handleCloseModal();
     }
   };
+
+  const handleSaveCotizacion = async (data) => {
+    try {
+      const response = await createCotizacionApi(data, authToken);
+      toast.success(response?.message || "Cotización guardada");
+      await refreshVisits();
+    } catch (error) {
+      toast.error("Error al guardar cotización");
+      console.error(error);
+    } finally {
+      handleCloseModal();
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-200 relative max-w-7xl mx-auto">
@@ -215,13 +220,24 @@ const AdminTechnicalVisits = () => {
           />
         )}
 
-        {["diagnostico", "cotizacion"].includes(modalType) && selectedVisit && (
-          <DiagnosticOrQuoteForm
+        {modalType === "diagnostico" && selectedVisit && (
+          <DiagnosticForm
             citaId={selectedVisit.IdCita}
-            tipo={modalType}
-            tieneDiagnostico={selectedVisit.TieneDiagnostico}
-            tieneCotizacion={selectedVisit.TieneCotizacion}
-            onSubmit={handleGenerateDiagnosisOrQuote}
+            tecnicos={technicians}
+            tecnicoAsignado={
+              selectedVisit.TecnicoNombres
+                ? `${selectedVisit.TecnicoNombres} ${selectedVisit.TecnicoApellidos}`
+                : ""
+            }
+            onSubmit={handleSaveDiagnostico}
+            onCancel={handleCloseModal}
+          />
+        )}
+
+        {modalType === "cotizacion" && selectedVisit && (
+          <QuoteForm
+            idDiagnostico={selectedVisit.IdDiagnostico}
+            onSubmit={handleSaveCotizacion}
             onCancel={handleCloseModal}
           />
         )}

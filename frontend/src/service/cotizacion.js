@@ -2,7 +2,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/';
 
 export const createCotizacionApi = async (cotizacionData, token) => {
   try {
-    const response = await fetch(`${BASE_URL}/cotizacion`, {
+    const response = await fetch(`${BASE_URL}/cotizaciones`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
