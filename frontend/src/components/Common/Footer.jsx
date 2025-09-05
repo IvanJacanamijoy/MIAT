@@ -47,9 +47,9 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative bg-white text-gray-700 border-t border-black">
+    <footer className="relative bg-white text-gray-700 shadow-md">
       {/* Banda roja superior */}
-      <div className="h-1 w-full bg-red-600" />
+      <div className="h-1 w-full bg-red-500" />
 
       <motion.div
         variants={fadeIn("up", 0.05)}

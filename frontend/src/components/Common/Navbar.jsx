@@ -1,25 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link,  } from 'react-router-dom';
-import { Bars3Icon, XMarkIcon, UserCircleIcon } from '@heroicons/react/24/outline';
-//importamos el hook personalizado
+import { Link } from 'react-router-dom';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../context/AuthContext';
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(' ');
 }
 
-//objeto imagenes con las url de las imagenes
 const images = {
   logo_miat_rojo: '/src/assets/images/navbar/logo_miat_rojo.png',
-  ruta: '/src/assets/navbar/logo_miat_rojo.png'
-}
+  ruta: '/src/assets/navbar/logo_miat_rojo.png',
+};
 
 const Navbar = () => {
   const [rol, setRol] = useState(null);
   const [nombre, setNombre] = useState('');
   const [isOpen, setIsOpen] = useState(false); // Para el menú móvil
-  //obtenemos
-  const {usuario, cerrarSesion} = useAuth();
+  const [scrolled, setScrolled] = useState(false); // efecto toolbar sólo en fondo
+
+  const { usuario, cerrarSesion } = useAuth();
 
   useEffect(() => {
     const usuarioLogueado = localStorage.getItem('token');
@@ -27,6 +26,13 @@ const Navbar = () => {
       setRol(usuario.rol);
       setNombre(usuario.nombre);
     }
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   const handleLogout = () => {
@@ -66,13 +72,16 @@ const Navbar = () => {
     ];
   }
 
-  // Función para determinar si un enlace está activo
-  const isActive = (path) => {
-    return window.location.pathname === path;
-  };
+  const isActive = (path) => window.location.pathname === path;
 
   return (
-    <nav className="shadow-md min-h-[60px]">
+    <nav
+      className={classNames(
+        'sticky top-0 z-40 min-h-[60px]',
+        'backdrop-blur supports-[backdrop-filter]:bg-white/60', // efecto toolbar
+        scrolled ? 'bg-white/80 border-b border-gray-200 shadow-sm' : 'bg-transparent'
+      )}
+    >
       <div className="mx-auto w-full px-5">
         <div className="relative flex items-center justify-around">
           <div className="absolute inset-y-0 left-0 flex items-center xl:hidden">
@@ -93,13 +102,10 @@ const Navbar = () => {
           </div>
           <div className="flex flex-1 items-center justify-center xl:items-stretch xl:justify-around mt-3 xl:mt-0">
             <div className="flex shrink-0 items-center">
-              <img
-                alt="Logo miat"
-                src={images.logo_miat_rojo}
-                className="h-8 w-auto"
-              />
+              <img alt="Logo miat" src={images.logo_miat_rojo} className="h-8 w-auto" />
               <p className="text-3xl font-bold">MIAT</p>
             </div>
+            {/* ¡NO modificamos los botones! */}
             <div className="hidden ml-2 sm:ml-6 xl:block bg-red-700/80 py-3 px-7 rounded-full my-2">
               <div className="flex space-x-4 items-center px-4">
                 {navigation.map((item) => (
@@ -119,7 +125,7 @@ const Navbar = () => {
             <div className="absolute inset-y-0 -right-3 xl:flex items-center pr-2 xl:static xl:inset-auto ml-1 xl:pr-0 mt-2 xl:mt-0">
               <a
                 className={
-                  rol == null ? "hidden" : "block px-2 xl:px-4 py-2 text-sm text-gray-700 hover:bg-gray-700 hover:text-white border-2 border-gray-400 cursor-pointer rounded-4xl text-center"
+                  rol == null ? 'hidden' : 'block px-2 xl:px-4 py-2 text-sm text-gray-700 hover:bg-gray-700 hover:text-white border-2 border-gray-400 cursor-pointer rounded-4xl text-center'
                 }
                 role="menuitem"
                 onClick={(e) => {
@@ -140,7 +146,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Menú móvil */}
+      {/* Menú móvil (botones intactos) */}
       <div className={`xl:hidden ${isOpen ? 'block' : 'hidden'}`} id="mobile-menu">
         <div className="space-y-1 px-2 pb-3 pt-2">
           {navigation.map((item) => (
@@ -150,7 +156,7 @@ const Navbar = () => {
               className={isActive(item.to)
                 ? 'bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium block '
                 : 'text-gray-700 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium block cursor-pointer'}
-              onClick={() => setIsOpen(false)} // Cerrar el menú al hacer clic
+              onClick={() => setIsOpen(false)}
             >
               {item.name}
             </Link>

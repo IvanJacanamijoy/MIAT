@@ -19,7 +19,7 @@ const ButtonTechnicalVisits = () => {
     return (
 
         <>
-            <button className="block m-auto bg-red-700/80 py-2 px-5 rounded-2xl mb-2 hover:bg-red-700" onClick={() => handleOpenModal(usuario.nombre)}>
+            <button className="block m-auto bg-red-500 py-3 px-8 rounded-2xl mb-2 hover:bg-red-700" onClick={() => handleOpenModal(usuario.nombre)}>
                 Agendar Visita Técnica
             </button>
             <Modal isOpen={showModal} onClose={handleCloseModal}>
