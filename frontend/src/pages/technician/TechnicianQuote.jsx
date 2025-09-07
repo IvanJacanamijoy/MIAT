@@ -3,8 +3,40 @@ import QuoteCard from "../../components/QuoteFilterForm/QuoteCard";
 import QuoteFilterForm from "../../components/QuoteFilterForm/QuoteFilterForm";
 import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
 import { toast } from "react-toastify";
-import { useAuth } from "../../context/AuthContext";
-import { fetchCotizacionesApi } from "../../service/quotes";
+import EmptyState from "../../components/Common/EmptyState";
+
+const mockQuotes = [
+  {
+    id: 3,
+    totalAmount: 500000,
+    description: "Instalación de panel solar",
+    status: "Pendiente",
+    visitaTecnica: {
+      clienteNombre: "Juan Pérez",
+      clienteIdentificacion: "123456789",
+      direccion: "Calle 123 #45-67, Bogotá",
+      servicio: "Instalación de panel solar",
+      fecha: "2025-08-20",
+      hora: "10:00",
+      tecnicoNombre: "Tú",
+    },
+  },
+  {
+    id: 4,
+    totalAmount: 250000,
+    description: "Reparación de cableado",
+    status: "Aceptada",
+    visitaTecnica: {
+      clienteNombre: "Ana Gómez",
+      clienteIdentificacion: "987654321",
+      direccion: "Carrera 10 #20-30, Medellín",
+      servicio: "Reparación de cableado",
+      fecha: "2025-08-22",
+      hora: "16:00",
+      tecnicoNombre: "Tú",
+    },
+  },
+];
 
 const TechnicianQuote = () => {
   const [quotes, setQuotes] = useState([]);
@@ -100,7 +132,11 @@ const TechnicianQuote = () => {
 
         <div className="grid gap-6 mt-6">
           {filteredQuotes.length === 0 ? (
-            <p>No hay cotizaciones que coincidan con los filtros.</p>
+            <EmptyState
+              title="No hay cotizaciones"
+              description="No hay cotizaciones que coincidan con los filtros."
+              icon="quotes"
+            />
           ) : (
             filteredQuotes.map((q) => (
               <QuoteCard

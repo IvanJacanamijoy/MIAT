@@ -9,7 +9,7 @@ import RegisterPage from './pages/public/RegisterPage';
 import Home from './pages/public/Home';
 import Contact from './pages/public/Contact';
 import HomeService from './pages/public/HomeService';
-import Whoweare from './pages/public/Whoweare'
+import Whoweare from './pages/public/WhoWeare';
 
 //vistas de usuario
 import UserDashboard from './pages/user/UserDashboard'

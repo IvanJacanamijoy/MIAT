@@ -1,7 +1,7 @@
 //componente que recibe un titulo, una descripción, una imagen y texto para un boton
 const CardService = ({ titulo, descripcion, imageUrl, textoBoton }) => {
     return (
-        <div className="bg-red-500 max-w-72 rounded-xl shadow-lg overflow-hidden  duration-300 hover:shadow-xl mx-auto">
+        <div className="bg-white max-w-72 rounded-xl shadow-lg overflow-hidden  duration-300 hover:shadow-xl mx-auto">
             <div className="h-full flex flex-col">
                 <div className="h-48 overflow-hidden">
                     <img
@@ -17,7 +17,7 @@ const CardService = ({ titulo, descripcion, imageUrl, textoBoton }) => {
                     <p className="mb-3">
                         {descripcion}
                     </p>
-                    <button className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 mx-auto cursor-pointer">
+                    <button className="px-4 py-2 bg-red-500 hover:bg-red-700 text-white rounded-lg mx-auto cursor-pointer">
                         {textoBoton}
                     </button>
                 </div>

@@ -122,10 +122,10 @@ const LoginForm = ({ styles }) => {
           <span className="block sm:inline">{error}</span>
         </div>
       )}
-      <div className="flex space-x-4">
+      <div className="flex justify-center">
         <button
           type="submit"
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full cursor-pointer"
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-4 px-8 rounded focus:outline-none focus:shadow-outline cursor-pointer"
         >
           Ingresar
         </button>
