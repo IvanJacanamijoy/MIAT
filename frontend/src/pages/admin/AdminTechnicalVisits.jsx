@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-import { useEffect, useState } from 'react';
-import VisitCard from '../../components/TechnicalVisitsFilterForm/VisitCard';
-import VisitFilterForm from '../../components/TechnicalVisitsFilterForm/VisitFilterForm';
-import Modal from '../../components/common/Modal';
-import ReprogramVisitForm from '../../components/TechnicalVisitsFilterForm/ReprogramVisitForm';
-import AssignTechnicianForm from '../../components/TechnicalVisitsFilterForm/AssignTechnicianForm';
-import DiagnosticForm from '../../components/DiagnosticForm';
-import QuoteForm from '../../components/QuoteForm';
-import { useAuth } from '../../context/AuthContext';
-=======
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
@@ -28,7 +17,6 @@ import Modal from "../../components/Common/Modal";
 import ReprogramVisitForm from "../../components/TechnicalVisitsFilterForm/ReprogramVisitForm";
 import AssignTechnicianForm from "../../components/TechnicalVisitsFilterForm/AssignTechnicianForm";
 import { useAuth } from "../../context/AuthContext";
->>>>>>> 76270688d0789f8d967608657eab6745c127d4e7
 import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
 import {
   fetchVisitasTecnicasApi,
