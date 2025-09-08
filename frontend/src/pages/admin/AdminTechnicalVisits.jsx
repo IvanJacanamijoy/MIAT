@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-import { useEffect, useState } from 'react';
-import VisitCard from '../../components/TechnicalVisitsFilterForm/VisitCard';
-import VisitFilterForm from '../../components/TechnicalVisitsFilterForm/VisitFilterForm';
-import Modal from '../../components/common/Modal';
-import ReprogramVisitForm from '../../components/TechnicalVisitsFilterForm/ReprogramVisitForm';
-import AssignTechnicianForm from '../../components/TechnicalVisitsFilterForm/AssignTechnicianForm';
-import DiagnosticForm from '../../components/DiagnosticForm';
-import QuoteForm from '../../components/QuoteForm';
-import { useAuth } from '../../context/AuthContext';
-=======
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
@@ -28,7 +17,6 @@ import Modal from "../../components/Common/Modal";
 import ReprogramVisitForm from "../../components/TechnicalVisitsFilterForm/ReprogramVisitForm";
 import AssignTechnicianForm from "../../components/TechnicalVisitsFilterForm/AssignTechnicianForm";
 import { useAuth } from "../../context/AuthContext";
->>>>>>> 76270688d0789f8d967608657eab6745c127d4e7
 import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
 import {
   fetchVisitasTecnicasApi,
@@ -145,61 +133,11 @@ export default function AdminTechnicalVisits() {
     } catch (e) {
       console.error(e);
       toast.error("Error al reprogramar la visita");
-<<<<<<< HEAD
-      console.error(error);
-    }
-    handleCloseModal();
-  };
-
-  const handleAssignTechnician = async ({ IdCita, IdTecnico }) => {
-    try {
-      console.log("Asignando técnico...");
-      await updateVisitaTecnicaApi(IdCita, {
-        IdTecnico,
-        IdEstado: 3,
-      }, authToken);
-      console.log("tecnico asignado");
-      toast.success("Técnico asignado correctamente");
-      await refreshVisits();
-      handleCloseModal();
-    } catch (error) {
-      toast.error("Error al asignar el técnico");
-      console.error(error);
-    }
-  };
-
-
-
-  const handleSaveDiagnostico = async (data) => {
-    try {
-      const response = await createDiagnosticoApi(data, authToken);
-      toast.success(response?.message || "Diagnóstico guardado");
-      await refreshVisits();
-    } catch (error) {
-      toast.error("Error al guardar diagnóstico");
-      console.error(error);
-=======
->>>>>>> 76270688d0789f8d967608657eab6745c127d4e7
     } finally {
       handleCloseModal();
     }
   };
 
-<<<<<<< HEAD
-  const handleSaveCotizacion = async (data) => {
-    try {
-      const response = await createCotizacionApi(data, authToken);
-      toast.success(response?.message || "Cotización guardada");
-      await refreshVisits();
-    } catch (error) {
-      toast.error("Error al guardar cotización");
-      console.error(error);
-    } finally {
-      handleCloseModal();
-    }
-  };
-
-=======
   const handleAssignTechnician = async (updatedVisit) => {
     try {
       await updateVisitaTecnicaApi(
@@ -237,7 +175,6 @@ export default function AdminTechnicalVisits() {
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
->>>>>>> 76270688d0789f8d967608657eab6745c127d4e7
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-100">
@@ -402,26 +339,6 @@ export default function AdminTechnicalVisits() {
           />
         )}
 
-<<<<<<< HEAD
-        {modalType === "diagnostico" && selectedVisit && (
-          <DiagnosticForm
-            citaId={selectedVisit.IdCita}
-            tecnicos={technicians}
-            tecnicoAsignado={
-              selectedVisit.TecnicoNombres
-                ? `${selectedVisit.TecnicoNombres} ${selectedVisit.TecnicoApellidos}`
-                : ""
-            }
-            onSubmit={handleSaveDiagnostico}
-            onCancel={handleCloseModal}
-          />
-        )}
-
-        {modalType === "cotizacion" && selectedVisit && (
-          <QuoteForm
-            idDiagnostico={selectedVisit.IdDiagnostico}
-            onSubmit={handleSaveCotizacion}
-=======
         {modalType === "nueva" && (
           <VisitForm
             onSuccess={async () => {
@@ -435,7 +352,6 @@ export default function AdminTechnicalVisits() {
                 handleCloseModal();
               }
             }}
->>>>>>> 76270688d0789f8d967608657eab6745c127d4e7
             onCancel={handleCloseModal}
           />
         )}
