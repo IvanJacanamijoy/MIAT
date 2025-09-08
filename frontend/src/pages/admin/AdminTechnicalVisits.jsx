@@ -25,6 +25,8 @@ import {
 import { fetchTecnicosApi } from "../../service/users";
 import ButtonTechnicalVisits from "../../components/ButtonTechnicalVisits";
 import EmptyState from "../../components/Common/EmptyState";
+import DiagnosticForm from "../../components/DiagnosticForm";
+import QuoteForm from "../../components/QuoteForm";
 
 /**
  * Vista de administración de Visitas Técnicas
@@ -133,6 +135,33 @@ export default function AdminTechnicalVisits() {
     } catch (e) {
       console.error(e);
       toast.error("Error al reprogramar la visita");
+    } finally {
+      handleCloseModal();
+    }
+  };
+
+  const handleSaveDiagnostico = async (data) => {
+    try {
+      const response = await createDiagnosticoApi(data, authToken);
+      toast.success(response?.message || "Diagnóstico guardado");
+      await refreshVisits();
+    } catch (error) {
+      toast.error("Error al guardar diagnóstico");
+      console.error(error);
+    } finally {
+      handleCloseModal();
+    }
+  };
+
+  const handleSaveCotizacion = async (data) => {
+    try {
+      const response = await createCotizacionApi(data, authToken);
+      toast.success(response?.message || "Cotización guardada");
+      await refreshVisits();
+    } catch (error) {
+      toast.error("Error al guardar información");
+      toast.error("Error al guardar cotización");
+      console.error(error);
     } finally {
       handleCloseModal();
     }
@@ -296,12 +325,15 @@ export default function AdminTechnicalVisits() {
               {visits.map((visit) => (
                 <li key={visit.IdCita}>
                   <VisitCard
+                    key={visit.IdCita}
                     visit={visit}
                     rol="admin"
-                    technicians={technicians}
                     onCancel={() => handleCancelVisit(visit.IdCita)}
                     onReprogram={() => handleOpenModal(visit, "reprogramar")}
-                    onOpenAssignModal={() => handleOpenModal(visit, "asignar")}
+                    onAssignTechnician={() => handleOpenModal(visit, "asignar")}
+                    onGenerateDiagnosis={() => handleOpenModal(visit, "diagnostico")}
+                    onGenerateQuote={() => handleOpenModal(visit, "cotizacion")}
+                    technicians={technicians}
                   />
                 </li>
               ))}
@@ -352,6 +384,27 @@ export default function AdminTechnicalVisits() {
                 handleCloseModal();
               }
             }}
+            onCancel={handleCloseModal}
+          />
+        )}
+        {modalType === "diagnostico" && selectedVisit && (
+          <DiagnosticForm
+            citaId={selectedVisit.IdCita}
+            tecnicos={technicians}
+            tecnicoAsignado={
+              selectedVisit.TecnicoNombres
+                ? `${selectedVisit.TecnicoNombres} ${selectedVisit.TecnicoApellidos}`
+                : ""
+            }
+            onSubmit={handleSaveDiagnostico}
+            onCancel={handleCloseModal}
+          />
+        )}
+
+        {modalType === "cotizacion" && selectedVisit && (
+          <QuoteForm
+            idDiagnostico={selectedVisit.IdDiagnostico}
+            onSubmit={handleSaveCotizacion}
             onCancel={handleCloseModal}
           />
         )}
