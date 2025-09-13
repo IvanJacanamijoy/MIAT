@@ -1,16 +1,14 @@
-import axios from 'axios';
-
-const API_COTIZACIONES_URL = 'http://localhost:3000/cotizaciones'; // Ajusta según tu ruta real
+// src/api/cotizaciones.js
+import apiRequest from '../utils/apiclient';
 
 // 🔍 Obtener cotizaciones con filtros
 export const fetchCotizacionesApi = async (authToken, filters = {}) => {
-  console.log("Estos son los filtros: "  + filters)
   try {
-    const response = await axios.get(API_COTIZACIONES_URL, {
-      headers: { Authorization: `Bearer ${authToken}` },
-      params: filters // Se envían como query params
-    });
-    return response.data;
+    const queryString = new URLSearchParams(filters).toString();
+    const url = `/cotizaciones${queryString ? `?${queryString}` : ''}`;
+
+    const data = await apiRequest(url, 'GET', null, authToken);
+    return data;
   } catch (error) {
     console.error('Error fetching cotizaciones:', error);
     throw error;
@@ -20,38 +18,33 @@ export const fetchCotizacionesApi = async (authToken, filters = {}) => {
 // 📝 Crear una nueva cotización
 export const createCotizacionApi = async (cotizacionData, authToken) => {
   try {
-    const response = await axios.post(API_COTIZACIONES_URL, cotizacionData, {
-      headers: { Authorization: `Bearer ${authToken}` }
-    });
-    return response.data;
+    const data = await apiRequest('/cotizaciones', 'POST', cotizacionData, authToken);
+    return data;
   } catch (error) {
     console.error('Error creating cotización:', error);
     throw error;
   }
 };
 
-// ✏️ Actualizar una cotización existente
+// ✏️ Actualizar cotización
 export const updateCotizacionApi = async (cotizacionId, updatedData, authToken) => {
   try {
-    const response = await axios.put(`${API_COTIZACIONES_URL}/${cotizacionId}`, updatedData, {
-      headers: { Authorization: `Bearer ${authToken}` }
-    });
-    return response.data;
+    const data = await apiRequest(`/cotizaciones/${cotizacionId}`, 'PUT', updatedData, authToken);
+    return data;
   } catch (error) {
     console.error('Error updating cotización:', error);
     throw error;
   }
 };
 
-// ❌ Eliminar una cotización
+// 🗑️ Eliminar cotización
 export const deleteCotizacionApi = async (cotizacionId, authToken) => {
   try {
-    const response = await axios.delete(`${API_COTIZACIONES_URL}/${cotizacionId}`, {
-      headers: { Authorization: `Bearer ${authToken}` }
-    });
-    return response.data;
+    const data = await apiRequest(`/cotizaciones/${cotizacionId}`, 'DELETE', null, authToken);
+    return data;
   } catch (error) {
     console.error('Error deleting cotización:', error);
     throw error;
   }
 };
+

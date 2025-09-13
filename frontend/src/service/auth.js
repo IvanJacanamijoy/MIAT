@@ -1,35 +1,29 @@
-const API_BASE_URL = 'http://localhost:3000'; // O tu base URL
+// src/api/auth.js
+import apiRequest from '../utils/apiclient';
 
-//pendiente hacer la logica de inicio y registro
+//Login de usuario
 export const login = async (email, password) => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email: email, password: password }),
-        });
-        if (response.ok) {
-            return response.json();
-        }
-    } catch (error) {
-        console.error(`Hay un error : ${error}`);
-    }
-}
+  try {
+    const response = await apiRequest('/auth/login', 'POST', {
+      email,
+      password,
+    });
 
-export const register = async ( formData ) => {
-    try {
-        const response = await fetch('http://localhost:3000/auth/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({...formData}),
-        });
-        return await response.json();
-    }catch(error){
-        console.error('Hubo un error registrando al usuario : ' + error)
-    }
+    return response;
+  } catch (error) {
+    console.error('Error en login:', error);
+    throw error;
+  }
+};
 
-}
+//Registro de usuario
+export const register = async (formData) => {
+  try {
+    const response = await apiRequest('/auth/register', 'POST', formData);
+    return response;
+  } catch (error) {
+    console.error('Error en registro:', error);
+    throw error;
+  }
+};
+

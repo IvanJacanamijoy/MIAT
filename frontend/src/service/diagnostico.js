@@ -1,23 +1,12 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// src/api/diagnostico.js
+import apiRequest from '../utils/apiclient';
 
 export const createDiagnosticoApi = async (diagnosticoData, token) => {
   try {
-    const response = await fetch(`${BASE_URL}/diagnostico`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(diagnosticoData)
-    });
-
-    if (!response.ok) {
-      throw new Error('Error al crear diagnóstico');
-    }
-
-    return await response.json();
+    const data = await apiRequest('/diagnostico', 'POST', diagnosticoData, token);
+    return data;
   } catch (error) {
-    console.error('createDiagnosticoApi error:', error);
+    console.error('Error creating diagnóstico:', error);
     throw error;
   }
 };

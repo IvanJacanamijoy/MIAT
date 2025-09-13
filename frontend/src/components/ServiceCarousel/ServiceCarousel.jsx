@@ -2,34 +2,24 @@ import { useState, useEffect } from 'react';
 import CardService from './CardService';
 import NavigationArrows from './NavigationArrows';
 
-/*componente service carousel
-el  componente recibe unos items
-
-
-
-*/
-
 const ServiceCarousel = ({ items }) => {
   const [indiceActual, setIndiceActual] = useState(0);
-
-  //revisar este codigo
-  const [serviciosVisibles, setserviciosVisibles] = useState(1);
-  const [anchoCardServicio, setanchoCardServicio] = useState('100%');
+  const [serviciosVisibles, setServiciosVisibles] = useState(1);
+  const [anchoCardServicio, setAnchoCardServicio] = useState('100%');
 
   // Ajustar el número de tarjetas visibles según el ancho de pantalla
-  //revisar
   useEffect(() => {
     const updateServiciosVisibles = () => {
       const width = window.innerWidth;
       if (width < 640) { // Mobile
-        setserviciosVisibles(1);
-        setanchoCardServicio('100%');
+        setServiciosVisibles(1);
+        setAnchoCardServicio('100%');
       } else if (width < 1024) { // Tablet grande
-        setserviciosVisibles(2);
-        setanchoCardServicio('50%');
+        setServiciosVisibles(2);
+        setAnchoCardServicio('50%');
       } else { // Desktop
-        setserviciosVisibles(3);
-        setanchoCardServicio('33%');
+        setServiciosVisibles(3);
+        setAnchoCardServicio('33.33%');
       }
     };
 
@@ -38,30 +28,31 @@ const ServiceCarousel = ({ items }) => {
     return () => window.removeEventListener('resize', updateServiciosVisibles);
   }, []);
 
-
+  // Flecha siguiente
   const deslizarSiguiente = () => {
     setIndiceActual((prev) => {
-      const indiceMaximo = Math.ceil(items.length - serviciosVisibles);
+      const indiceMaximo = items.length - serviciosVisibles;
       return prev >= indiceMaximo ? 0 : prev + 1;
     });
   };
 
+  // Flecha anterior (corregido: ahora retorna el nuevo índice)
   const deslizarAnterior = () => {
     setIndiceActual((prev) => {
-      prev === 0 ? Math.floor(items.length - serviciosVisibles) : prev - 1
+      const indiceMaximo = items.length - serviciosVisibles;
+      return prev === 0 ? indiceMaximo : prev - 1;
     });
   };
-
 
   return (
     <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6">
       {/* Contenedor del carrusel */}
-      <div className='relative overflow-hidden'>
+      <div className="relative overflow-hidden">
         {/* Carrusel */}
         <div
-          className="flex transition-transform duration-300 ease-in-out py-10"
+          className="flex transition-transform duration-500 ease-in-out py-10"
           style={{
-            transform: `translateX(-${indiceActual * (100/serviciosVisibles)}%)`,
+            transform: `translateX(-${indiceActual * (100 / serviciosVisibles)}%)`,
           }}
         >
           {items.map((item, index) => (
@@ -79,7 +70,10 @@ const ServiceCarousel = ({ items }) => {
       </div>
 
       {/* Controles */}
-      <NavigationArrows vistaAnterior={deslizarAnterior} VistaSiguiente={deslizarSiguiente} />
+      <NavigationArrows
+        vistaAnterior={deslizarAnterior}
+        vistaSiguiente={deslizarSiguiente}
+      />
     </div>
   );
 };

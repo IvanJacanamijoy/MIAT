@@ -1,14 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
-import {
-  Wand2,
-  RefreshCw,
-  Filter,
-  UserPlus,
-  CalendarPlus,
-  AlertTriangle,
-} from "lucide-react";
+import { Filter, AlertTriangle } from "lucide-react";
 
 import VisitCard from "../../components/TechnicalVisitsFilterForm/VisitCard";
 import VisitFilterForm from "../../components/TechnicalVisitsFilterForm/VisitFilterForm";
@@ -23,18 +16,9 @@ import {
   updateVisitaTecnicaApi,
 } from "../../service/visitasTecnicas";
 import { fetchTecnicosApi } from "../../service/users";
-import ButtonTechnicalVisits from "../../components/ButtonTechnicalVisits";
 import EmptyState from "../../components/Common/EmptyState";
 import DiagnosticForm from "../../components/DiagnosticForm";
 import QuoteForm from "../../components/QuoteForm";
-
-/**
- * Vista de administración de Visitas Técnicas
- * - Layout moderno con hero, toolbar pegajosa y grid responsivo
- * - Accesible (roles ARIA, teclas rápidas) y completamente responsive
- * - Carga esquelética, manejo de errores y refresco manual
- * - Compatible con Tailwind v4 (utility-first)
- */
 
 const skeletonArray = Array.from({ length: 6 }, (_, i) => i);
 
@@ -52,7 +36,6 @@ export default function AdminTechnicalVisits() {
   const [loadingTechs, setLoadingTechs] = useState(false);
   const [error, setError] = useState("");
 
-  // Para evitar doble fetch cuando el token cambie 
   const firstLoad = useRef(true);
 
   const loadData = async (filters = {}) => {
@@ -64,8 +47,25 @@ export default function AdminTechnicalVisits() {
         fetchVisitasTecnicasApi(authToken, filters),
         fetchTecnicosApi(authToken),
       ]);
-      setVisits(Array.isArray(vData) ? vData : []);
-      setTechnicians(Array.isArray(tData) ? tData : []);
+
+      // Relacionamos visitas con técnicos
+      const visitasArray = Array.isArray(vData) ? vData : [];
+      const tecnicosArray = Array.isArray(tData) ? tData : [];
+
+      const visitasPorTecnico = visitasArray.reduce((acc, v) => {
+        if (v.IdTecnico) {
+          acc[v.IdTecnico] = (acc[v.IdTecnico] || 0) + 1;
+        }
+        return acc;
+      }, {});
+
+      const tecnicosConVisitas = tecnicosArray.map((t) => ({
+        ...t,
+        totalVisitas: visitasPorTecnico[t.IdUsuario] || 0,
+      }));
+
+      setVisits(visitasArray);
+      setTechnicians(tecnicosConVisitas);
     } catch (e) {
       console.error(e);
       setError("No pudimos cargar la información. Intenta nuevamente.");
@@ -82,7 +82,6 @@ export default function AdminTechnicalVisits() {
       firstLoad.current = false;
     }
     loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken]);
 
   const handleFilter = async (filters) => {
@@ -144,7 +143,7 @@ export default function AdminTechnicalVisits() {
     try {
       const response = await createDiagnosticoApi(data, authToken);
       toast.success(response?.message || "Diagnóstico guardado");
-      await refreshVisits();
+      await refresh();
     } catch (error) {
       toast.error("Error al guardar diagnóstico");
       console.error(error);
@@ -157,9 +156,8 @@ export default function AdminTechnicalVisits() {
     try {
       const response = await createCotizacionApi(data, authToken);
       toast.success(response?.message || "Cotización guardada");
-      await refreshVisits();
+      await refresh();
     } catch (error) {
-      toast.error("Error al guardar información");
       toast.error("Error al guardar cotización");
       console.error(error);
     } finally {
@@ -182,7 +180,6 @@ export default function AdminTechnicalVisits() {
     }
   };
 
-  // KPIs simples por estado (asumiendo prop IdEstado)
   const stats = useMemo(() => {
     const s = { total: visits.length, pendientes: 0, asignadas: 0, canceladas: 0 };
     for (const v of visits) {
@@ -193,26 +190,14 @@ export default function AdminTechnicalVisits() {
     return s;
   }, [visits]);
 
-  // Atajos de teclado (N = nueva visita, R = refresh)
-  useEffect(() => {
-    const onKey = (e) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (e.key.toLowerCase() === "n") handleOpenNewVisit();
-      if (e.key.toLowerCase() === "r") refresh();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-100">
+    <div className="min-h-screen bg-gray-200 relative max-w-7xl mx-auto">
       {/* HERO */}
       <section className="relative isolate">
         <img
           src={fondo1}
           alt="Fondo eléctrico"
-          className="h-[220px] md:h-[320px] w-full object-cover opacity-90"
+          className="h-[200px] sm:h-[260px] md:h-[320px] w-full object-cover opacity-90"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
         <motion.div
@@ -221,69 +206,88 @@ export default function AdminTechnicalVisits() {
           transition={{ duration: 0.5 }}
           className="absolute inset-0 grid place-items-center px-4 text-center"
         >
-          <div className="max-w-4xl">
-            <h1 className="text-white tracking-tight font-extrabold text-3xl md:text-5xl">
+          <div className="max-w-3xl sm:max-w-4xl">
+            <h1 className="text-white tracking-tight font-extrabold text-2xl sm:text-3xl md:text-5xl">
               Visitas Técnicas
             </h1>
-            <p className="text-white/90 mt-3 md:mt-4 text-base md:text-lg">
+            <p className="text-white/90 mt-2 sm:mt-3 md:mt-4 text-sm sm:text-base md:text-lg">
               Administra, filtra y actúa sobre todas las visitas técnicas del sistema.
             </p>
-            <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 ring-1 ring-white/30 backdrop-blur">
-              <Wand2 className="size-4 text-white" />
-              <span className="text-white text-sm md:text-base">Atajos: N = nueva, R = refrescar</span>
+            <div className="mt-6">
+              <button
+                onClick={handleOpenNewVisit}
+                className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition"
+              >
+                Agendar Visita Técnica
+              </button>
             </div>
           </div>
         </motion.div>
       </section>
 
-      {/* TOOLBAR pegajosa */}
-      <div
-        role="region"
-        aria-label="Barra de herramientas"
-        className="sticky top-0 z-30 border-b border-gray-200/80 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60"
-      >
-        <div className="mx-auto max-w-7xl px-4 py-3 flex flex-wrap items-center gap-3">
-          <ButtonTechnicalVisits />
-          <button
-            onClick={handleOpenNewVisit}
-            className="inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-semibold ring-1 ring-gray-300 hover:ring-gray-400 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/50"
-          >
-            <CalendarPlus className="size-4" /> Agendar visita
-          </button>
-          <button
-            onClick={refresh}
-            aria-label="Refrescar"
-            className="ml-auto inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-semibold ring-1 ring-gray-300 hover:ring-gray-400 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/50"
-          >
-            <RefreshCw className={"size-4 " + (loadingVisits ? "animate-spin" : "")} />
-            Refrescar
-          </button>
-        </div>
-      </div>
-
       {/* CONTENIDO */}
-      <main className="mx-auto max-w-7xl px-4 pb-16 -mt-12 relative z-10">
-        {/* Tarjeta de filtro + stats */}
+      <main className="mx-auto max-w-7xl px-3 sm:px-4 pb-12 sm:pb-16 mt-4 md:mt-6 relative z-10">
+        {/* Filtros + Skeletons */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          className="grid grid-cols-1 lg:grid-cols-3 gap-4"
+          className="flex flex-col items-center gap-6"
         >
-          <div className="lg:col-span-2 rounded-3xl border border-gray-200 bg-white p-4 md:p-5 shadow-sm">
+          {/* Filtro centrado */}
+          <div className="w-full md:w-3/4 rounded-3xl border border-gray-200 bg-white p-4 shadow-sm">
             <div className="flex items-center gap-2 mb-3">
               <Filter className="size-4" />
-              <h2 className="font-semibold tracking-tight">Filtrar visitas</h2>
+              <h2 className="font-semibold tracking-tight text-sm sm:text-base">
+                Filtrar visitas
+              </h2>
             </div>
             <VisitFilterForm onFilter={handleFilter} />
           </div>
 
-          <div className="rounded-3xl border border-gray-200 bg-white p-4 md:p-5 shadow-sm grid grid-cols-3 gap-3">
-            <Kpi label="Totales" value={stats.total} />
-            <Kpi label="Pendientes" value={stats.pendientes} />
-            <Kpi label="Asignadas" value={stats.asignadas} />
-            <div className="col-span-3">
-              <Kpi label="Canceladas" value={stats.canceladas} subtle />
+          {/* KPIs + Técnicos destacados */}
+          <div className="w-full flex flex-col lg:flex-row gap-4">
+            {/* KPIs */}
+            <div className="flex-1 rounded-3xl border border-gray-200 bg-white p-4 shadow-sm grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <Kpi label="Totales" value={stats.total} />
+              <Kpi label="Pendientes" value={stats.pendientes} />
+              <Kpi label="Asignadas" value={stats.asignadas} />
+              <div className="col-span-2 sm:col-span-3">
+                <Kpi label="Canceladas" value={stats.canceladas} subtle />
+              </div>
+            </div>
+
+            {/* Técnicos top */}
+            <div className="flex-1 rounded-3xl border border-gray-200 bg-white p-4 shadow-sm">
+              <h3 className="font-semibold text-gray-700 mb-3">
+                Técnicos con más visitas
+              </h3>
+              {loadingTechs ? (
+                <div className="animate-pulse space-y-3">
+                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                  <div className="h-4 bg-gray-200 rounded w-2/3" />
+                  <div className="h-4 bg-gray-200 rounded w-1/2" />
+                </div>
+              ) : (
+                <ul className="space-y-2">
+                  {technicians
+                    .sort((a, b) => b.totalVisitas - a.totalVisitas)
+                    .slice(0, 3)
+                    .map((t, i) => (
+                      <li
+                        key={t.IdUsuario}
+                        className="flex justify-between items-center border-b last:border-b-0 pb-2"
+                      >
+                        <span className="font-medium text-gray-800">
+                          {i + 1}. {t.Nombres} {t.Apellidos}
+                        </span>
+                        <span className="text-red-600 font-bold">
+                          {t.totalVisitas}
+                        </span>
+                      </li>
+                    ))}
+                </ul>
+              )}
             </div>
           </div>
         </motion.div>
@@ -291,11 +295,13 @@ export default function AdminTechnicalVisits() {
         {/* Lista de visitas */}
         <section className="mt-6">
           {error && (
-            <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-red-800 flex items-start gap-3">
-              <AlertTriangle className="mt-0.5 size-5" />
+            <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-red-800 flex flex-col sm:flex-row items-start gap-3">
+              <AlertTriangle className="size-5 shrink-0" />
               <div>
-                <p className="font-semibold">Ocurrió un problema</p>
-                <p className="text-sm/6">{error}</p>
+                <p className="font-semibold text-sm sm:text-base">
+                  Ocurrió un problema
+                </p>
+                <p className="text-xs sm:text-sm">{error}</p>
               </div>
             </div>
           )}
@@ -304,14 +310,14 @@ export default function AdminTechnicalVisits() {
             <div
               role="status"
               aria-live="polite"
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+              className="flex flex-col gap-4 w-full"
             >
               {skeletonArray.map((i) => (
                 <SkeletonCard key={i} />
               ))}
             </div>
           ) : visits?.length === 0 ? (
-            <div className="rounded-3xl border border-gray-200 bg-white p-6 md:p-10 shadow-sm">
+            <div className="rounded-3xl border border-gray-200 bg-white p-6 sm:p-8 md:p-10 shadow-sm">
               <EmptyState
                 title="No hay visitas técnicas registradas"
                 description="Cuando se agenden, aparecerán aquí automáticamente."
@@ -321,17 +327,21 @@ export default function AdminTechnicalVisits() {
               />
             </div>
           ) : (
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <ul className="flex flex-col gap-4 w-full">
               {visits.map((visit) => (
-                <li key={visit.IdCita}>
+                <li key={visit.IdCita} className="w-full">
                   <VisitCard
                     key={visit.IdCita}
                     visit={visit}
                     rol="admin"
                     onCancel={() => handleCancelVisit(visit.IdCita)}
                     onReprogram={() => handleOpenModal(visit, "reprogramar")}
-                    onAssignTechnician={() => handleOpenModal(visit, "asignar")}
-                    onGenerateDiagnosis={() => handleOpenModal(visit, "diagnostico")}
+                    onAssignTechnician={() =>
+                      handleOpenModal(visit, "asignar")
+                    }
+                    onGenerateDiagnosis={() =>
+                      handleOpenModal(visit, "diagnostico")
+                    }
                     onGenerateQuote={() => handleOpenModal(visit, "cotizacion")}
                     technicians={technicians}
                   />
@@ -387,6 +397,7 @@ export default function AdminTechnicalVisits() {
             onCancel={handleCloseModal}
           />
         )}
+
         {modalType === "diagnostico" && selectedVisit && (
           <DiagnosticForm
             citaId={selectedVisit.IdCita}
@@ -415,23 +426,32 @@ export default function AdminTechnicalVisits() {
 
 function Kpi({ label, value, subtle = false }) {
   return (
-    <div className={`rounded-2xl border ${subtle ? "border-gray-200 bg-gray-50" : "border-gray-200 bg-white"} p-4 text-center shadow-xs`}>
-      <div className="text-xs font-medium text-gray-500 tracking-wide">{label}</div>
-      <div className="mt-1 text-2xl font-extrabold tabular-nums">{value}</div>
+    <div
+      className={`rounded-2xl border ${
+        subtle ? "border-gray-200 bg-gray-50" : "border-gray-200 bg-white"
+      } p-3 sm:p-4 text-center shadow-xs`}
+    >
+      <div className="text-xs sm:text-sm font-medium text-gray-500 tracking-wide">
+        {label}
+      </div>
+      <div className="mt-1 text-xl sm:text-2xl font-extrabold tabular-nums">
+        {value}
+      </div>
     </div>
   );
 }
 
 function SkeletonCard() {
   return (
-    <div className="rounded-3xl border border-gray-200 bg-white p-4 shadow-sm">
-      <div className="h-40 w-full rounded-2xl bg-gray-200 animate-pulse" />
-      <div className="mt-3 h-4 w-3/5 rounded bg-gray-200 animate-pulse" />
-      <div className="mt-2 h-4 w-2/5 rounded bg-gray-200 animate-pulse" />
-      <div className="mt-4 flex gap-2">
-        <div className="h-8 w-24 rounded-xl bg-gray-200 animate-pulse" />
-        <div className="h-8 w-24 rounded-xl bg-gray-200 animate-pulse" />
+    <div className="rounded-3xl border border-gray-200 bg-white p-4 shadow-sm w-full">
+      <div className="h-32 sm:h-40 w-full rounded-2xl bg-gray-200 animate-pulse" />
+      <div className="mt-3 h-3 sm:h-4 w-3/5 rounded bg-gray-200 animate-pulse" />
+      <div className="mt-2 h-3 sm:h-4 w-2/5 rounded bg-gray-200 animate-pulse" />
+      <div className="mt-4 flex flex-wrap gap-2">
+        <div className="h-7 sm:h-8 w-20 sm:w-24 rounded-xl bg-gray-200 animate-pulse" />
+        <div className="h-7 sm:h-8 w-20 sm:w-24 rounded-xl bg-gray-200 animate-pulse" />
       </div>
     </div>
   );
 }
+

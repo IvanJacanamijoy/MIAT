@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import QuoteCard from "../../components/QuoteFilterForm/QuoteCard";
+import { motion } from "framer-motion";
 import QuoteFilterForm from "../../components/QuoteFilterForm/QuoteFilterForm";
 import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
 import { toast } from "react-toastify";
@@ -82,20 +83,30 @@ const AdminQuote = () => {
   return (
     <div className="min-h-screen bg-gray-200 relative max-w-7xl mx-auto">
       {/* Banner */}
-      <div className="relative">
+      <section className="relative isolate">
         <img
           src={fondo1}
-          className="w-full h-[500px] object-cover opacity-90"
-          alt="Fondo"
+          alt="Fondo eléctrico"
+          className="h-[200px] sm:h-[260px] md:h-[320px] w-full object-cover opacity-90"
         />
-        <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 text-center text-gray-200">
-          <h1 className="font-bold md:text-6xl">Cotizaciones Administrador</h1>
-          <p className="md:text-xl py-4">
-            Gestione todas las cotizaciones, edítelas o márcalas como
-            completadas.
-          </p>
-        </div>
-      </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="absolute inset-0 grid place-items-center px-4 text-center"
+        >
+          <div className="max-w-3xl sm:max-w-4xl">
+            <h1 className="text-white tracking-tight font-extrabold text-2xl sm:text-3xl md:text-5xl">
+              Cotizaciones
+            </h1>
+            <p className="text-white/90 mt-2 sm:mt-3 md:mt-4 text-sm sm:text-base md:text-lg">
+              Gestione todas las cotizaciones, edítelas o márcalas como
+              completadas.
+            </p>
+          </div>
+        </motion.div>
+      </section>
 
       {/* Filtros + lista */}
       <div className="relative z-10 rounded-t-3xl -mt-24 px-4 py-10 mx-10 text-white">

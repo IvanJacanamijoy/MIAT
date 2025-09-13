@@ -109,7 +109,7 @@ const Contact = () => {
               className="flex items-center gap-4 p-4 bg-red-500/10 rounded-xl hover:bg-red-500/20 transition"
             >
               <Mail className="text-red-600" />
-              <span className="font-medium text-gray-800">miat@gmail.com</span>
+              <span className="font-medium text-gray-800">servicesmiat@gmail.com</span>
             </a>
 
             {/* Teléfono: clic en el span copia al portapapeles */}

@@ -1,36 +1,44 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom"; // 👈 para leer el state de navegación
 import VisitCard from "../../components/TechnicalVisitsFilterForm/VisitCard";
 import VisitFilterForm from "../../components/TechnicalVisitsFilterForm/VisitFilterForm";
 import VisitForm from "../../components/TechnicalVisitsFilterForm/VisitForm";
 import { useAuth } from "../../context/AuthContext";
-import Modal from "../../components/common/Modal";
+import Modal from "../../components/Common/Modal";
 import ReprogramVisitForm from "../../components/TechnicalVisitsFilterForm/ReprogramVisitForm";
 import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
 import { fetchVisitasTecnicasApi } from '../../service/visitasTecnicas';
 import ButtonTechnicalVisits from "../../components/ButtonTechnicalVisits";
 import EmptyState from "../../components/Common/EmptyState";
 
-
 const UserTechnicalVisits = () => {
   const { usuario, authToken } = useAuth();
+  const location = useLocation(); // 👈 leer si viene con openForm
   const [visits, setVisits] = useState([]);
   const [selectedVisit, setSelectedVisit] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showFormModal, setShowFormModal] = useState(false);
+  const [modalType, setModalType] = useState("");
+
+  // Abrir modal de agendar si viene desde el Home con openForm=true
+  useEffect(() => {
+    if (location.state?.openForm) {
+      setShowFormModal(true);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     if (usuario?.id) {
-      fetchVisitasTecnicasApi(authToken,{clienteId: usuario.id}).then((data) => {
+      fetchVisitasTecnicasApi(authToken, { clienteId: usuario.id }).then((data) => {
         setVisits(data);
       });
     }
-  }, [usuario]);
+  }, [usuario, authToken]);
 
   const handleFilter = (filters) => {
-    console.log(filters)
-    fetchVisitasTecnicasApi(authToken, filters).then((data)=>{
-      setVisits(data);
-    }).catch('Hubo un error');
+    fetchVisitasTecnicasApi(authToken, filters)
+      .then((data) => setVisits(data))
+      .catch(() => console.error("Hubo un error al filtrar"));
   };
 
   const handleOpenModal = (visit, type) => {
@@ -41,7 +49,7 @@ const UserTechnicalVisits = () => {
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setModalType('');
+    setModalType("");
     setSelectedVisit(null);
   };
 
@@ -50,7 +58,6 @@ const UserTechnicalVisits = () => {
       v.id === visitId ? { ...v, estado: "Cancelada" } : v
     );
     setVisits(updated);
-    
   };
 
   const handleReprogramVisit = (updatedVisit) => {
@@ -58,7 +65,6 @@ const UserTechnicalVisits = () => {
       v.id === updatedVisit.id ? updatedVisit : v
     );
     setVisits(updated);
-    
     handleCloseModal();
   };
 
@@ -78,7 +84,6 @@ const UserTechnicalVisits = () => {
 
       const updatedVisits = [...visits, nuevaVisita];
       setVisits(updatedVisits);
-      setFilteredVisits(updatedVisits);
       setShowFormModal(false);
     } catch (error) {
       alert("Ocurrió un error: " + error.message);
@@ -87,21 +92,23 @@ const UserTechnicalVisits = () => {
 
   return (
     <div className="min-h-screen bg-gray-200 relative max-w-7xl mx-auto">
+      {/* Hero */}
       <div className="relative">
         <img
           src={fondo1}
           className="w-full h-[400px] object-cover opacity-90"
           alt="Fondo eléctrico"
         />
-        <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 text-center text-gray-200 ">
-          <h1 className="font-bold md:text-6xl">
-            Mis Visitas Técnicas
-          </h1>
-          <p className="md:text-xl py-4">Aquí puede revisar el estado y los detalles de todas sus visitas técnicas programadas.</p>
+        <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 text-center text-gray-200">
+          <h1 className="font-bold md:text-6xl">Mis Visitas Técnicas</h1>
+          <p className="md:text-xl py-4">
+            Aquí puede revisar el estado y los detalles de todas sus visitas técnicas programadas.
+          </p>
         </div>
       </div>
 
-      <div className="relative z-10 rounded-t-3xl -mt-40 sm:-mt-34  md:-mt-30 px-4 pb-10 lg:pb-0 pt-10 lg:pt-0 mx-10 text-white">
+      {/* Contenido */}
+      <div className="relative z-10 rounded-t-3xl -mt-40 sm:-mt-34 md:-mt-30 px-4 pb-10 lg:pb-0 pt-10 lg:pt-0 mx-10 text-white">
         <ButtonTechnicalVisits />
         <VisitFilterForm onFilter={handleFilter} />
 
@@ -149,3 +156,4 @@ const UserTechnicalVisits = () => {
 };
 
 export default UserTechnicalVisits;
+

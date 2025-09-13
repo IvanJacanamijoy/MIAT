@@ -1,6 +1,6 @@
 import { useState } from "react";
 import servicio1 from "../../assets/images/servicecarousel/servicio_1.png";
-import Modal from "../common/Modal";
+import Modal from "../Common/Modal";
 
 const QuoteCard = ({ quote, rol, onAccept, onReject, onEdit, onComplete, onViewMore }) => {
   const [accionesVisibles, setAccionesVisibles] = useState(true);
