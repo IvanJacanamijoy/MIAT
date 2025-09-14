@@ -40,26 +40,48 @@ class ServicioController {
             orderDirection: req.query.orderDirection || 'DESC'
         };
 
-        // Aplicar filtros basados en el rol del usuario autenticado
-        if (req.userRole === 1) { // Rol: Cliente
+        // Filtros por rol
+        if (req.userRole === 1) { // Cliente
             filters.clienteId = req.userId;
-        } else if (req.userRole === 2) { // Rol: Técnico
+        } else if (req.userRole === 2) { // Técnico
             filters.tecnicoId = req.userId;
         }
 
-        // Otros filtros desde la query parameters
-        if (req.query.estadoId) filters.estadoId = parseInt(req.query.estadoId);
-        if (req.query.cotizacionId) filters.cotizacionId = parseInt(req.query.cotizacionId);
+        // Filtros adicionales desde query
+        if (req.query.estadoId) {
+            filters.estadoId = parseInt(req.query.estadoId);
+        }
+
+        if (req.query.cotizacionId) {
+            filters.cotizacionId = parseInt(req.query.cotizacionId);
+        }
+
+        if (req.query.fecha && req.query.fecha !== "") {
+            filters.fecha = req.query.fecha; // formato YYYY-MM-DD
+        }
+
+        if (req.query.clienteIdentificacion !== undefined) {
+            filters.clienteIdentificacion = req.query.clienteIdentificacion;
+        }
+
+        if (req.query.tipoServicioId) {
+            try {
+                filters.tipoServicioId = JSON.parse(req.query.tipoServicioId); // espera un array
+            } catch (error) {
+                console.warn("Error al parsear tipoServicioId:", error);
+                filters.tipoServicioId = [];
+            }
+        }
 
         try {
             const servicios = await ServicioModel.getAll(filters, options);
-            console.log(servicios)
             res.status(200).json(servicios);
         } catch (error) {
             console.error('Error al obtener la lista de servicios:', error);
             res.status(500).json({ message: 'Error interno del servidor al obtener los servicios.' });
         }
-    };
+    }
+
 }
 
 module.exports = new ServicioController();

@@ -1,4 +1,4 @@
-import Modal from "./common/Modal";
+import Modal from "./Common/Modal";
 import VisitForm from "./TechnicalVisitsFilterForm/VisitForm";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";

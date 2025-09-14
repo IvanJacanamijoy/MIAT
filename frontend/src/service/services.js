@@ -1,52 +1,47 @@
-// src/api/services.js
-const API_BASE_URL = 'http://localhost:3000'; // Asegúrate de que esta sea tu URL base del backend
+import apiRequest from '../utils/apiclient';
 
-export const fetchAllServicesApi = async (authToken, queryParams = '') => {
-    try {
-        // Construye la URL con los parámetros de consulta
-        const url = `${API_BASE_URL}/servicios${queryParams ? `?${queryParams}` : ''}`;
-        console.log("fetchAllServicesApi: Llamando a URL:", url); // Para depuración
+/**
+ * Convierte un objeto de filtros en una cadena de consulta URL válida.
+ * Arrays como tipoServicioId se serializan como JSON.
+ */
+export const buildQueryParams = (filters = {}) => {
+  const params = new URLSearchParams();
 
-        // Petición siempre será GET para el filtrado por URL
-        const response = await fetch(url, {
-            method: 'GET', // <-- ¡CORRECCIÓN CLAVE! Siempre 'GET' para query parameters
-            headers: {
-                'Content-Type': 'application/json',
-                // 'Authorization': `Bearer ${authToken}` // Es recomendable mantener la autenticación aquí
-            }
-        });
-
-        const data = await response.json(); 
-
-        if (!response.ok) {
-            // Si el backend envía un mensaje de error en formato JSON, 'data.message' lo capturará.
-            // Si el backend envía HTML o texto, el catch del JSON.parse lo manejará.
-            throw new Error(data.message || `Error al obtener los servicios: ${response.status} - ${response.statusText}`);
-        }
-        
-        // Verifica que la respuesta sea un array. 
-        // Si tu backend envuelve el array (ej. { data: [...] } o { servicios: [...] }),
-        // deberás ajustar esta lógica para extraerlo.
-        console.log(data);
-        if (Array.isArray(data)) {
-            return data;
-        } 
-        // Si tu backend devuelve un objeto que contiene el array (ej. { servicios: [...] })
-        else if (data && typeof data === 'object' && Array.isArray(data.servicios)) { // <-- Ajusta 'servicios' a la clave real de tu backend
-            console.warn('La respuesta de la API envuelve el array de servicios en una propiedad "servicios".');
-            return data.servicios;
-        }
-        // Puedes añadir más condiciones 'else if' si hay otras claves (ej. data.results)
-        
-        // Si no es un array directamente ni un objeto con un array en 'servicios', lanza el error
-        console.warn('La respuesta de la API para servicios no es un array como se esperaba, ni un objeto con array reconocido:', data);
-        throw new Error('Formato de respuesta de la API incorrecto para servicios: Se esperaba un array o un objeto con array.');
-    } catch (error) {
-        console.error('Error en fetchAllServicesApi:', error);
-        // Si el error original fue por JSON malformado (SyntaxError), lo relanza con un mensaje más claro
-        if (error instanceof SyntaxError && error.message.includes('JSON.parse')) {
-            throw new Error('Error al parsear la respuesta del servidor como JSON. Posiblemente el servidor no devolvió JSON válido para servicios.');
-        }
-        throw error; // Relanza el error para que el GenericEntityManager lo capture
+  Object.entries(filters).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      if (value.length > 0) {
+        params.append(key, JSON.stringify(value));
+      }
+    } else if (value !== undefined && value !== '') {
+      params.append(key, value);
     }
+  });
+
+  return params.toString(); // Ejemplo: "fecha=2024-08-01&tipoServicioId=%5B1%5D"
+};
+
+/**
+ * Realiza una petición GET a /servicios con filtros opcionales.
+ * @param {string} authToken - Token de autenticación
+ * @param {object} filters - Objeto con filtros (fecha, tipoServicioId, etc.)
+ * @returns {Promise<Array>} - Lista de servicios
+ */
+export const fetchAllServicesApi = async (authToken, filters = {}) => {
+  try {
+    const queryParams = buildQueryParams(filters);
+    const url = `/servicios${queryParams ? `?${queryParams}` : ''}`;
+
+    const data = await apiRequest(url, 'GET', null, authToken);
+
+    if (Array.isArray(data)) {
+      return data;
+    } else if (data && Array.isArray(data.servicios)) {
+      return data.servicios;
+    }
+
+    throw new Error('Formato de respuesta de la API incorrecto para servicios');
+  } catch (error) {
+    console.error('Error en fetchAllServicesApi:', error);
+    throw error;
+  }
 };

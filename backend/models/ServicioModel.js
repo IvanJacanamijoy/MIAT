@@ -65,50 +65,85 @@ class ServicioModel {
                 'S.IdTecnico',
                 'S.IdCotizacion',
                 'S.IdEstado',
+
                 'C.CostoMateriales',
-                'C.CostoManoObra', 'C.PrecioTotal',
+                'C.CostoManoObra',
+                'C.PrecioTotal',
+                'C.Garantia',
+                'C.Observaciones',
+
+                'D.Descripcion as DiagnosticoDescripcion',
+                'D.Materiales',
+                'D.Medidas',
+
                 'Cliente.Nombres as ClienteNombres',
                 'Cliente.Apellidos as ClienteApellidos',
+                'Cliente.Identificacion as ClienteIdentificacion',
                 'Tecnico.Nombres as TecnicoNombres',
                 'Tecnico.Apellidos as TecnicoApellidos',
                 'ES.Descripcion as EstadoServicioDescripcion',
-                knex.raw('GROUP_CONCAT(TS.Descripcion SEPARATOR \', \') AS TiposServicio')
+
+                'Cita.Fecha as FechaServicio',
+                'Cita.Direccion as DireccionServicio',
+
+                knex.raw('GROUP_CONCAT(DISTINCT TS.Descripcion SEPARATOR \', \') AS TiposServicio')
             )
             .join('Cotizacion as C', 'S.IdCotizacion', '=', 'C.IdCotizacion')
+            .join('Diagnostico as D', 'C.IdDiagnostico', '=', 'D.IdDiagnostico')
+            .join('CitaServicio as Cita', 'D.IdCita', '=', 'Cita.IdCita')
             .join('Usuario as Cliente', 'S.IdCliente', '=', 'Cliente.IdUsuario')
             .join('Usuario as Tecnico', 'S.IdTecnico', '=', 'Tecnico.IdUsuario')
             .join('Estado as ES', 'S.IdEstado', '=', 'ES.IdEstado')
             .leftJoin('ServicioTipoServicio as STS', 'S.IdServicio', '=', 'STS.IdServicio')
             .leftJoin('TipoServicio as TS', 'STS.IdTipoServicio', '=', 'TS.IdTipoServicio');
 
-        // Apply filters
-        if (filters.clienteId) {
-            query.where('S.IdCliente', filters.clienteId);
+        // 🔍 Filtros dinámicos
+        if (filters.fecha !== undefined && filters.fecha !== '') {
+            query.where('Cita.Fecha', filters.fecha);
         }
-        if (filters.tecnicoId) {
+
+        if (Array.isArray(filters.tipoServicioId) && filters.tipoServicioId.length > 0) {
+            query.whereExists(function () {
+                this.select('*')
+                    .from('ServicioTipoServicio as STS2')
+                    .whereRaw('STS2.IdServicio = S.IdServicio')
+                    .whereIn('STS2.IdTipoServicio', filters.tipoServicioId);
+            });
+        }
+
+
+        if (filters.clienteIdentificacion !== undefined && filters.clienteIdentificacion !== '') {
+            query.where('Cliente.Identificacion', filters.clienteIdentificacion);
+        }
+
+        if (filters.tecnicoId !== undefined) {
             query.where('S.IdTecnico', filters.tecnicoId);
         }
-        if (filters.estadoId) {
+
+        if (filters.clienteId !== undefined) {
+            query.where('S.IdCliente', filters.clienteId);
+        }
+
+        if (filters.estadoId !== undefined) {
             query.where('S.IdEstado', filters.estadoId);
         }
-        if (filters.cotizacionId) {
+
+        if (filters.cotizacionId !== undefined) {
             query.where('S.IdCotizacion', filters.cotizacionId);
         }
 
         query.groupBy('S.IdServicio');
 
-        // Ordering
-        const orderBy = options.orderBy || 'IdServicio';
+        const orderBy = options.orderBy || 'S.IdServicio';
         const orderDirection = options.orderDirection || 'DESC';
         query.orderBy(orderBy, orderDirection);
 
-        console.log('Generated SQL Query:', query.toString()); // Log the SQL
+        // console.log('SQL generada:', query.toString());
+
         const rows = await query;
-        console.log('Query Results:', rows); // Log the results
-
         return rows;
-
     }
+
 
 }
 

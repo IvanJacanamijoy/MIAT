@@ -106,7 +106,7 @@ const Navbar = () => {
               <p className="text-3xl font-bold">MIAT</p>
             </div>
             {/* ¡NO modificamos los botones! */}
-            <div className="hidden ml-2 sm:ml-6 xl:block bg-red-700/80 py-3 px-7 rounded-full my-2">
+            <div className="hidden ml-2 sm:ml-6 xl:block bg-red-500 py-3 px-7 rounded-full my-2">
               <div className="flex space-x-4 items-center px-4">
                 {navigation.map((item) => (
                   <Link

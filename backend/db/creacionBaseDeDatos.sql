@@ -34,6 +34,8 @@ CREATE TABLE Usuario (
     Telefono VARCHAR(20),
     IdRol INT NOT NULL,
     IdEstado INT NOT NULL,
+    ResetPasswordToken VARCHAR(255) NULL,
+    ResetPasswordExpire BIGINT NULL,
     FOREIGN KEY (IdRol) REFERENCES Rol(IdRol),
     FOREIGN KEY (IdEstado) REFERENCES Estado(IdEstado)
 );

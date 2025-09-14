@@ -1,23 +1,51 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/';
+// src/api/cotizaciones.js
+import apiRequest from '../utils/apiclient';
 
-export const createCotizacionApi = async (cotizacionData, token) => {
+const ENDPOINT = '/cotizaciones';
+
+//Obtener cotizaciones con filtros
+export const fetchCotizacionesApi = async (authToken, filters = {}) => {
   try {
-    const response = await fetch(`${BASE_URL}/cotizaciones`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(cotizacionData)
-    });
-
-    if (!response.ok) {
-      throw new Error('Error al crear cotización');
-    }
-
-    return await response.json();
+    const queryString = new URLSearchParams(filters).toString();
+    const url = `${ENDPOINT}${queryString ? `?${queryString}` : ''}`;
+    const data = await apiRequest(url, 'GET', null, authToken);
+    return data;
   } catch (error) {
-    console.error('createCotizacionApi error:', error);
+    console.error('Error fetching cotizaciones:', error);
     throw error;
   }
 };
+
+//Crear una nueva cotización
+export const createCotizacionApi = async (cotizacionData, authToken) => {
+  try {
+    const data = await apiRequest(ENDPOINT, 'POST', cotizacionData, authToken);
+    return data;
+  } catch (error) {
+    console.error('Error creating cotización:', error);
+    throw error;
+  }
+};
+
+//Actualizar cotización
+export const updateCotizacionApi = async (cotizacionId, updatedData, authToken) => {
+  try {
+    const data = await apiRequest(`${ENDPOINT}/${cotizacionId}`, 'PUT', updatedData, authToken);
+    return data;
+  } catch (error) {
+    console.error('Error updating cotización:', error);
+    throw error;
+  }
+};
+
+//Eliminar cotización
+export const deleteCotizacionApi = async (cotizacionId, authToken) => {
+  try {
+    const data = await apiRequest(`${ENDPOINT}/${cotizacionId}`, 'DELETE', null, authToken);
+    return data;
+  } catch (error) {
+    console.error('Error deleting cotización:', error);
+    throw error;
+  }
+};
+

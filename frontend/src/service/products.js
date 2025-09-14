@@ -1,51 +1,41 @@
-// src/api/products.js
-const API_BASE_URL = 'http://localhost:3000'; // O tu base URL
+import apiRequest from '../utils/apiclient';
 
+const ENDPOINT = '/productos';
+
+//Obtener todos los productos
 export const fetchAllProductsApi = async (authToken) => {
-  const response = await fetch(`${API_BASE_URL}/productos`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${authToken}`,
-      'Content-Type': 'application/json',
+  try {
+    const data = await apiRequest(ENDPOINT, 'GET', null, authToken);
+
+    if (!Array.isArray(data)) {
+      throw new Error('Formato de respuesta incorrecto: se esperaba un array.');
     }
-  });
-  if (!response.ok) {
-    throw new Error(`Error al obtener los productos: ${response.status} - ${response.statusText}`);
+
+    return data;
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    throw error;
   }
-  const data = await response.json();
-  // Asume que la API de productos devuelve directamente un array
-  if (!Array.isArray(data)) {
-      throw new Error('Formato de respuesta de la API de productos incorrecto: Se esperaba un array.');
-  }
-  return data;
 };
 
+//Actualizar datos de producto
 export const updateProductDataApi = async (updatedProduct, authToken) => {
-  const response = await fetch(`${API_BASE_URL}/productos/${updatedProduct.IdProducto}`, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${authToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ ...updatedProduct }),
-  });
-  if (!response.ok) {
-    throw new Error(`Hubo un error actualizando el producto: ${response.statusText}`);
+  try {
+    await apiRequest(`${ENDPOINT}/${updatedProduct.IdProducto}`, 'PUT', updatedProduct, authToken);
+  } catch (error) {
+    console.error('Error updating product:', error);
+    throw error;
   }
 };
 
-// Si los productos tienen un estado que se pueda activar/desactivar:
+//Activar o desactivar producto
 export const toggleProductStatusApi = async (product, authToken) => {
-  const nuevoEstado = product.Activo === 1 ? 0 : 1; // Asumiendo un campo 'Activo'
-  const response = await fetch(`${API_BASE_URL}/productos/${product.IdProducto}`, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${authToken}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ Activo: nuevoEstado }),
-  });
-  if (!response.ok) {
-    throw new Error(`Error al cambiar el estado del producto: ${response.statusText}`);
+  const nuevoEstado = product.Activo === 1 ? 0 : 1;
+
+  try {
+    await apiRequest(`${ENDPOINT}/${product.IdProducto}`, 'PUT', { Activo: nuevoEstado }, authToken);
+  } catch (error) {
+    console.error('Error changing product status:', error);
+    throw error;
   }
 };

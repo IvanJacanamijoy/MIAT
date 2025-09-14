@@ -146,7 +146,7 @@ export default function Footer() {
               </a>
 
               <a
-                href="mailto:miatsoluciones@gmail.com"
+                href="mailto:servicesmiat@gmail.com"
                 aria-label="Enviar correo"
                 className="rounded-lg bg-white p-2 ring-1 ring-gray-200 transition hover:ring-red-500"
               >
@@ -176,10 +176,10 @@ export default function Footer() {
 
             <div className="mt-3 text-center md:text-left">
               <a
-                href="mailto:miatsoluciones@gmail.com"
+                href="mailto:servicesmiat@gmail.com"
                 className="inline-block text-base font-semibold text-gray-800 underline underline-offset-4 hover:text-red-600 transition"
               >
-                miatsoluciones@gmail.com
+                servicesmiat@gmail.com
               </a>
             </div>
           </motion.address>

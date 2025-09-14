@@ -1,109 +1,161 @@
-import { useEffect, useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import {fadeIn, zoomIn, staggerContainer, slideIn, bounceIn, pulse,} from "../../Animations/variants";
+import { useAuth } from "../../context/AuthContext";
+import { fetchVisitasTecnicasApi } from "../../service/visitasTecnicas";
+import { fetchAllServicesApi } from "../../service/services";
 import fondo from "../../assets/images/home/imagen_fondo_nosotros.png";
-import servicio_adecuacion from "../../assets/images/home/imagen_fondo_nosotros.png";
-import servicio_mantenimiento from "../../assets/images/home/imagen_fondo_servicios.png";
-import { fetchVisitasTecnicasApi } from '../../service/visitasTecnicas';
-import { Link } from 'react-router-dom';
+import VisitCard from "../../components/TechnicalVisitsFilterForm/VisitCard";
+import { CalendarClock, ClipboardList, FileText } from "lucide-react";
 
 const UserDashboard = () => {
   const { usuario, authToken } = useAuth();
-  const [visitasAgendadas, setVisitasAgendadas] = useState(0);
+  const [visitas, setVisitas] = useState([]);
+  const [servicios, setServicios] = useState([]);
 
   useEffect(() => {
-    const fetchMyVisitas = async () => {
-      if (!usuario || !authToken) return;
-
+    const cargarDatos = async () => {
       try {
-        const allVisits = await fetchVisitasTecnicasApi(authToken, {});
-        
-        // Filtramos las visitas que pertenecen al usuario actual
-        const myVisits = allVisits.filter(visita => visita.idUsuario === usuario.uid);
-        
-        const agendadas = myVisits.filter(visita => visita.estado === 'Agendada');
-        
-        setVisitasAgendadas(agendadas.length);
+        const visitasData = await fetchVisitasTecnicasApi(authToken);
+        const soloCliente = visitasData.filter(
+          (v) => v.cliente?.id === usuario.id
+        );
+        setVisitas(soloCliente);
 
+        const serviciosData = await fetchAllServicesApi(authToken, {
+          clienteId: usuario.id,
+        });
+        setServicios(serviciosData);
       } catch (error) {
-        console.error("Error al obtener los datos de visitas:", error);
+        console.error("Error al cargar el dashboard del cliente", error);
       }
     };
 
-    fetchMyVisitas();
-  }, [usuario, authToken]);
+    cargarDatos();
+  }, [authToken, usuario.id]);
+
+  const visitasPendientes = visitas.filter(
+    (v) => v.EstadoDescripcion === "Pendiente"
+  );
+  const visitasFinalizadas = visitas.filter(
+    (v) => v.EstadoDescripcion === "Finalizado"
+  );
+  const serviciosActivos = servicios.filter(
+    (s) => s.EstadoDescripcion !== "Finalizado"
+  );
+  const serviciosCompletados = servicios.filter(
+    (s) => s.EstadoDescripcion === "Finalizado"
+  );
 
   return (
-    <div className="relative min-h-screen bg-gray-200">
-      {/* Sección principal con la imagen de fondo y el título */}
-      <div className="relative w-full h-screen">
-        <img
-          src={fondo}
-          className="absolute inset-0 w-full h-full object-cover opacity-90"
-          alt="Fondo de bienvenida"
-        />
-        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white px-4 md:px-6">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4">
-            Bienvenido Cliente
-          </h1>
-          <Link to="/usuario/visitatecnica" className="mt-8">
-            <button className="bg-red-600 bg-opacity-80 py-4 px-8 rounded-full shadow-lg transform transition duration-300 hover:scale-105">
-              <span className='text-xl font-semibold whitespace-nowrap'>Agenda Una Visita Técnica AQUI!!</span>
-            </button>
-          </Link>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gray-200 relative max-w-7xl mx-auto">
+      {/* Hero con animación y fondo */}
+      <section
+        className="relative w-full h-[300px] overflow-hidden bg-cover bg-center shadow-xl mb-12"
+        style={{ backgroundImage: `url(${fondo})` }}
+      >
+        <div className="absolute inset-0 bg-black/50 z-10" />
+        <motion.div
+          className="relative z-20 flex flex-col justify-center items-center h-full text-white text-center px-4"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+        >
+          <motion.h1
+            className="text-4xl md:text-5xl font-bold drop-shadow-lg"
+            variants={fadeIn("down", 0.3)}
+          >
+            ¡Bienvenido, {usuario.nombres}!
+          </motion.h1>
+          <motion.p
+            className="mt-4 text-lg md:text-xl max-w-2xl"
+            variants={fadeIn("up", 0.5)}
+          >
+            Aquí puedes consultar el estado de tus visitas técnicas y servicios
+            agendados.
+          </motion.p>
+        </motion.div>
+      </section>
 
-      {/* Sección de servicios y visitas pendientes */}
-      <div className='relative z-10 -mt-24 px-4 sm:px-8 md:px-12 lg:px-24'>
-        <div className='flex flex-col gap-8'>
-          {/* Carrusel de servicios */}
-          <div className="flex justify-center items-center gap-4">
-            <button className="bg-black bg-opacity-50 p-2 rounded-full text-white hover:bg-opacity-70">
-              &lt;
-            </button>
-            <div className="relative bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-sm">
-              <img src={servicio_adecuacion} alt="Servicio Adecuación" className="w-full h-48 object-cover"/>
-              <div className="absolute inset-x-0 bottom-0 bg-black bg-opacity-50 text-white p-4">
-                <h3 className="text-xl font-semibold">Servicio Adecuación</h3>
-                <Link to="/servicios/adecuacion">
-                  <button className="mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">
-                    Ver Más
-                  </button>
-                </Link>
-              </div>
-            </div>
-            <div className="relative bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-sm">
-              <img src={servicio_mantenimiento} alt="Servicio Mantenimiento" className="w-full h-48 object-cover"/>
-              <div className="absolute inset-x-0 bottom-0 bg-black bg-opacity-50 text-white p-4">
-                <h3 className="text-xl font-semibold">Servicio Mantenimiento</h3>
-                <Link to="/servicios/mantenimiento">
-                  <button className="mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">
-                    Ver Más
-                  </button>
-                </Link>
-              </div>
-            </div>
-            <button className="bg-black bg-opacity-50 p-2 rounded-full text-white hover:bg-opacity-70">
-              &gt;
-            </button>
+      {/* Tarjetas Resumen */}
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 px-10"
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+      >
+        <motion.div
+          className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition transform hover:scale-105 border-t-4 border-red-400"
+          variants={bounceIn}
+        >
+          <h3 className="text-lg font-semibold mb-2">Visitas Pendientes</h3>
+          <div className="flex items-center justify-between">
+            <CalendarClock className="text-red-500 w-8 h-8" />
+            <span className="text-3xl font-bold">
+              {visitasPendientes.length}
+            </span>
           </div>
-          
-          {/* Sección de Visitas Pendientes */}
-          <div className='relative z-10 flex justify-center items-center'>
-            <div className="relative flex items-center gap-4">
-              <div className='bg-red-600 bg-opacity-80 py-4 px-8 rounded-full shadow-lg transform transition duration-300 hover:scale-105'>
-                <span className='text-xl font-semibold whitespace-nowrap'>Visitas Pendientes</span>
-              </div>
-              <div className="bg-red-600 bg-opacity-80 rounded-full w-24 h-24 flex flex-col justify-center items-center shadow-lg">
-                <span className="text-6xl font-bold">{visitasAgendadas}</span>
-              </div>
-              <div className='bg-red-600 bg-opacity-80 py-4 px-8 rounded-full shadow-lg transform transition duration-300 hover:scale-105'>
-                <span className='text-xl font-semibold whitespace-nowrap'>Hoy</span>
-              </div>
-            </div>
+        </motion.div>
+
+        <motion.div
+          className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition transform hover:scale-105 border-t-4 border-green-400"
+          variants={pulse}
+        >
+          <h3 className="text-lg font-semibold mb-2">Visitas Finalizadas</h3>
+          <div className="flex items-center justify-between">
+            <ClipboardList className="text-green-500 w-8 h-8" />
+            <span className="text-3xl font-bold">
+              {visitasFinalizadas.length}
+            </span>
           </div>
-        </div>
-      </div>
+        </motion.div>
+
+        <motion.div
+          className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition transform hover:scale-105 border-t-4 border-yellow-400"
+          variants={slideIn("left", 0.4)}
+        >
+          <h3 className="text-lg font-semibold mb-2">Servicios Activos</h3>
+          <div className="flex items-center justify-between">
+            <FileText className="text-yellow-500 w-8 h-8" />
+            <span className="text-3xl font-bold">
+              {serviciosActivos.length}
+            </span>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition transform hover:scale-105 border-t-4 border-blue-400"
+          variants={slideIn("right", 0.4)}
+        >
+          <h3 className="text-lg font-semibold mb-2">Servicios Completados</h3>
+          <div className="flex items-center justify-between">
+            <FileText className="text-blue-500 w-8 h-8" />
+            <span className="text-3xl font-bold">
+              {serviciosCompletados.length}
+            </span>
+          </div>
+        </motion.div>
+      </motion.div>
+
+      {/* Listado de últimas visitas */}
+      <motion.div
+        className="mt-16"
+        variants={fadeIn("up", 0.3)}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+      >
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          Últimas Visitas Técnicas
+        </h2>
+        {visitas.slice(0, 3).map((visita) => (
+          <motion.div key={visita.id} variants={zoomIn(0.2)}>
+            <VisitCard visita={visita} modoCliente={true} />
+          </motion.div>
+        ))}
+      </motion.div>
     </div>
   );
 };

@@ -1,52 +1,27 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "../../context/AuthContext"; // ✅ Importación corregida
+import { toast } from "react-toastify";
+
 import QuoteCard from "../../components/QuoteFilterForm/QuoteCard";
 import QuoteFilterForm from "../../components/QuoteFilterForm/QuoteFilterForm";
-import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
-import { toast } from "react-toastify";
 import EmptyState from "../../components/Common/EmptyState";
 
-const mockQuotes = [
-  {
-    id: 3,
-    totalAmount: 500000,
-    description: "Instalación de panel solar",
-    status: "Pendiente",
-    visitaTecnica: {
-      clienteNombre: "Juan Pérez",
-      clienteIdentificacion: "123456789",
-      direccion: "Calle 123 #45-67, Bogotá",
-      servicio: "Instalación de panel solar",
-      fecha: "2025-08-20",
-      hora: "10:00",
-      tecnicoNombre: "Tú",
-    },
-  },
-  {
-    id: 4,
-    totalAmount: 250000,
-    description: "Reparación de cableado",
-    status: "Aceptada",
-    visitaTecnica: {
-      clienteNombre: "Ana Gómez",
-      clienteIdentificacion: "987654321",
-      direccion: "Carrera 10 #20-30, Medellín",
-      servicio: "Reparación de cableado",
-      fecha: "2025-08-22",
-      hora: "16:00",
-      tecnicoNombre: "Tú",
-    },
-  },
-];
+import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
+import { fetchCotizacionesApi } from "../../service/quotes"; // ✅ Asegúrate de tener este import correctamente
 
 const TechnicianQuote = () => {
+  const { usuario, authToken } = useAuth();
+
   const [quotes, setQuotes] = useState([]);
   const [filteredQuotes, setFilteredQuotes] = useState([]);
-  const { usuario, authToken } = useAuth();
+
   // 🔄 Buscar cotizaciones al cargar
   useEffect(() => {
+    if (!authToken || !usuario?.id) return;
+
     const fetchQuotes = async () => {
       try {
-        const data = await fetchCotizacionesApi(authToken, { IdTecnico: usuario.id });
+        const data = await fetchCotizacionesApi(authToken, { tecnicoId: usuario.id });
         console.log("Cotizaciones obtenidas:", data);
         setQuotes(data);
         setFilteredQuotes(data);
@@ -57,12 +32,11 @@ const TechnicianQuote = () => {
     };
 
     fetchQuotes();
-  }, [authToken]);
+  }, [authToken, usuario?.id]);
 
   const handleEdit = (id) => {
-    console.log("Editar cotización:", id);
     toast.info("Abriendo formulario para editar cotización");
-    // Aquí abrir modal de edición
+    console.log("Editar cotización:", id);
   };
 
   const handleComplete = (id) => {
@@ -74,7 +48,6 @@ const TechnicianQuote = () => {
 
   const handleViewMore = (quote) => {
     console.log("Detalle de cotización:", quote);
-    // Aquí abrir modal o navegar a detalle
   };
 
   // 🔎 Filtro
@@ -113,7 +86,7 @@ const TechnicianQuote = () => {
       <div className="relative">
         <img
           src={fondo1}
-          className="w-full h-[500px] object-cover opacity-90"
+          className="w-full h-[350px] object-cover opacity-90"
           alt="Fondo"
         />
         <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 text-center text-gray-200">
@@ -126,8 +99,6 @@ const TechnicianQuote = () => {
 
       {/* Filtros + lista de cotizaciones */}
       <div className="relative z-10 rounded-t-3xl -mt-24 px-4 py-10 mx-10 text-white">
-
-        {/* 🔽 Formulario de filtros */}
         <QuoteFilterForm onFilter={handleFilter} />
 
         <div className="grid gap-6 mt-6">
@@ -144,7 +115,7 @@ const TechnicianQuote = () => {
                 quote={q}
                 rol="tecnico"
                 onEdit={handleEdit}
-                onApprove={handleComplete}
+                onComplete={handleComplete}
                 onViewMore={handleViewMore}
               />
             ))

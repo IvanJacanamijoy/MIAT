@@ -1,128 +1,149 @@
-import { useEffect, useState } from 'react';
-import VisitCard from '../../components/TechnicalVisitsFilterForm/VisitCard';
-import VisitFilterForm from '../../components/TechnicalVisitsFilterForm/VisitFilterForm';
-import { useAuth } from '../../context/AuthContext';
-import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
-import { fetchVisitasTecnicasApi } from '../../service/visitasTecnicas';
-
-// Componente para el modal con los detalles de todas las visitas
-const VisitsModal = ({ visits, onClose }) => {
-  return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-4xl mx-auto h-[90vh] flex flex-col">
-        <div className="flex justify-between items-center border-b pb-3 mb-4">
-          <h3 className="text-2xl font-bold text-gray-900">Visitas Asignadas</h3>
-          <button onClick={onClose} className="p-1 rounded-full text-gray-400 hover:text-gray-600">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        <div className="flex-1 overflow-y-auto space-y-6">
-          {visits.length === 0 ? (
-            <p className="text-gray-700 text-center text-lg mt-8">No tienes visitas asignadas.</p>
-          ) : (
-            visits.map((visit) => (
-              <div key={visit.Ident} className="bg-gray-100 p-4 rounded-lg shadow-md flex flex-col md:flex-row space-x-0 md:space-x-6">
-                <div className="flex-1">
-                  <h4 className="text-xl font-bold text-gray-900 mb-1">{visit.Ident} - {visit.Titulo}</h4>
-                  <p className="text-gray-600 text-sm"><span className="font-semibold">Dirección:</span> {visit.Direccion}</p>
-                  <p className="text-gray-600 text-sm"><span className="font-semibold">Hora:</span> {visit.Hora}</p>
-                  <p className="text-gray-600 text-sm"><span className="font-semibold">Precio:</span> ${visit.Precio}</p>
-                </div>
-                <div className="w-full md:w-1/2 mt-4 md:mt-0">
-                  <h5 className="font-semibold text-gray-800 mb-2">Ubicación en el mapa</h5>
-                  {/* Mapa simulado - en un entorno real se usaría una biblioteca de mapas como Google Maps o Leaflet */}
-                  <div className="bg-gray-300 h-40 rounded-lg flex items-center justify-center text-gray-500">
-                    <p>Mapa de la ubicación de la visita</p>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import {fadeIn, zoomIn, rotateIn, staggerContainer, slideIn, bounceIn, pulse,} from "../../Animations/variants";
+import { ClipboardList, CheckCircle, CalendarClock, FileText } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import { fetchVisitasTecnicasApi } from "../../service/visitasTecnicas";
+import fondo from "../../assets/images/home/imagen_fondo_nosotros.png";
+import VisitCard from "../../components/TechnicalVisitsFilterForm/VisitCard";
+import EmptyState from "../../components/Common/EmptyState";
 
 const TechnicianDashboard = () => {
   const { usuario, authToken } = useAuth();
-  const [visits, setVisits] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [visitas, setVisitas] = useState([]);
 
   useEffect(() => {
-    if (usuario?.id) {
-      fetchVisitasTecnicasApi(authToken, { tecnicoId: usuario.id }).then((data) => {
-        setVisits(data);
-      });
-    }
-  }, [usuario, authToken]);
+    const obtenerVisitas = async () => {
+      try {
+        const data = await fetchVisitasTecnicasApi(authToken);
+        const soloTecnico = data.filter(v => v.tecnico?.id === usuario.id);
+        setVisitas(soloTecnico);
+      } catch (error) {
+        console.error("Error cargando visitas:", error);
+      }
+    };
 
-  const totalVisits = visits.length;
+    obtenerVisitas();
+  }, [authToken, usuario.id]);
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+  const visitasHoy = visitas.filter(
+    v => new Date(v.fecha).toDateString() === new Date().toDateString()
+  );
+  const visitasPendientes = visitas.filter(v => v.EstadoDescripcion === "Pendiente");
+  const visitasFinalizadas = visitas.filter(v => v.EstadoDescripcion === "Finalizado");
 
   return (
     <div className="min-h-screen bg-gray-200 relative max-w-7xl mx-auto">
-      {/* Sección del Dashboard con imagen y texto de bienvenida */}
-      <div className="relative">
-        <img
-          src={fondo1}
-          className="w-full h-[500px] object-cover opacity-90"
-          alt="Fondo de bienvenida"
-        />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center px-6">
-          <h1 className="text-white font-extrabold text-4xl md:text-5xl lg:text-6xl whitespace-nowrap">
-            Bienvenido, Técnico
-          </h1>
-          <p className="text-white mt-4 text-lg md:text-xl max-w-4xl mx-auto">
-            Tienes un resumen de tus próximas visitas asignadas.
-          </p>
+      {/* Hero */}
+      <section
+        className="relative w-full h-[280px] md:h-[320px] overflow-hidden bg-cover bg-center shadow-xl mb-12"
+        style={{ backgroundImage: `url(${fondo})` }}
+      >
+        <div className="absolute inset-0 bg-black/50 z-10" />
+        <motion.div
+          className="relative z-20 flex flex-col justify-center items-center h-full text-white text-center px-4"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+        >
+          <motion.h1
+            className="text-4xl md:text-5xl font-bold drop-shadow-xl"
+            variants={fadeIn("down", 0.3)}
+          >
+            Panel Técnico - Bienvenido {usuario.nombres}
+          </motion.h1>
+          <motion.p
+            className="mt-3 text-lg md:text-xl max-w-2xl"
+            variants={fadeIn("up", 0.5)}
+          >
+            Aquí encuentras tus visitas técnicas y reportes del día.
+          </motion.p>
+        </motion.div>
+      </section>
 
-          {/* Círculo como botón para abrir el modal - Centrado correctamente */}
-          <div className="flex justify-center">
-            <button onClick={handleOpenModal} className="mt-8 flex flex-col items-center justify-center focus:outline-none">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 bg-red-600 rounded-full flex items-center justify-center border-4 border-red-800 transform hover:scale-110 transition-transform duration-300">
-                <span className="text-4xl sm:text-5xl font-bold text-white z-10">{totalVisits}</span>
-              </div>
-              <span className="text-white mt-2 text-md sm:text-lg">Ver detalles de visitas</span>
-            </button>
+      {/* Tarjetas resumen */}
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 px-10"
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+      >
+        <motion.div
+          className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-yellow-400 hover:shadow-xl transition transform hover:scale-105"
+          variants={slideIn("left", 0.2)}
+        >
+          <h3 className="text-lg font-semibold mb-2">Visitas para Hoy</h3>
+          <div className="flex items-center justify-between">
+            <CalendarClock className="text-yellow-500 w-8 h-8" />
+            <span className="text-3xl font-bold">{visitasHoy.length}</span>
           </div>
-        </div>
-      </div>
+        </motion.div>
 
-      {/* Contenedor de las tarjetas de visita */}
-      <div className="relative z-10 bg-black rounded-t-3xl -mt-24 px-4 py-10 mx-10 sm:mx-20 xl:mx-30 text-white shadow-xl">
-        <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">Próximas Visitas</h2>
+        <motion.div
+          className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-red-400 hover:shadow-xl transition transform hover:scale-105"
+          variants={slideIn("right", 0.3)}
+        >
+          <h3 className="text-lg font-semibold mb-2">Pendientes</h3>
+          <div className="flex items-center justify-between">
+            <ClipboardList className="text-red-500 w-8 h-8" />
+            <span className="text-3xl font-bold">{visitasPendientes.length}</span>
+          </div>
+        </motion.div>
 
-        <div className="grid gap-6 mt-6">
-          {visits.length === 0 ? (
-            <p className="text-white text-center text-lg mt-8">No tienes visitas asignadas.</p>
-          ) : (
-            visits.map((visit) => (
-              <VisitCard
-                key={visit.IdCita}
-                visit={visit}
-                rol="tecnico"
-              />
-            ))
-          )}
-        </div>
-      </div>
+        <motion.div
+          className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-green-400 hover:shadow-xl transition transform hover:scale-105"
+          variants={bounceIn}
+        >
+          <h3 className="text-lg font-semibold mb-2">Finalizadas</h3>
+          <div className="flex items-center justify-between">
+            <CheckCircle className="text-green-500 w-8 h-8" />
+            <span className="text-3xl font-bold">{visitasFinalizadas.length}</span>
+          </div>
+        </motion.div>
 
-      {/* Modal */}
-      {isModalOpen && (
-        <VisitsModal visits={visits} onClose={handleCloseModal} />
-      )}
+        <motion.div
+          className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-400 hover:shadow-xl transition transform hover:scale-105"
+          variants={pulse}
+        >
+          <h3 className="text-lg font-semibold mb-2">Total Asignadas</h3>
+          <div className="flex items-center justify-between">
+            <FileText className="text-blue-500 w-8 h-8" />
+            <span className="text-3xl font-bold">{visitas.length}</span>
+          </div>
+        </motion.div>
+      </motion.div>
+
+      {/* Lista de visitas próximas */}
+      <motion.div
+        className="mt-16 px-10"
+        variants={fadeIn("up", 0.3)}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+      >
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          Próximas visitas técnicas
+        </h2>
+        {visitasHoy.length > 0 ? (
+          visitasHoy.map((visita) => (
+            <motion.div key={visita.id} variants={zoomIn(0.2)}>
+              <VisitCard visita={visita} />
+            </motion.div>
+          ))
+        ) : (
+          <motion.div>
+            <EmptyState
+              description="No tienes visitas técnicas agendadas para hoy."
+              icon="visits"
+            />
+          </motion.div>
+        )}
+      </motion.div>
     </div>
   );
 };
 
 export default TechnicianDashboard;
+
