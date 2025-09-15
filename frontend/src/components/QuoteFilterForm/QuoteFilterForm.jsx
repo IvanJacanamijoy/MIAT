@@ -10,21 +10,24 @@ const QuoteFilterForm = ({ onFilter }) => {
 
   // Detectamos rol del usuario
   useEffect(() => {
-    if (usuario.rol === "admin") {
-      setAdmin(true);
-    } else if (usuario.rol === "tecnico") {
-      setTecnico(true);
-    } else if (usuario.rol === "cliente") {
-      setCliente(true);
-    }
-  }, [usuario]);
+  if (usuario.rol === "admin") {
+    setAdmin(true);
+  } else if (usuario.rol === "tecnico") {
+    setTecnico(true);
+    setFilters((prev) => ({ ...prev, tecnicoId: usuario.id }));
+  } else if (usuario.rol === "cliente") {
+    setCliente(true);
+    setFilters((prev) => ({ ...prev, clienteId: usuario.id }));
+  }
+}, [usuario]);
+
 
   // Estado inicial de filtros según rol
   const [filters, setFilters] = useState({
     fecha: "",
     tipoServicioId: [],
     clienteIdentificacion: admin || tecnico ? "" : undefined, // solo admin y técnico
-    tecnicoId: tecnico ? usuario.id : "",
+    tecnicoId: undefined,
     clienteId: cliente ? usuario.id : "",
   });
 
@@ -37,21 +40,30 @@ const QuoteFilterForm = ({ onFilter }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onFilter(filters);
+
+    const filtrosFinales = {
+      ...filters,
+      tecnicoId: tecnico ? usuario.id : undefined,
+      clienteId: cliente ? usuario.id : undefined,
+    };
+
+    onFilter(filtrosFinales);
   };
+
 
   const handleReset = () => {
     const resetFilters = {
       fecha: "",
       tipoServicioId: [],
-      clienteIdentificacion: (admin || tecnico) ? "" : "", // Se limpia siempre como string vacío
-      tecnicoId: tecnico ? usuario.id : null,
-      clienteId: cliente ? usuario.id : null
+      clienteIdentificacion: "",
+      tecnicoId: tecnico ? usuario.id : undefined,
+      clienteId: cliente ? usuario.id : undefined,
     };
 
     setFilters(resetFilters);
     onFilter(resetFilters);
   };
+
 
 
   const opcionesTipoServicio = [

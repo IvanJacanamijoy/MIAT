@@ -11,7 +11,7 @@ class VisitaTecnicaModel {
  * @returns {Promise<Array>} - Una promesa que resuelve con un array de objetos de citas de servicio.
  */
     async getAll(filters = {}, options = {}) {
-        console.log("filtros de las visitas: " + JSON.stringify(filters));
+        // console.log("filtros de las visitas: " + JSON.stringify(filters));
     
         const query = knex('CitaServicio as CS')
             .select(

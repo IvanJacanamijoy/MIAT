@@ -1,13 +1,11 @@
 import { useState } from "react";
 import MaterialesSection from "./shared/MaterialesSection";
-import FotosSection from "./shared/FotosSection";
 import TecnicoSelect from "./shared/TecnicoSelect";
 
 const DiagnosticForm = ({ tecnicos, tecnicoAsignado, citaId, onSubmit, onCancel }) => {
   const [descripcion, setDescripcion] = useState("");
   const [medidas, setMedidas] = useState("");
   const [materiales, setMateriales] = useState([{ nombre: "", cantidad: "", umedida: "", precio: "" }]);
-  const [fotos, setFotos] = useState({ foto1: null, foto2: null });
   const [tecnico, setTecnico] = useState(tecnicoAsignado || "");
   const bloqueado = !!tecnicoAsignado;
 
@@ -19,7 +17,6 @@ const DiagnosticForm = ({ tecnicos, tecnicoAsignado, citaId, onSubmit, onCancel 
       Descripcion: descripcion,
       Medidas: medidas,
       Materiales: JSON.stringify(materiales), // ← debe ser string
-      FotoDiagnostico: fotos.foto1?.name || "", // ← nombre del archivo o ruta
       IdCita: citaId // ← obligatorio y único
     };
 
@@ -54,7 +51,6 @@ const DiagnosticForm = ({ tecnicos, tecnicoAsignado, citaId, onSubmit, onCancel 
         />
       </div>
       <MaterialesSection materiales={materiales} setMateriales={setMateriales} />
-      <FotosSection fotos={fotos} setFotos={setFotos} />
       <div className="flex justify-between mt-6">
         <button type="button" onClick={onCancel} className="bg-gray-500 px-4 py-2 rounded">Cancelar</button>
         <button type="submit" className="bg-green-600 px-4 py-2 rounded">Guardar</button>

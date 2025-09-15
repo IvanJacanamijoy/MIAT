@@ -58,42 +58,75 @@ class CotizacionModel {
             .leftJoin('TipoServicio as TS', 'CTS.IdTipoServicio', '=', 'TS.IdTipoServicio');
 
         // 🔍 Filtros
+        // 🔍 Filtros dinámicos
         if (filters.IdCotizacion) {
             query.where('C.IdCotizacion', filters.IdCotizacion);
         }
+
         if (filters.IdDiagnostico) {
             query.where('C.IdDiagnostico', filters.IdDiagnostico);
         }
+
         if (filters.IdEstado) {
             query.where('C.IdEstado', filters.IdEstado);
         }
+
         if (filters.IdCita) {
             query.where('D.IdCita', filters.IdCita);
         }
-        if (filters.IdCliente) {
-            query.where('CS.IdCliente', filters.IdCliente);
-        }
-        if (filters.IdTecnico) {
-            query.where('CS.IdTecnico', filters.IdTecnico);
-            console.log('Filtro IdTecnico aplicado:', filters.IdTecnico);
-        }
-        if (filters.Materiales) {
-            query.where('D.Materiales', 'like', `%${filters.Materiales}%`);
-        }
-        if (filters.fecha) {
-            query.where('CS.Fecha', filters.fecha);
-        }
-        if (Array.isArray(filters.tipoServicioId) && filters.tipoServicioId.length > 0) {
-            query.whereIn('CS.IdCita', function () {
-                this.select('CTS.IdCita')
-                    .from('CitaTipoServicio as CTS')
-                    .whereIn('CTS.IdTipoServicio', filters.tipoServicioId);
-            });
-        }
-        if (filters.ClienteIdentificacion) {
-            query.whereRaw('LOWER(Cliente.Identificacion) LIKE ?', [`%${filters.ClienteIdentificacion.toLowerCase()}%`]);
+
+        // ✅ Filtro por técnico
+        const tecnicoId = filters.IdTecnico ?? filters.idTecnico ?? filters.tecnicoId;
+        if (tecnicoId && tecnicoId !== '') {
+            query.where('CS.IdTecnico', tecnicoId);
         }
 
+
+        // ✅ Filtro por cliente
+        const clienteId = filters.IdCliente ?? filters.clienteId;
+        if (clienteId !== undefined && clienteId !== '') {
+            query.where('CS.IdCliente', clienteId);
+            console.log('Filtro clienteId aplicado:', clienteId);
+        }
+
+        // ✅ Filtro por fecha
+        if (filters.fecha && filters.fecha !== '') {
+            query.where('CS.Fecha', filters.fecha);
+        }
+
+        // ✅ Filtro por tipo de servicio
+        let tipoServicioIds = filters.tipoServicioId;
+
+        // Si llega como string (ej. '[1]'), conviértelo a array
+        if (typeof tipoServicioIds === 'string') {
+            try {
+                tipoServicioIds = JSON.parse(tipoServicioIds);
+            } catch (err) {
+                console.warn('tipoServicioId no es un JSON válido:', tipoServicioIds);
+                tipoServicioIds = [];
+            }
+        }
+
+        // Aplica el filtro si es un array válido
+        if (Array.isArray(tipoServicioIds) && tipoServicioIds.length > 0) {
+            query.whereExists(function () {
+                this.select('*')
+                    .from('CitaTipoServicio as CTS2')
+                    .whereRaw('CTS2.IdCita = CS.IdCita')
+                    .whereIn('CTS2.IdTipoServicio', tipoServicioIds);
+            });
+        }
+
+
+
+
+        // ✅ Filtro por identificación del cliente
+        const clienteIdentificacion = filters.ClienteIdentificacion ?? filters.clienteIdentificacion;
+        if (clienteIdentificacion && clienteIdentificacion !== '') {
+            query.whereRaw('LOWER(Cliente.Identificacion) LIKE ?', [`%${clienteIdentificacion.toLowerCase()}%`]);
+        }
+
+        console.log('Filters applied in query:', filters);
         // 🧮 Agrupación para GROUP_CONCAT
         query.groupBy(
             'C.IdCotizacion',
@@ -143,7 +176,7 @@ class CotizacionModel {
         }
 
         try {
-            // console.log('Consulta SQL generada:', query.toString());
+            console.log('Consulta SQL generada:', query.toString());
             const rows = await query;
             return rows;
         } catch (error) {

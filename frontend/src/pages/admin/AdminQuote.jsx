@@ -51,34 +51,18 @@ const AdminQuote = () => {
   };
 
   // 🔎 Filtro
-  const handleFilter = (filters) => {
-    let result = [...quotes];
+  const handleFilter = async (filters) => {
+  try {
+    console.log("Enviando filtros al backend:", filters);
+    const data = await fetchCotizacionesApi(authToken, filters);
+    console.log(data);
+    setFilteredQuotes(data);
+  } catch (error) {
+    toast.error("Error al aplicar filtros");
+    console.error("Error en handleFilter:", error);
+  }
+};
 
-    if (filters.fecha) {
-      result = result.filter((q) => {
-        const fechaBase = new Date(q.Fecha).toISOString().split("T")[0];
-        return fechaBase === filters.fecha;
-      });
-    }
-
-    if (filters.tipoServicioId?.length > 0) {
-      result = result.filter((q) =>
-        filters.tipoServicioId.some((id) =>
-          q.TiposServicioCita?.toLowerCase().includes(String(id).toLowerCase())
-        )
-      );
-    }
-
-    if (filters.clienteIdentificacion) {
-      result = result.filter(
-        (q) =>
-          q.ClienteIdentificacion?.toLowerCase() ===
-          filters.clienteIdentificacion.toLowerCase()
-      );
-    }
-
-    setFilteredQuotes(result);
-  };
 
   return (
     <div className="min-h-screen bg-gray-200 relative max-w-7xl mx-auto">

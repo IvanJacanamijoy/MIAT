@@ -1,47 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "../../context/AuthContext";
+import { toast } from "react-toastify";
+
 import QuoteCard from "../../components/QuoteFilterForm/QuoteCard";
 import QuoteFilterForm from "../../components/QuoteFilterForm/QuoteFilterForm";
-import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
-import { toast } from "react-toastify";
 import EmptyState from "../../components/Common/EmptyState";
-
-const mockQuotes = [
-  {
-    id: 1,
-    totalAmount: 150000,
-    description: "Instalación eléctrica básica",
-    status: "Pendiente",
-    visitaTecnica: {
-      clienteNombre: "Juan Pérez",
-      clienteIdentificacion: "123456789",
-      direccion: "Calle 123 #45-67",
-      servicio: "Instalación eléctrica",
-      fecha: "2025-08-15",
-      hora: "14:30",
-      tecnicoNombre: "Carlos López",
-    },
-  },
-  {
-    id: 2,
-    totalAmount: 80000,
-    description: "Mantenimiento general del sistema",
-    status: "Aceptada",
-    visitaTecnica: {
-      clienteNombre: "Ana Torres",
-      clienteIdentificacion: "987654321",
-      direccion: "Carrera 8 #12-34",
-      servicio: "Mantenimiento general",
-      fecha: "2025-08-16",
-      hora: "09:00",
-      tecnicoNombre: "Luis Martínez",
-    },
-  },
-];
+import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
+import { fetchCotizacionesApi } from "../../service/quotes";
 
 const UserQuotes = () => {
-  const [quotes, setQuotes] = useState(mockQuotes);
-  const [filteredQuotes, setFilteredQuotes] = useState(mockQuotes);
+  const { usuario, authToken } = useAuth();
 
+  const [quotes, setQuotes] = useState([]);
+  const [filteredQuotes, setFilteredQuotes] = useState([]);
+
+  // 🔄 Cargar cotizaciones del usuario al montar
+  useEffect(() => {
+    if (!usuario?.id || !authToken) return;
+
+    const fetchUserQuotes = async () => {
+      try {
+        const filters = { clienteId: usuario.id };
+        const data = await fetchCotizacionesApi(authToken, filters);
+        setQuotes(data);
+        setFilteredQuotes(data);
+      } catch (error) {
+        toast.error("Error al cargar cotizaciones");
+        console.error("Error al obtener cotizaciones:", error);
+      }
+    };
+
+    fetchUserQuotes();
+  }, [usuario, authToken]);
+
+  // ✅ Aceptar cotización
   const handleAccept = (id) => {
     setQuotes((prev) =>
       prev.map((q) => (q.id === id ? { ...q, status: "Aprobada" } : q))
@@ -49,6 +41,7 @@ const UserQuotes = () => {
     toast.success("Cotización aceptada");
   };
 
+  // ❌ Rechazar cotización
   const handleReject = (id) => {
     setQuotes((prev) =>
       prev.map((q) => (q.id === id ? { ...q, status: "Rechazada" } : q))
@@ -56,43 +49,30 @@ const UserQuotes = () => {
     toast.error("Cotización rechazada");
   };
 
+  // 👁 Ver más detalles
   const handleViewMore = (quote) => {
     console.log("Detalle de cotización:", quote);
-    // Aquí puedes abrir un modal o navegar a la página de detalle
   };
 
-  // 🔎 Función para aplicar filtros
-  const handleFilter = (filters) => {
-    let result = [...quotes];
+  // 🔎 Aplicar filtros desde el formulario
+  const handleFilter = async (filters = {}) => {
+    try {
+      const filtrosConCliente = {
+        ...filters,
+        clienteId: usuario.id, // 🔒 siempre incluir clienteId
+      };
 
-    if (filters.fecha) {
-      result = result.filter(
-        (q) => q.visitaTecnica.fecha === filters.fecha
-      );
+      const data = await fetchCotizacionesApi(authToken, filtrosConCliente);
+      setFilteredQuotes(data);
+    } catch (error) {
+      toast.error("Error al aplicar filtros");
+      console.error("Error en handleFilter:", error);
     }
-
-    if (filters.tipoServicioId?.length > 0) {
-      result = result.filter((q) =>
-        filters.tipoServicioId.some((id) =>
-          q.visitaTecnica.servicio.toLowerCase().includes(String(id).toLowerCase())
-        )
-      );
-    }
-
-    if (filters.clienteIdentificacion) {
-      result = result.filter(
-        (q) =>
-          q.visitaTecnica.clienteIdentificacion ===
-          filters.clienteIdentificacion
-      );
-    }
-
-    setFilteredQuotes(result);
   };
 
   return (
     <div className="min-h-screen bg-gray-200 relative max-w-7xl mx-auto">
-      
+      {/* Banner */}
       <div className="relative">
         <img
           src={fondo1}
@@ -108,24 +88,21 @@ const UserQuotes = () => {
         </div>
       </div>
 
-      {/* Contenedor de filtros + lista */}
+      {/* Filtros + lista */}
       <div className="relative z-10 rounded-t-3xl -mt-24 px-4 py-10 mx-10 text-white">
-        
-        {/* 🔽 Filtro */}
         <QuoteFilterForm onFilter={handleFilter} />
 
-        {/* Lista */}
         <div className="grid gap-6 mt-6">
           {filteredQuotes.length === 0 ? (
             <EmptyState
               title="No existe cotización"
-              description="la cotización que buscas no ha sido generada"
+              description="La cotización que buscas no ha sido generada"
               icon="quotes"
             />
           ) : (
             filteredQuotes.map((q) => (
               <QuoteCard
-                key={q.id}
+                key={q.IdCotizacion}
                 quote={q}
                 rol="usuario"
                 onAccept={handleAccept}

@@ -20,9 +20,11 @@ const TechnicianQuote = () => {
     if (!authToken || !usuario?.id) return;
 
     const fetchQuotes = async () => {
+      const filters = { idTecnico: usuario.id };
+      // console.log("Enviando filtros a fetchCotizacionesApi:", filters);
+
       try {
-        const data = await fetchCotizacionesApi(authToken, { tecnicoId: usuario.id });
-        console.log("Cotizaciones obtenidas:", data);
+        const data = await fetchCotizacionesApi(authToken, filters);
         setQuotes(data);
         setFilteredQuotes(data);
       } catch (error) {
@@ -32,7 +34,9 @@ const TechnicianQuote = () => {
     };
 
     fetchQuotes();
-  }, [authToken, usuario?.id]);
+  }, [authToken, usuario]);
+
+
 
   const handleEdit = (id) => {
     toast.info("Abriendo formulario para editar cotización");
@@ -51,34 +55,27 @@ const TechnicianQuote = () => {
   };
 
   // 🔎 Filtro
-  const handleFilter = (filters) => {
-    let result = [...quotes];
+  const handleFilter = async (filters = {}) => {
+    try {
+      if (!usuario?.id || !authToken) return;
 
-    if (filters.fecha) {
-      result = result.filter((q) => {
-        const fechaBase = new Date(q.Fecha).toISOString().split("T")[0];
-        return fechaBase === filters.fecha;
-      });
+      // 🔒 Siempre incluir el id del técnico
+      const filtrosConTecnico = {
+        ...filters,
+        idTecnico: usuario.id,
+      };
+
+      console.log("Enviando filtros al backend (rol técnico):", filtrosConTecnico);
+
+      const data = await fetchCotizacionesApi(authToken, filtrosConTecnico);
+      setFilteredQuotes(data);
+    } catch (error) {
+      toast.error("Error al aplicar filtros");
+      console.error("Error en handleFilter:", error);
     }
-
-    if (filters.tipoServicioId?.length > 0) {
-      result = result.filter((q) =>
-        filters.tipoServicioId.some((id) =>
-          q.TiposServicioCita?.toLowerCase().includes(String(id).toLowerCase())
-        )
-      );
-    }
-
-    if (filters.clienteIdentificacion) {
-      result = result.filter(
-        (q) =>
-          q.ClienteIdentificacion?.toLowerCase() ===
-          filters.clienteIdentificacion.toLowerCase()
-      );
-    }
-
-    setFilteredQuotes(result);
   };
+
+
 
   return (
     <div className="min-h-screen bg-gray-200 relative max-w-7xl mx-auto">
@@ -111,7 +108,7 @@ const TechnicianQuote = () => {
           ) : (
             filteredQuotes.map((q) => (
               <QuoteCard
-                key={q.id}
+                key={q.IdCotizacion}
                 quote={q}
                 rol="tecnico"
                 onEdit={handleEdit}

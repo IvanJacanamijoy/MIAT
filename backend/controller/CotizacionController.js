@@ -3,7 +3,8 @@ const CotizacionModel = require('../models/CotizacionModel');
 class CotizacionController {
     async getAllCotizaciones(req, res) {
         try {
-            const filters = req.params;
+            const filters = req.query; // ✅ Aquí está el cambio clave
+
             const options = {
                 orderBy: req.query.orderBy,
                 orderDirection: req.query.orderDirection,
@@ -13,9 +14,11 @@ class CotizacionController {
             const cotizaciones = await CotizacionModel.getAllCotizaciones(filters, options);
             res.json(cotizaciones);
         } catch (error) {
+            console.error("Error en getAllCotizaciones:", error);
             res.status(500).json({ message: 'Error al obtener cotizaciones', error });
         }
     }
+
 
     async getCotizacionById(req, res) {
         try {
