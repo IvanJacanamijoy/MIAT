@@ -1,5 +1,6 @@
 //importamos las variables de entorno
-require('dotenv').config()
+const environment = process.env.NODE_ENV || 'development';
+const knex = require('knex')(require('./config/knexfile')[environment]);
 //importamos express
 const express = require('express');
 //importamos cors para evitar error de cors
