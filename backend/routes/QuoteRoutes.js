@@ -3,7 +3,6 @@ const router = express.Router();
 const QuoteController = require('../controller/QuoteController');
 const { authenticateToken, authorizeRoles } = require('../middleware/authMiddleware');
 
-
 // GET /api/quotes - Obtener todas las cotizaciones (con filtros según rol)
 // Acceso: Administrador, Técnico (sus diagnósticos), Cliente (sus cotizaciones)
 router.get(
