@@ -20,8 +20,6 @@ const diagnosticoRouter = require('./routes/diagnosticoRoutes');
 //importamos las rutas de cotizacion
 const cotizacionRouter = require('./routes/cotizacionRoutes');
 
-//inicializamos knex
-const knex = require('knex')(require('./config/knexfile').development);
 //puerto del proyecto
 const PORT = process.env.PORT;
 
