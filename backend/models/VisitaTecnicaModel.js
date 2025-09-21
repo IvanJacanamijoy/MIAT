@@ -35,6 +35,12 @@ class VisitaTecnicaModel {
                 knex.raw('GROUP_CONCAT(TS.Descripcion SEPARATOR \', \') AS TiposServicioCita'),
                 // 👇 Diagnóstico
                 knex.raw(`
+                    (SELECT D.IdDiagnostico 
+                     FROM Diagnostico D 
+                     WHERE D.IdCita = CS.IdCita 
+                     LIMIT 1) AS IdDiagnostico
+                `),
+                knex.raw(`
                     EXISTS (
                         SELECT 1
                         FROM CitaTipoServicio CTS2

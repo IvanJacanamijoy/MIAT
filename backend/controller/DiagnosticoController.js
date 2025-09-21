@@ -24,12 +24,15 @@ class DiagnosticoController {
 
     async createDiagnostico(req, res) {
         try {
-            const nuevoDiagnostico = await DiagnosticoModel.createDiagnostico(req.body);
+            const data = req.body;
+            const nuevoDiagnostico = await DiagnosticoModel.createDiagnostico(data);
             res.status(201).json(nuevoDiagnostico);
         } catch (error) {
-            res.status(500).json({ message: 'Error al crear diagnóstico', error });
+            res.status(400).json({ message: error.message });
         }
     }
+
+
 
     async updateDiagnostico(req, res) {
         try {

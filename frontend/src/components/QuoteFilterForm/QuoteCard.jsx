@@ -53,14 +53,14 @@ const QuoteCard = ({ quote, rol, onAccept, onReject, onEdit, onComplete, onViewM
     estado === "En proceso"
       ? "bg-blue-200 text-blue-800"
       : estado === "Completada" || estado === "Finalizado"
-      ? "bg-green-200 text-green-800"
-      : estado === "Rechazada" || estado === "Cancelada" || estado === "Inactivo"
-      ? "bg-red-200 text-red-800"
-      : estado === "Aceptada" || estado === "Activo"
-      ? "bg-yellow-200 text-yellow-800"
-      : estado === "Pendiente"
-      ? "bg-orange-200 text-orange-800"
-      : "bg-gray-200 text-gray-800";
+        ? "bg-green-200 text-green-800"
+        : estado === "Rechazada" || estado === "Cancelada" || estado === "Inactivo"
+          ? "bg-red-200 text-red-800"
+          : estado === "Aceptada" || estado === "Activo"
+            ? "bg-yellow-200 text-yellow-800"
+            : estado === "Pendiente"
+              ? "bg-orange-200 text-orange-800"
+              : "bg-gray-200 text-gray-800";
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col md:flex-row">
@@ -149,27 +149,67 @@ const QuoteCard = ({ quote, rol, onAccept, onReject, onEdit, onComplete, onViewM
               >
                 Editar cotización
               </button>
-              <button
-                onClick={() => setIsCompleteModalOpen(true)}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
-              >
-                Completar servicio
-              </button>
+
+              {estado === "Aceptada" && !quote.ServicioFinalizado && (
+                <button
+                  onClick={() => setIsCompleteModalOpen(true)}
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+                >
+                  Completar servicio
+                </button>
+              )}
             </>
           )}
+
         </div>
       </div>
 
       {/* Modales */}
       <Modal isOpen={isAcceptModalOpen} onClose={() => setIsAcceptModalOpen(false)}>
-        <h2 className="text-lg font-bold mb-4">Aceptar cotización</h2>
-        <p>¿Confirmas que deseas aceptar esta cotización?</p>
+        <h2 className="text-lg font-bold mb-4 text-black">Aceptar cotización</h2>
+        <p className="text-black">¿Confirmas que deseas aceptar esta cotización?</p>
+        <div className="mt-4 flex gap-3">
+          <button
+            onClick={() => {
+              onAccept?.(quote.IdCotizacion);
+              setIsAcceptModalOpen(false);
+            }}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+          >
+            Confirmar
+          </button>
+          <button
+            onClick={() => setIsAcceptModalOpen(false)}
+            className="bg-gray-400 text-white px-4 py-2 rounded"
+          >
+            Cancelar
+          </button>
+        </div>
       </Modal>
+
 
       <Modal isOpen={isRejectModalOpen} onClose={() => setIsRejectModalOpen(false)}>
         <h2 className="text-lg font-bold mb-4 text-black">Rechazar cotización</h2>
         <p className="text-black">¿Confirmas que deseas rechazar esta cotización?</p>
+        <div className="mt-4 flex gap-3">
+          <button
+            onClick={() => {
+              onReject?.(quote.IdCotizacion);
+              setIsRejectModalOpen(false);
+            }}
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+          >
+            Confirmar
+          </button>
+          <button
+            onClick={() => setIsRejectModalOpen(false)}
+            className="bg-gray-400 text-white px-4 py-2 rounded"
+          >
+            Cancelar
+          </button>
+        </div>
       </Modal>
+
 
       <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
         <h2 className="text-lg font-bold mb-4 text-black">Editar cotización</h2>

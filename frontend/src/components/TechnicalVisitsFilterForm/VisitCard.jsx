@@ -8,10 +8,12 @@ const VisitCard = ({
   onAssignTechnician,
   onGenerateQuote,
   onGenerateDiagnosis,
+  onEditDiagnosis,
   technicians = [],
 }) => {
-  const tieneDiagnostico = visit.TieneDiagnostico === 1 || visit.TieneDiagnostico === true;
-  const tieneCotizacion = visit.TieneCotizacion === 1 || visit.TieneCotizacion === true;
+  const tieneDiagnostico = !!visit.IdDiagnostico;
+  const tieneCotizacion = !!visit.IdCotizacion;
+
 
   const datePart = visit.Fecha ? visit.Fecha.split("T")[0] : "";
   const timePart = visit.Hora || "";
@@ -119,12 +121,12 @@ const VisitCard = ({
 
         {visit.IdEstado !== 7 && (
           <div className="flex flex-wrap gap-3 mt-4 justify-around">
-            {(rol === "admin" || rol === "usuario") && (
+            {(rol === "admin" || rol === "usuario") && !tieneDiagnostico && (
               <>
                 <button
                   className={`px-4 py-2 rounded font-bold ${canModify
-                      ? "bg-red-500 hover:bg-red-700 text-white cursor-pointer"
-                      : "bg-gray-400 text-white cursor-not-allowed"
+                    ? "bg-red-500 hover:bg-red-700 text-white cursor-pointer"
+                    : "bg-gray-400 text-white cursor-not-allowed"
                     }`}
                   disabled={!canModify}
                   onClick={() => onCancel?.(visit.IdCita)}
@@ -133,8 +135,8 @@ const VisitCard = ({
                 </button>
                 <button
                   className={`px-4 py-2 rounded font-bold ${canModify
-                      ? "bg-blue-500 hover:bg-blue-700 cursor-pointer text-white"
-                      : "bg-gray-400 text-white cursor-not-allowed"
+                    ? "bg-blue-500 hover:bg-blue-700 cursor-pointer text-white"
+                    : "bg-gray-400 text-white cursor-not-allowed"
                     }`}
                   disabled={!canModify}
                   onClick={() => onReprogram?.(visit)}
@@ -143,9 +145,10 @@ const VisitCard = ({
                 </button>
               </>
             )}
+
             {(rol === "admin" || rol === "tecnico") && (
               <>
-                {!tieneDiagnostico && (
+                {!visit.IdDiagnostico && (
                   <button
                     className="bg-yellow-600 hover:bg-yellow-700 text-white cursor-pointer p-2 rounded-md"
                     onClick={() => onGenerateDiagnosis?.(visit)}
@@ -153,18 +156,18 @@ const VisitCard = ({
                     Generar diagnóstico
                   </button>
                 )}
-                {tieneDiagnostico && !tieneCotizacion && (
+                {visit.IdDiagnostico && (
                   <button
-                    className="bg-green-600 hover:bg-green-700 text-white cursor-pointer p-2 rounded-md"
-                    onClick={() => onGenerateQuote?.(visit)}
+                    className="bg-orange-600 hover:bg-orange-700 text-white cursor-pointer p-2 rounded-md"
+                    onClick={() => onEditDiagnosis?.(visit)}
                   >
-                    Generar cotización
+                    Editar diagnóstico
                   </button>
                 )}
               </>
             )}
 
-            {rol === "admin" && (
+            {rol === "admin" && !visit.IdDiagnostico && (
               <button
                 className="px-4 py-2 rounded font-bold bg-blue-500 hover:bg-blue-700 cursor-pointer text-white"
                 onClick={() => onAssignTechnician?.(visit)}
@@ -174,6 +177,7 @@ const VisitCard = ({
             )}
           </div>
         )}
+
       </div>
     </div>
   );

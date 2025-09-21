@@ -17,13 +17,13 @@ export const buildQueryParams = (filters = {}) => {
     }
   });
 
-  return params.toString(); // Ejemplo: "fecha=2024-08-01&tipoServicioId=%5B1%5D"
+  return params.toString();
 };
 
 /**
- * Realiza una petición GET a /servicios con filtros opcionales.
+ * Obtiene todos los servicios con filtros opcionales.
  * @param {string} authToken - Token de autenticación
- * @param {object} filters - Objeto con filtros (fecha, tipoServicioId, etc.)
+ * @param {object} filters - Filtros como tecnicoId, clienteId, estado, etc.
  * @returns {Promise<Array>} - Lista de servicios
  */
 export const fetchAllServicesApi = async (authToken, filters = {}) => {
@@ -42,6 +42,59 @@ export const fetchAllServicesApi = async (authToken, filters = {}) => {
     throw new Error('Formato de respuesta de la API incorrecto para servicios');
   } catch (error) {
     console.error('Error en fetchAllServicesApi:', error);
+    throw error;
+  }
+};
+
+/**
+ * Actualiza un servicio específico.
+ * @param {string} authToken - Token de autenticación
+ * @param {number} servicioId - ID del servicio a actualizar
+ * @param {object} payload - Datos del servicio a actualizar
+ * @returns {Promise<object>} - Servicio actualizado
+ */
+export const updateServicioApi = async (authToken, servicioId, payload) => {
+  try {
+    const url = `/servicios/${servicioId}`;
+    const data = await apiRequest(url, 'PUT', payload, authToken);
+    return data;
+  } catch (error) {
+    console.error(`Error al actualizar el servicio ${servicioId}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Valida si un servicio tiene todos los datos completos.
+ * @param {string} authToken - Token de autenticación
+ * @param {number} servicioId - ID del servicio a validar
+ * @returns {Promise<object>} - Resultado de la validación
+ */
+export const validarDatosCompletosApi = async (authToken, servicioId) => {
+  try {
+    const url = `/servicios/${servicioId}/validar`;
+    const data = await apiRequest(url, 'GET', null, authToken);
+    return data;
+  } catch (error) {
+    console.error(`Error al validar datos del servicio ${servicioId}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Finaliza un servicio específico.
+ * @param {string} authToken - Token de autenticación
+ * @param {number} servicioId - ID del servicio a finalizar
+ * @param {object} payload - Datos del servicio finalizado
+ * @returns {Promise<object>} - Servicio actualizado
+ */
+export const finalizarServicioApi = async (authToken, servicioId, payload) => {
+  try {
+    const url = `/servicios/${servicioId}/finalizar`;
+    const data = await apiRequest(url, 'PUT', payload, authToken);
+    return data;
+  } catch (error) {
+    console.error(`Error al finalizar el servicio ${servicioId}:`, error);
     throw error;
   }
 };

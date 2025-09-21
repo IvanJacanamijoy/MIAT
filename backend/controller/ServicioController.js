@@ -82,6 +82,106 @@ class ServicioController {
         }
     }
 
+    async createServicio(req, res) {
+        try {
+            const nuevoServicio = await ServicioModel.createServicio(req.body);
+            res.status(201).json(nuevoServicio);
+        } catch (error) {
+            console.error('Error al crear servicio:', error);
+            res.status(500).json({ message: 'Error al crear servicio', error });
+        }
+    }
+
+    async finalizarServicio(req, res) {
+        try {
+            const { id } = req.params;
+            const datosFinales = req.body;
+
+            const servicioFinalizado = await ServicioModel.finalizarServicio(id, datosFinales);
+            res.status(200).json(servicioFinalizado);
+        } catch (error) {
+            console.error('Error al finalizar servicio:', error);
+            
+            // Si el error es de validación, devolvemos un 400 con el mensaje específico
+            if (error.message.includes('Faltan los siguientes datos')) {
+                return res.status(400).json({ 
+                    message: error.message,
+                    type: 'validation_error'
+                });
+            }
+            
+            res.status(500).json({ message: 'Error al finalizar servicio', error: error.message });
+        }
+    }
+
+    async updateServicio(req, res) {
+        try {
+            const { id } = req.params;
+            const datosActualizados = req.body;
+
+            const servicioActualizado = await ServicioModel.updateServicio(id, datosActualizados);
+            res.status(200).json(servicioActualizado);
+        } catch (error) {
+            console.error('Error al actualizar servicio:', error);
+            res.status(500).json({ message: 'Error al actualizar servicio', error: error.message });
+        }
+    }
+
+    async validarDatosCompletos(req, res) {
+        try {
+            const { id } = req.params;
+            const validacion = await ServicioModel.validarDatosCompletos(id);
+            res.status(200).json(validacion);
+        } catch (error) {
+            console.error('Error al validar datos del servicio:', error);
+            res.status(500).json({ message: 'Error al validar datos del servicio', error: error.message });
+        }
+    }
+
+    async uploadServicePhotos(req, res) {
+        try {
+            const { id } = req.params;
+            const files = req.files;
+
+            if (!files || (!files.fotoAntes && !files.fotoDespues)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'No se han subido archivos'
+                });
+            }
+
+            const updateData = {};
+            
+            if (files.fotoAntes && files.fotoAntes[0]) {
+                updateData.FotosAntes = files.fotoAntes[0].filename;
+            }
+            
+            if (files.fotoDespues && files.fotoDespues[0]) {
+                updateData.FotosDespues = files.fotoDespues[0].filename;
+            }
+
+            const servicioActualizado = await ServicioModel.updateServicePhotos(id, updateData);
+            
+            res.status(200).json({
+                success: true,
+                message: 'Fotos subidas exitosamente',
+                data: servicioActualizado,
+                files: {
+                    fotoAntes: files.fotoAntes ? files.fotoAntes[0].filename : null,
+                    fotoDespues: files.fotoDespues ? files.fotoDespues[0].filename : null
+                }
+            });
+        } catch (error) {
+            console.error('Error al subir fotos del servicio:', error);
+            res.status(500).json({ 
+                success: false,
+                message: 'Error al subir fotos del servicio', 
+                error: error.message 
+            });
+        }
+    }
+
+
 }
 
 module.exports = new ServicioController();

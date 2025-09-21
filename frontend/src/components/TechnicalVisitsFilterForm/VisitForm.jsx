@@ -158,6 +158,7 @@ const VisitForm = ({ agendar = true, visitaTecnica = {}}) => {
     { value: "16:00", label: "4:00 PM" },
     { value: "18:00", label: "6:00 PM" },
   ];
+  // console.log(hourOptions)
 
   // Si la fecha seleccionada es hoy, filtra las horas pasadas
   const today = new Date().toISOString().split('T')[0];

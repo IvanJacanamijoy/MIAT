@@ -39,6 +39,7 @@ const LoginForm = ({ styles, openModal }) => {
 
     try {
       const data = await login(email, password);
+      console.log(data)
 
       if (data?.token) {
         iniciarSesion(data.token);

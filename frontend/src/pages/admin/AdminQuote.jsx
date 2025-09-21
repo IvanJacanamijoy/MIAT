@@ -6,8 +6,9 @@ import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
 import { toast } from "react-toastify";
 import ButtonTechnicalVisits from "../../components/ButtonTechnicalVisits";
 import { useAuth } from "../../context/AuthContext";
-import { fetchCotizacionesApi } from "../../service/quotes";
+import { fetchCotizacionesApi } from "../../service/cotizacion";
 import EmptyState from "../../components/Common/EmptyState";
+import PendingDiagnoses from "../../components/PendingDiagnoses"
 
 const AdminQuote = () => {
   const [quotes, setQuotes] = useState([]);
@@ -94,6 +95,7 @@ const AdminQuote = () => {
 
       {/* Filtros + lista */}
       <div className="relative z-10 rounded-t-3xl -mt-24 px-4 py-10 mx-10 text-white">
+        <PendingDiagnoses />
         <QuoteFilterForm onFilter={handleFilter} />
 
         <div className="grid gap-6 mt-6">

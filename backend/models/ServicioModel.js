@@ -143,6 +143,82 @@ class ServicioModel {
         const rows = await query;
         return rows;
     }
+    // ServicioModel.js
+    async createServicio(data) {
+        const [id] = await knex('Servicio').insert(data);
+        return await knex('Servicio').where('IdServicio', id).first();
+    }
+
+    async finalizarServicio(id, data) {
+        // Primero obtenemos el servicio actual
+        const servicioActual = await knex('Servicio').where('IdServicio', id).first();
+        
+        if (!servicioActual) {
+            throw new Error('Servicio no encontrado');
+        }
+
+        // Validamos que todos los campos obligatorios estén completos
+        const camposObligatorios = ['Descripcion', 'FotosAntes', 'FotosDespues', 'HoraInicial', 'HoraFinal'];
+        const camposFaltantes = [];
+
+        // Verificamos los campos actuales y los nuevos datos
+        const datosCompletos = { ...servicioActual, ...data };
+        
+        camposObligatorios.forEach(campo => {
+            if (!datosCompletos[campo] || datosCompletos[campo] === '' || datosCompletos[campo] === null) {
+                camposFaltantes.push(campo);
+            }
+        });
+
+        if (camposFaltantes.length > 0) {
+            throw new Error(`No se puede finalizar el servicio. Faltan los siguientes datos: ${camposFaltantes.join(', ')}`);
+        }
+
+        // Si todos los datos están completos, actualizamos el servicio
+        await knex('Servicio')
+            .where('IdServicio', id)
+            .update({
+                ...data,
+                IdEstado: 4, // Estado "Finalizado" (corregido de 3 a 4 según la base de datos)
+            });
+        return await knex('Servicio').where('IdServicio', id).first();
+    }
+
+    async updateServicio(id, data) {
+        await knex('Servicio')
+            .where('IdServicio', id)
+            .update(data);
+        return await knex('Servicio').where('IdServicio', id).first();
+    }
+
+    async validarDatosCompletos(id) {
+        const servicio = await knex('Servicio').where('IdServicio', id).first();
+        
+        if (!servicio) {
+            throw new Error('Servicio no encontrado');
+        }
+
+        const camposObligatorios = ['Descripcion', 'FotosAntes', 'FotosDespues', 'HoraInicial', 'HoraFinal'];
+        const camposFaltantes = [];
+
+        camposObligatorios.forEach(campo => {
+            if (!servicio[campo] || servicio[campo] === '' || servicio[campo] === null) {
+                camposFaltantes.push(campo);
+            }
+        });
+
+        return {
+            esCompleto: camposFaltantes.length === 0,
+            camposFaltantes: camposFaltantes
+        };
+    }
+
+    async updateServicePhotos(id, photoData) {
+        await knex('Servicio')
+            .where('IdServicio', id)
+            .update(photoData);
+        return await knex('Servicio').where('IdServicio', id).first();
+    }
 
 
 }

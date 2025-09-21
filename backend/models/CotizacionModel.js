@@ -6,6 +6,9 @@ class CotizacionModel {
     }
 
     async getAllCotizaciones(filters = {}, options = {}) {
+        // Primero, actualizar cotizaciones expiradas
+        await this.updateExpiredQuotes();
+
         const query = knex('Cotizacion as C')
             .select(
                 // Cotización
@@ -16,6 +19,7 @@ class CotizacionModel {
                 'C.Garantia',
                 'C.Observaciones',
                 'C.IdEstado',
+                'C.FechaCreacion',
                 'E.Descripcion as EstadoDescripcion',
 
                 // Diagnóstico
@@ -188,7 +192,16 @@ class CotizacionModel {
 
 
     async getCotizacionById(id) {
-        return await knex(this.tableName).where({ IdCotizacion: id }).first();
+        return await knex('Cotizacion as C')
+            .select(
+                'C.*',
+                'CS.IdCliente',
+                'CS.IdTecnico'
+            )
+            .join('Diagnostico as D', 'C.IdDiagnostico', '=', 'D.IdDiagnostico')
+            .join('CitaServicio as CS', 'D.IdCita', '=', 'CS.IdCita')
+            .where('C.IdCotizacion', id)
+            .first();
     }
 
     async createCotizacion(data) {
@@ -203,6 +216,58 @@ class CotizacionModel {
 
     async deleteCotizacion(id) {
         return await knex(this.tableName).where({ IdCotizacion: id }).del();
+    }
+
+    // Método para actualizar cotizaciones expiradas (más de 1 semana)
+    async updateExpiredQuotes() {
+        try {
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+            // Buscar el ID del estado "Expirada"
+            const expiredState = await knex('Estado')
+                .where('Descripcion', 'Expirada')
+                .first();
+
+            if (!expiredState) {
+                console.warn('Estado "Expirada" no encontrado en la base de datos');
+                return 0;
+            }
+
+            // Actualizar cotizaciones pendientes (IdEstado = 5) que tienen más de 1 semana
+            const updatedCount = await knex(this.tableName)
+                .where('IdEstado', 5) // Estado pendiente
+                .where('FechaCreacion', '<', oneWeekAgo)
+                .update({ IdEstado: expiredState.IdEstado });
+
+            if (updatedCount > 0) {
+                console.log(`Se marcaron ${updatedCount} cotizaciones como expiradas`);
+            }
+
+            return updatedCount;
+        } catch (error) {
+            console.error('Error al actualizar cotizaciones expiradas:', error);
+            throw error;
+        }
+    }
+
+    // Método para obtener cotizaciones que están por expirar (próximas 24 horas)
+    async getQuotesAboutToExpire() {
+        try {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+            return await knex(this.tableName)
+                .where('IdEstado', 5) // Estado pendiente
+                .where('FechaCreacion', '<', tomorrow)
+                .where('FechaCreacion', '>=', oneWeekAgo);
+        } catch (error) {
+            console.error('Error al obtener cotizaciones por expirar:', error);
+            throw error;
+        }
     }
 }
 

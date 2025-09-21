@@ -39,6 +39,15 @@ router.put(
   CotizacionController.updateCotizacion
 );
 
+// 🔄 PATCH /api/cotizaciones/:id/status - Actualizar estado de cotización (aceptar/rechazar)
+// Acceso: Cliente (solo sus cotizaciones), Administrador
+router.patch(
+  '/:id/status',
+  authenticateToken,
+  authorizeRoles([1, 3]),
+  CotizacionController.updateQuoteStatus
+);
+
 // ❌ DELETE /api/cotizaciones/:id - Eliminar una cotización
 // Acceso: Solo Administrador
 router.delete(

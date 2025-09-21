@@ -1,51 +1,75 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {fadeIn, zoomIn, staggerContainer, slideIn, bounceIn, pulse,} from "../../Animations/variants";
 import { useAuth } from "../../context/AuthContext";
 import { fetchVisitasTecnicasApi } from "../../service/visitasTecnicas";
 import { fetchAllServicesApi } from "../../service/services";
+import { getDiagnosticosApi } from "../../service/diagnostico";
+import { fetchCotizacionesApi } from "../../service/cotizacion";
 import fondo from "../../assets/images/home/imagen_fondo_nosotros.png";
 import VisitCard from "../../components/TechnicalVisitsFilterForm/VisitCard";
 import { CalendarClock, ClipboardList, FileText } from "lucide-react";
+import { FaFileAlt, FaMoneyBillWave } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 const UserDashboard = () => {
   const { usuario, authToken } = useAuth();
   const [visitas, setVisitas] = useState([]);
   const [servicios, setServicios] = useState([]);
+  const [diagnosticos, setDiagnosticos] = useState([]);
+  const [cotizaciones, setCotizaciones] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const cargarDatos = async () => {
+    const fetchData = async () => {
       try {
-        const visitasData = await fetchVisitasTecnicasApi(authToken);
-        const soloCliente = visitasData.filter(
-          (v) => v.cliente?.id === usuario.id
-        );
-        setVisitas(soloCliente);
+        setLoading(true);
+        const [visitasData, serviciosData, diagnosticosData, cotizacionesData] = await Promise.all([
+          fetchVisitasTecnicasApi(authToken),
+          fetchAllServicesApi(authToken, { clienteId: usuario.id }),
+          getDiagnosticosApi(authToken),
+          fetchCotizacionesApi(authToken)
+        ]);
 
-        const serviciosData = await fetchAllServicesApi(authToken, {
-          clienteId: usuario.id,
-        });
+        // Filtrar solo los datos del cliente actual
+        const soloCliente = visitasData.filter(v => v.cliente?.id === usuario.id);
+        const diagnosticosCliente = diagnosticosData.filter(d => d.IdCliente === usuario.id);
+        const cotizacionesCliente = cotizacionesData.filter(c => c.IdCliente === usuario.id);
+
+        setVisitas(soloCliente);
         setServicios(serviciosData);
+        setDiagnosticos(diagnosticosCliente);
+        setCotizaciones(cotizacionesCliente);
       } catch (error) {
         console.error("Error al cargar el dashboard del cliente", error);
+        toast.error("Error al cargar los datos del dashboard");
+      } finally {
+        setLoading(false);
       }
     };
 
-    cargarDatos();
+    fetchData();
   }, [authToken, usuario.id]);
 
-  const visitasPendientes = visitas.filter(
-    (v) => v.EstadoDescripcion === "Pendiente"
-  );
-  const visitasFinalizadas = visitas.filter(
-    (v) => v.EstadoDescripcion === "Finalizado"
-  );
-  const serviciosActivos = servicios.filter(
-    (s) => s.EstadoDescripcion !== "Finalizado"
-  );
-  const serviciosCompletados = servicios.filter(
-    (s) => s.EstadoDescripcion === "Finalizado"
-  );
+  const estadisticas = useMemo(() => {
+    const visitasPendientes = visitas.filter(v => v.IdEstado === 1);
+    const visitasFinalizadas = visitas.filter(v => v.IdEstado === 3);
+    const serviciosActivos = servicios.filter(s => s.IdEstado !== 3);
+    const serviciosCompletados = servicios.filter(s => s.IdEstado === 3);
+    const diagnosticosPendientes = diagnosticos.filter(d => d.IdEstado === 1);
+    const cotizacionesPendientes = cotizaciones.filter(c => c.IdEstado === 1);
+    const cotizacionesAceptadas = cotizaciones.filter(c => c.IdEstado === 2);
+
+    return {
+      visitasPendientes,
+      visitasFinalizadas,
+      serviciosActivos,
+      serviciosCompletados,
+      diagnosticosPendientes,
+      cotizacionesPendientes,
+      cotizacionesAceptadas
+    };
+  }, [visitas, servicios, diagnosticos, cotizaciones]);
 
   return (
     <div className="min-h-screen bg-gray-200 relative max-w-7xl mx-auto">
@@ -80,7 +104,7 @@ const UserDashboard = () => {
 
       {/* Tarjetas Resumen */}
       <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 px-10"
+        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-6 px-10"
         variants={staggerContainer}
         initial="hidden"
         whileInView="show"
@@ -94,7 +118,7 @@ const UserDashboard = () => {
           <div className="flex items-center justify-between">
             <CalendarClock className="text-red-500 w-8 h-8" />
             <span className="text-3xl font-bold">
-              {visitasPendientes.length}
+              {estadisticas.visitasPendientes.length}
             </span>
           </div>
         </motion.div>
@@ -107,7 +131,7 @@ const UserDashboard = () => {
           <div className="flex items-center justify-between">
             <ClipboardList className="text-green-500 w-8 h-8" />
             <span className="text-3xl font-bold">
-              {visitasFinalizadas.length}
+              {estadisticas.visitasFinalizadas.length}
             </span>
           </div>
         </motion.div>
@@ -120,7 +144,7 @@ const UserDashboard = () => {
           <div className="flex items-center justify-between">
             <FileText className="text-yellow-500 w-8 h-8" />
             <span className="text-3xl font-bold">
-              {serviciosActivos.length}
+              {estadisticas.serviciosActivos.length}
             </span>
           </div>
         </motion.div>
@@ -133,7 +157,33 @@ const UserDashboard = () => {
           <div className="flex items-center justify-between">
             <FileText className="text-blue-500 w-8 h-8" />
             <span className="text-3xl font-bold">
-              {serviciosCompletados.length}
+              {estadisticas.serviciosCompletados.length}
+            </span>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition transform hover:scale-105 border-t-4 border-purple-400"
+          variants={bounceIn}
+        >
+          <h3 className="text-lg font-semibold mb-2">Diagnósticos Pendientes</h3>
+          <div className="flex items-center justify-between">
+            <FaFileAlt className="text-purple-500 w-8 h-8" />
+            <span className="text-3xl font-bold">
+              {estadisticas.diagnosticosPendientes.length}
+            </span>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition transform hover:scale-105 border-t-4 border-indigo-400"
+          variants={pulse}
+        >
+          <h3 className="text-lg font-semibold mb-2">Cotizaciones Aceptadas</h3>
+          <div className="flex items-center justify-between">
+            <FaMoneyBillWave className="text-indigo-500 w-8 h-8" />
+            <span className="text-3xl font-bold">
+              {estadisticas.cotizacionesAceptadas.length}
             </span>
           </div>
         </motion.div>
@@ -150,11 +200,17 @@ const UserDashboard = () => {
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
           Últimas Visitas Técnicas
         </h2>
-        {visitas.slice(0, 3).map((visita) => (
-          <motion.div key={visita.id} variants={zoomIn(0.2)}>
-            <VisitCard visita={visita} modoCliente={true} />
-          </motion.div>
-        ))}
+        {visitas.length > 0 ? (
+          visitas.slice(0, 3).map((visita) => (
+            <motion.div key={visita.IdCita} variants={zoomIn(0.2)}>
+              <VisitCard visita={visita} modoCliente={true} />
+            </motion.div>
+          ))
+        ) : (
+          <div className="text-center text-gray-500 py-8">
+            No tienes visitas técnicas registradas
+          </div>
+        )}
       </motion.div>
     </div>
   );

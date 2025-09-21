@@ -6,7 +6,7 @@ import QuoteCard from "../../components/QuoteFilterForm/QuoteCard";
 import QuoteFilterForm from "../../components/QuoteFilterForm/QuoteFilterForm";
 import EmptyState from "../../components/Common/EmptyState";
 import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
-import { fetchCotizacionesApi } from "../../service/quotes";
+import { fetchCotizacionesApi, updateCotizacionStatusApi } from "../../service/cotizacion";
 
 const UserQuotes = () => {
   const { usuario, authToken } = useAuth();
@@ -34,19 +34,43 @@ const UserQuotes = () => {
   }, [usuario, authToken]);
 
   // ✅ Aceptar cotización
-  const handleAccept = (id) => {
-    setQuotes((prev) =>
-      prev.map((q) => (q.id === id ? { ...q, status: "Aprobada" } : q))
-    );
-    toast.success("Cotización aceptada");
+  const handleAccept = async (id) => {
+    try {
+      await updateCotizacionStatusApi(id, 6, authToken); // 6 = Aceptada
+      
+      // Actualizar el estado local
+      setQuotes((prev) =>
+        prev.map((q) => (q.IdCotizacion === id ? { ...q, IdEstado: 6, EstadoDescripcion: "Aceptada" } : q))
+      );
+      setFilteredQuotes((prev) =>
+        prev.map((q) => (q.IdCotizacion === id ? { ...q, IdEstado: 6, EstadoDescripcion: "Aceptada" } : q))
+      );
+      
+      toast.success("Cotización aceptada exitosamente. Se ha creado un servicio automáticamente.");
+    } catch (error) {
+      console.error("Error al aceptar cotización:", error);
+      toast.error("Error al aceptar la cotización. Inténtelo nuevamente.");
+    }
   };
 
   // ❌ Rechazar cotización
-  const handleReject = (id) => {
-    setQuotes((prev) =>
-      prev.map((q) => (q.id === id ? { ...q, status: "Rechazada" } : q))
-    );
-    toast.error("Cotización rechazada");
+  const handleReject = async (id) => {
+    try {
+      await updateCotizacionStatusApi(id, 7, authToken); // 7 = Cancelada
+      
+      // Actualizar el estado local
+      setQuotes((prev) =>
+        prev.map((q) => (q.IdCotizacion === id ? { ...q, IdEstado: 7, EstadoDescripcion: "Cancelada" } : q))
+      );
+      setFilteredQuotes((prev) =>
+        prev.map((q) => (q.IdCotizacion === id ? { ...q, IdEstado: 7, EstadoDescripcion: "Cancelada" } : q))
+      );
+      
+      toast.success("Cotización rechazada exitosamente.");
+    } catch (error) {
+      console.error("Error al rechazar cotización:", error);
+      toast.error("Error al rechazar la cotización. Inténtelo nuevamente.");
+    }
   };
 
   // 👁 Ver más detalles
@@ -104,7 +128,7 @@ const UserQuotes = () => {
               <QuoteCard
                 key={q.IdCotizacion}
                 quote={q}
-                rol="usuario"
+                rol="cliente"
                 onAccept={handleAccept}
                 onReject={handleReject}
                 onViewMore={handleViewMore}

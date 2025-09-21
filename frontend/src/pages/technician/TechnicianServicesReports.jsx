@@ -12,13 +12,8 @@ const TechnicianServiceReports = () => {
 
   useEffect(() => {
     fetchAllServicesApi(authToken, { tecnicoId: usuario.id }).then((data) => {
-      const finalizadosAsignados = data.filter(s =>
-        s.EstadoDescripcion === "Finalizado" &&
-        s.TieneDiagnostico &&
-        s.TieneCotizacion &&
-        s.IdTecnico === usuario.id
-      );
-      setServicios(finalizadosAsignados);
+      // Mostrar todos los servicios asignados al técnico sin filtrar por estado
+      setServicios(data);
     });
   }, [usuario, authToken]);
 
@@ -28,13 +23,8 @@ const TechnicianServiceReports = () => {
       tecnicoId: usuario.id
     };
     fetchAllServicesApi(authToken, filtrosCombinados).then((data) => {
-      const finalizadosAsignados = data.filter(s =>
-        s.EstadoDescripcion === "Finalizado" &&
-        s.TieneDiagnostico &&
-        s.TieneCotizacion &&
-        s.IdTecnico === usuario.id
-      );
-      setServicios(finalizadosAsignados);
+      // Mostrar todos los servicios asignados al técnico sin filtrar por estado
+      setServicios(data);
     });
   };
 

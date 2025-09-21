@@ -1,6 +1,6 @@
 import apiRequest from '../utils/apiclient';
 
-const ENDPOINT = '/visitatecnica';
+const ENDPOINT = '/visitas-tecnicas';
 
 export const fetchVisitasTecnicasApi = async (authToken, filters = {}) => {
   try {

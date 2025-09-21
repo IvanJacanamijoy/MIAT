@@ -12,15 +12,15 @@ const ClientServiceReports = () => {
 
   useEffect(() => {
     fetchAllServicesApi(authToken, { clienteId: usuario.id }).then((data) => {
-      const finalizados = data.filter(s => s.EstadoDescripcion === "Finalizado" && s.TieneDiagnostico && s.TieneCotizacion);
-      setServicios(finalizados);
+      // Mostrar todos los servicios del cliente sin filtrar por estado
+      setServicios(data);
     });
   }, [usuario, authToken]);
 
   const handleFilter = (filters) => {
     fetchAllServicesApi(authToken, filters).then((data) => {
-      const finalizados = data.filter(s => s.EstadoDescripcion === "Finalizado" && s.TieneDiagnostico && s.TieneCotizacion);
-      setServicios(finalizados);
+      // Mostrar todos los servicios sin filtrar por estado
+      setServicios(data);
     });
   };
 

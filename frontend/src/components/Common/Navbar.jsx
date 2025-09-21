@@ -22,11 +22,11 @@ const Navbar = () => {
 
   useEffect(() => {
     const usuarioLogueado = localStorage.getItem('token');
-    if (usuarioLogueado) {
+    if (usuarioLogueado && usuario) {
       setRol(usuario.rol);
       setNombre(usuario.nombre);
     }
-  }, []);
+  }, [usuario]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 4);

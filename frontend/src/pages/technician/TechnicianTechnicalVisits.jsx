@@ -3,31 +3,86 @@ import VisitCard from '../../components/TechnicalVisitsFilterForm/VisitCard';
 import VisitFilterForm from '../../components/TechnicalVisitsFilterForm/VisitFilterForm';
 import { useAuth } from '../../context/AuthContext';
 import fondo1 from "../../assets/images/home/imagen_fondo_nosotros.png";
-import { fetchVisitasTecnicasApi } from '../../service/visitasTecnicas';
+import { fetchVisitasTecnicasApi, updateVisitaTecnicaApi } from '../../service/visitasTecnicas';
+import { createDiagnosticoApi, getDiagnosticoByIdApi, updateDiagnosticoApi } from '../../service/diagnostico';
 import EmptyState from "../../components/Common/EmptyState";
+import Modal from "../../components/Common/Modal";
+import DiagnosticForm from "../../components/DiagnosticForm";
+import { toast } from "react-toastify";
 
 const TechnicianTechnicalVisits = () => {
   const { usuario, authToken } = useAuth();
   const [visits, setVisits] = useState([]);
+  const [selectedVisit, setSelectedVisit] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState("");
+  const [editingDiagnosis, setEditingDiagnosis] = useState(null);
 
   useEffect(() => {
     if (usuario?.id) {
-      fetchVisitasTecnicasApi(authToken,{tecnicoId:usuario.id}).then((data) => {
-        setVisits(data);
-      });
+      fetchVisitasTecnicasApi(authToken, { tecnicoId: usuario.id })
+        .then(setVisits)
+        .catch(() => toast.error("Error al cargar visitas técnicas"));
     }
-  }, [usuario]);
+  }, [usuario, authToken]);
 
   const handleFilter = (filters) => {
-    console.log(filters)
-    fetchVisitasTecnicasApi(authToken, filters).then((data)=>{
-      setVisits(data);
-      console.log(data.map((visita) => visita.Ident))
-    }).catch('Hubo un error');
+    fetchVisitasTecnicasApi(authToken, filters)
+      .then(setVisits)
+      .catch(() => toast.error("Error al aplicar filtros"));
+  };
+
+  const handleOpenModal = (visit, type) => {
+    setSelectedVisit(visit);
+    setModalType(type);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedVisit(null);
+    setModalType("");
+    setEditingDiagnosis(null);
+  };
+
+  const handleEditDiagnosis = async (visit) => {
+    try {
+      const diagnosis = await getDiagnosticoByIdApi(visit.IdDiagnostico, authToken);
+      setEditingDiagnosis(diagnosis);
+      setSelectedVisit(visit);
+      setModalType("diagnostico");
+      setShowModal(true);
+    } catch (error) {
+      toast.error("Error al cargar el diagnóstico");
+    }
+  };
+
+  const handleSaveDiagnostico = async (data) => {
+    try {
+      if (editingDiagnosis) {
+        // Actualizar diagnóstico existente
+        await updateDiagnosticoApi(editingDiagnosis.IdDiagnostico, data, authToken);
+        toast.success("Diagnóstico actualizado exitosamente");
+      } else {
+        // Crear nuevo diagnóstico
+        await createDiagnosticoApi({ ...data, IdCita: selectedVisit.IdCita }, authToken);
+        toast.success("Diagnóstico creado exitosamente");
+      }
+      handleCloseModal();
+      // Recargar visitas
+      if (usuario?.id) {
+        fetchVisitasTecnicasApi(authToken, { tecnicoId: usuario.id })
+          .then(setVisits)
+          .catch(() => toast.error("Error al cargar visitas técnicas"));
+      }
+    } catch (error) {
+      toast.error(editingDiagnosis ? "Error al actualizar diagnóstico" : "Error al crear diagnóstico");
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-200 relative max-w-7xl mx-auto">
+      {/* HERO */}
       <div className="relative">
         <img
           src={fondo1}
@@ -46,7 +101,7 @@ const TechnicianTechnicalVisits = () => {
         </div>
       </div>
 
-      {/* Contenedor con lista de visitas */}
+      {/* CONTENIDO */}
       <div className="relative z-10 rounded-t-3xl -mt-24 px-4 py-10 mx-10 text-white">
         <VisitFilterForm onFilter={handleFilter} />
 
@@ -54,7 +109,7 @@ const TechnicianTechnicalVisits = () => {
           {visits.length === 0 ? (
             <EmptyState
               title="No existe visita técnica"
-              description="No hay visitas tecnicas asignadas que coincidan con los filtros."
+              description="No hay visitas técnicas asignadas que coincidan con los filtros."
               icon="visits"
             />
           ) : (
@@ -63,11 +118,26 @@ const TechnicianTechnicalVisits = () => {
                 key={visit.IdCita}
                 visit={visit}
                 rol="tecnico"
+                onGenerateDiagnosis={() => handleOpenModal(visit, "diagnostico")}
+                onEditDiagnosis={() => handleEditDiagnosis(visit)}
               />
             ))
           )}
         </div>
       </div>
+
+      {/* MODAL DE DIAGNÓSTICO */}
+      <Modal isOpen={showModal} onClose={handleCloseModal}>
+        {modalType === "diagnostico" && selectedVisit && (
+          <DiagnosticForm
+            citaId={selectedVisit.IdCita}
+            tecnicoAsignado={`${usuario.nombres} ${usuario.apellidos}`}
+            onSubmit={handleSaveDiagnostico}
+            onCancel={handleCloseModal}
+            initialData={editingDiagnosis}
+          />
+        )}
+      </Modal>
     </div>
   );
 };

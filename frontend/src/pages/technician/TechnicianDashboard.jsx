@@ -1,9 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {fadeIn, zoomIn, rotateIn, staggerContainer, slideIn, bounceIn, pulse,} from "../../Animations/variants";
 import { ClipboardList, CheckCircle, CalendarClock, FileText } from "lucide-react";
+import { FaFileAlt, FaMoneyBillWave, FaTools, FaExclamationTriangle } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 import { fetchVisitasTecnicasApi } from "../../service/visitasTecnicas";
+import { fetchAllServicesApi } from "../../service/services";
+import { getDiagnosticosApi } from "../../service/diagnostico";
+import { fetchCotizacionesApi } from "../../service/cotizacion";
+import { toast } from "react-toastify";
 import fondo from "../../assets/images/home/imagen_fondo_nosotros.png";
 import VisitCard from "../../components/TechnicalVisitsFilterForm/VisitCard";
 import EmptyState from "../../components/Common/EmptyState";
@@ -11,26 +16,68 @@ import EmptyState from "../../components/Common/EmptyState";
 const TechnicianDashboard = () => {
   const { usuario, authToken } = useAuth();
   const [visitas, setVisitas] = useState([]);
+  const [servicios, setServicios] = useState([]);
+  const [diagnosticos, setDiagnosticos] = useState([]);
+  const [cotizaciones, setCotizaciones] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const obtenerVisitas = async () => {
+    const fetchData = async () => {
       try {
-        const data = await fetchVisitasTecnicasApi(authToken);
-        const soloTecnico = data.filter(v => v.tecnico?.id === usuario.id);
-        setVisitas(soloTecnico);
+        setLoading(true);
+        
+        // Cargar todos los datos del técnico en paralelo
+        const [visitasData, serviciosData, diagnosticosData, cotizacionesData] = await Promise.all([
+          fetchVisitasTecnicasApi(authToken, { tecnicoId: usuario.id }),
+          fetchAllServicesApi(authToken, { tecnicoId: usuario.id }),
+          getDiagnosticosApi(authToken),
+          fetchCotizacionesApi(authToken, { idTecnico: usuario.id })
+        ]);
+
+        setVisitas(visitasData);
+        setServicios(serviciosData);
+        
+        // Filtrar diagnósticos del técnico
+        const diagnosticosTecnico = diagnosticosData.filter(d => d.IdTecnico === usuario.id);
+        setDiagnosticos(diagnosticosTecnico);
+        
+        setCotizaciones(cotizacionesData);
       } catch (error) {
-        console.error("Error cargando visitas:", error);
+        console.error("Error al cargar datos del dashboard:", error);
+        toast.error("Error al cargar datos del dashboard");
+      } finally {
+        setLoading(false);
       }
     };
 
-    obtenerVisitas();
-  }, [authToken, usuario.id]);
+    if (authToken && usuario?.id) {
+      fetchData();
+    }
+  }, [authToken, usuario?.id]);
 
-  const visitasHoy = visitas.filter(
-    v => new Date(v.fecha).toDateString() === new Date().toDateString()
-  );
-  const visitasPendientes = visitas.filter(v => v.EstadoDescripcion === "Pendiente");
-  const visitasFinalizadas = visitas.filter(v => v.EstadoDescripcion === "Finalizado");
+  // Cálculos dinámicos de estadísticas del técnico
+  const estadisticas = useMemo(() => {
+    const visitasHoy = visitas.filter(
+      v => new Date(v.Fecha).toDateString() === new Date().toDateString()
+    );
+    const visitasPendientes = visitas.filter(v => v.IdEstado === 1);
+    const visitasFinalizadas = visitas.filter(v => v.IdEstado === 4);
+    const serviciosActivos = servicios.filter(s => s.IdEstado !== 7);
+    const diagnosticosPendientes = diagnosticos.filter(d => !d.tieneCotizacion);
+    const cotizacionesPendientes = cotizaciones.filter(c => c.IdEstado === 5);
+    const cotizacionesAceptadas = cotizaciones.filter(c => c.IdEstado === 6);
+
+    return {
+      visitasHoy: visitasHoy.length,
+      visitasPendientes: visitasPendientes.length,
+      visitasFinalizadas: visitasFinalizadas.length,
+      totalVisitas: visitas.length,
+      serviciosActivos: serviciosActivos.length,
+      diagnosticosPendientes: diagnosticosPendientes.length,
+      cotizacionesPendientes: cotizacionesPendientes.length,
+      cotizacionesAceptadas: cotizacionesAceptadas.length
+    };
+  }, [visitas, servicios, diagnosticos, cotizaciones]);
 
   return (
     <div className="min-h-screen bg-gray-200 relative max-w-7xl mx-auto">
@@ -62,7 +109,7 @@ const TechnicianDashboard = () => {
         </motion.div>
       </section>
 
-      {/* Tarjetas resumen */}
+      {/* Tarjetas resumen expandidas */}
       <motion.div
         className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 px-10"
         variants={staggerContainer}
@@ -77,7 +124,7 @@ const TechnicianDashboard = () => {
           <h3 className="text-lg font-semibold mb-2">Visitas para Hoy</h3>
           <div className="flex items-center justify-between">
             <CalendarClock className="text-yellow-500 w-8 h-8" />
-            <span className="text-3xl font-bold">{visitasHoy.length}</span>
+            <span className="text-3xl font-bold">{estadisticas.visitasHoy}</span>
           </div>
         </motion.div>
 
@@ -85,10 +132,10 @@ const TechnicianDashboard = () => {
           className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-red-400 hover:shadow-xl transition transform hover:scale-105"
           variants={slideIn("right", 0.3)}
         >
-          <h3 className="text-lg font-semibold mb-2">Pendientes</h3>
+          <h3 className="text-lg font-semibold mb-2">Visitas Pendientes</h3>
           <div className="flex items-center justify-between">
             <ClipboardList className="text-red-500 w-8 h-8" />
-            <span className="text-3xl font-bold">{visitasPendientes.length}</span>
+            <span className="text-3xl font-bold">{estadisticas.visitasPendientes}</span>
           </div>
         </motion.div>
 
@@ -96,10 +143,10 @@ const TechnicianDashboard = () => {
           className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-green-400 hover:shadow-xl transition transform hover:scale-105"
           variants={bounceIn}
         >
-          <h3 className="text-lg font-semibold mb-2">Finalizadas</h3>
+          <h3 className="text-lg font-semibold mb-2">Visitas Finalizadas</h3>
           <div className="flex items-center justify-between">
             <CheckCircle className="text-green-500 w-8 h-8" />
-            <span className="text-3xl font-bold">{visitasFinalizadas.length}</span>
+            <span className="text-3xl font-bold">{estadisticas.visitasFinalizadas}</span>
           </div>
         </motion.div>
 
@@ -110,7 +157,52 @@ const TechnicianDashboard = () => {
           <h3 className="text-lg font-semibold mb-2">Total Asignadas</h3>
           <div className="flex items-center justify-between">
             <FileText className="text-blue-500 w-8 h-8" />
-            <span className="text-3xl font-bold">{visitas.length}</span>
+            <span className="text-3xl font-bold">{estadisticas.totalVisitas}</span>
+          </div>
+        </motion.div>
+
+        {/* Nuevas tarjetas para servicios, diagnósticos y cotizaciones */}
+        <motion.div
+          className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-indigo-400 hover:shadow-xl transition transform hover:scale-105"
+          variants={slideIn("left", 0.4)}
+        >
+          <h3 className="text-lg font-semibold mb-2">Servicios Activos</h3>
+          <div className="flex items-center justify-between">
+            <FaTools className="text-indigo-500 w-8 h-8" />
+            <span className="text-3xl font-bold">{estadisticas.serviciosActivos}</span>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-orange-400 hover:shadow-xl transition transform hover:scale-105"
+          variants={slideIn("right", 0.5)}
+        >
+          <h3 className="text-lg font-semibold mb-2">Diagnósticos Pendientes</h3>
+          <div className="flex items-center justify-between">
+            <FaFileAlt className="text-orange-500 w-8 h-8" />
+            <span className="text-3xl font-bold">{estadisticas.diagnosticosPendientes}</span>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-purple-400 hover:shadow-xl transition transform hover:scale-105"
+          variants={bounceIn}
+        >
+          <h3 className="text-lg font-semibold mb-2">Cotizaciones Pendientes</h3>
+          <div className="flex items-center justify-between">
+            <FaMoneyBillWave className="text-purple-500 w-8 h-8" />
+            <span className="text-3xl font-bold">{estadisticas.cotizacionesPendientes}</span>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-emerald-400 hover:shadow-xl transition transform hover:scale-105"
+          variants={pulse}
+        >
+          <h3 className="text-lg font-semibold mb-2">Cotizaciones Aceptadas</h3>
+          <div className="flex items-center justify-between">
+            <FaExclamationTriangle className="text-emerald-500 w-8 h-8" />
+            <span className="text-3xl font-bold">{estadisticas.cotizacionesAceptadas}</span>
           </div>
         </motion.div>
       </motion.div>
@@ -126,9 +218,9 @@ const TechnicianDashboard = () => {
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
           Próximas visitas técnicas
         </h2>
-        {visitasHoy.length > 0 ? (
-          visitasHoy.map((visita) => (
-            <motion.div key={visita.id} variants={zoomIn(0.2)}>
+        {estadisticas.visitasHoy > 0 ? (
+          visitas.filter(v => new Date(v.Fecha).toDateString() === new Date().toDateString()).map((visita) => (
+            <motion.div key={visita.IdCita} variants={zoomIn(0.2)}>
               <VisitCard visita={visita} />
             </motion.div>
           ))

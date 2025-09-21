@@ -1,6 +1,7 @@
 import { useState } from "react";
 import servicio1 from "../assets/images/servicecarousel/servicio_1.png";
 import Modal from "../components/Common/Modal";
+import ServiceReportDetail from "./ServiceReportDetails";
 
 const ServiceReportCard = ({ servicio, rol }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -112,12 +113,7 @@ const ServiceReportCard = ({ servicio, rol }) => {
       </div>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <h2 className="text-lg font-bold mb-4 text-black">Informe del Servicio</h2>
-        <p className="text-black"><strong>Diagnóstico:</strong> {servicio.DiagnosticoDescripcion || 'No disponible'}</p>
-        <p className="text-black"><strong>Materiales:</strong> {servicio.Materiales || 'No especificado'}</p>
-        <p className="text-black"><strong>Medidas:</strong> {servicio.Medidas || 'No aplican'}</p>
-        <p className="text-black"><strong>Garantía:</strong> {servicio.Garantia || 'Sin garantía registrada'}</p>
-        <p className="text-black"><strong>Observaciones:</strong> {servicio.Observaciones || 'Sin observaciones'}</p>
+        <ServiceReportDetail servicio={servicio} />
       </Modal>
     </div>
   );

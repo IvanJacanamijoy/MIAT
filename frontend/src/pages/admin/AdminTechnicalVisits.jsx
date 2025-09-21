@@ -18,7 +18,7 @@ import {
 import { fetchTecnicosApi } from "../../service/users";
 import EmptyState from "../../components/Common/EmptyState";
 import DiagnosticForm from "../../components/DiagnosticForm";
-import QuoteForm from "../../components/QuoteForm";
+import { createDiagnosticoApi, getDiagnosticoByIdApi, updateDiagnosticoApi } from "../../service/diagnostico";
 
 const skeletonArray = Array.from({ length: 6 }, (_, i) => i);
 
@@ -31,6 +31,7 @@ export default function AdminTechnicalVisits() {
   const [selectedVisit, setSelectedVisit] = useState(null);
   const [modalType, setModalType] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [editingDiagnosis, setEditingDiagnosis] = useState(null);
 
   const [loadingVisits, setLoadingVisits] = useState(false);
   const [loadingTechs, setLoadingTechs] = useState(false);
@@ -100,6 +101,7 @@ export default function AdminTechnicalVisits() {
     setShowModal(false);
     setModalType("");
     setSelectedVisit(null);
+    setEditingDiagnosis(null);
   };
 
   const refresh = async () => {
@@ -139,31 +141,46 @@ export default function AdminTechnicalVisits() {
     }
   };
 
+  const handleEditDiagnosis = async (visit) => {
+    try {
+      const diagnosis = await getDiagnosticoByIdApi(visit.IdDiagnostico, authToken);
+      setEditingDiagnosis(diagnosis);
+      setSelectedVisit(visit);
+      setModalType("diagnostico");
+      setShowModal(true);
+    } catch (error) {
+      toast.error("Error al cargar el diagnóstico");
+    }
+  };
+
   const handleSaveDiagnostico = async (data) => {
     try {
-      const response = await createDiagnosticoApi(data, authToken);
-      toast.success(response?.message || "Diagnóstico guardado");
+      if (editingDiagnosis) {
+        // Actualizar diagnóstico existente
+        await updateDiagnosticoApi(editingDiagnosis.IdDiagnostico, data, authToken);
+        toast.success("Diagnóstico actualizado exitosamente");
+      } else {
+        // 1. Crear diagnóstico
+        const nuevoDiagnostico = await createDiagnosticoApi(data, authToken);
+
+        // 2. Actualizar visita con el IdDiagnostico
+        await updateVisitaTecnicaApi(
+          data.IdCita,
+          { IdDiagnostico: nuevoDiagnostico.IdDiagnostico },
+          authToken
+        );
+
+        toast.success("Diagnóstico guardado y vinculado correctamente");
+      }
       await refresh();
     } catch (error) {
-      toast.error("Error al guardar diagnóstico");
+      toast.error(editingDiagnosis ? "Error al actualizar diagnóstico" : "Error al guardar diagnóstico");
       console.error(error);
     } finally {
       handleCloseModal();
     }
   };
 
-  const handleSaveCotizacion = async (data) => {
-    try {
-      const response = await createCotizacionApi(data, authToken);
-      toast.success(response?.message || "Cotización guardada");
-      await refresh();
-    } catch (error) {
-      toast.error("Error al guardar cotización");
-      console.error(error);
-    } finally {
-      handleCloseModal();
-    }
-  };
 
   const handleAssignTechnician = async (updatedVisit) => {
     try {
@@ -235,7 +252,7 @@ export default function AdminTechnicalVisits() {
           className="flex flex-col items-center gap-6"
         >
           {/* Filtro centrado */}
-          <div className="w-full md:w-3/4 rounded-3xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div className="w-full rounded-3xl border border-gray-200 bg-white p-4 shadow-sm">
             <div className="flex items-center gap-2 mb-3">
               <Filter className="size-4" />
               <h2 className="font-semibold tracking-tight text-sm sm:text-base">
@@ -342,7 +359,7 @@ export default function AdminTechnicalVisits() {
                     onGenerateDiagnosis={() =>
                       handleOpenModal(visit, "diagnostico")
                     }
-                    onGenerateQuote={() => handleOpenModal(visit, "cotizacion")}
+                    onEditDiagnosis={() => handleEditDiagnosis(visit)}
                     technicians={technicians}
                   />
                 </li>
@@ -409,14 +426,7 @@ export default function AdminTechnicalVisits() {
             }
             onSubmit={handleSaveDiagnostico}
             onCancel={handleCloseModal}
-          />
-        )}
-
-        {modalType === "cotizacion" && selectedVisit && (
-          <QuoteForm
-            idDiagnostico={selectedVisit.IdDiagnostico}
-            onSubmit={handleSaveCotizacion}
-            onCancel={handleCloseModal}
+            initialData={editingDiagnosis}
           />
         )}
       </Modal>
@@ -427,9 +437,8 @@ export default function AdminTechnicalVisits() {
 function Kpi({ label, value, subtle = false }) {
   return (
     <div
-      className={`rounded-2xl border ${
-        subtle ? "border-gray-200 bg-gray-50" : "border-gray-200 bg-white"
-      } p-3 sm:p-4 text-center shadow-xs`}
+      className={`rounded-2xl border ${subtle ? "border-gray-200 bg-gray-50" : "border-gray-200 bg-white"
+        } p-3 sm:p-4 text-center shadow-xs`}
     >
       <div className="text-xs sm:text-sm font-medium text-gray-500 tracking-wide">
         {label}

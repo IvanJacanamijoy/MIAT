@@ -4,20 +4,9 @@ require('dotenv').config()
 const express = require('express');
 //importamos cors para evitar error de cors
 const cors = require('cors');
+const path = require('path');
 //creamos una app con express
 const app = express();
-//importamos las rutas de usuario
-const usuarioRouter = require('./routes/usuarioRoutes');
-//importamos las rutas de usuario autenticacion
-const authRouter = require('./routes/authRoutes');
-//importamos las rutas de servicios
-const servicioRouter = require('./routes/servicioRoutes');
-//importamos las rutas de visitas tecnicas
-const visitaTecnicaRouter = require('./routes/VisitaTecnicaRoutes')
-//importamos las rutas de diagnostico
-const diagnosticoRouter = require('./routes/diagnosticoRoutes');
-//importamos las rutas de cotizacion
-const cotizacionRouter = require('./routes/cotizacionRoutes');
 
 //inicializamos knex
 const knex = require('knex')(require('./config/knexfile').development);
@@ -28,18 +17,27 @@ const PORT = process.env.PORT;
 app.use(cors());
 app.use(express.json());
 
-// Rutas de autenticacion (login, registro)
-app.use('/auth', authRouter)
-// Rutas de usuario
-app.use('/usuarios', usuarioRouter);
-// Rutas de servicios
-app.use('/servicios', servicioRouter);
-// Rutas de visitas tecnicas
-app.use('/visitatecnica', visitaTecnicaRouter);
-// Rutas de diagnostico
-app.use('/diagnostico', diagnosticoRouter);
-// Rutas de cotizacion
-app.use('/cotizaciones', cotizacionRouter);
+// Servir archivos estáticos desde la carpeta uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Importar rutas
+const authRoutes = require('./routes/authRoutes');
+const usuarioRoutes = require('./routes/usuarioRoutes');
+const citaServicioRoutes = require('./routes/citaServicio');
+const visitaTecnicaRoutes = require('./routes/VisitaTecnicaRoutes');
+const diagnosticoRoutes = require('./routes/diagnosticoRoutes');
+const cotizacionRoutes = require('./routes/cotizacionRoutes');
+const servicioRoutes = require('./routes/servicioRoutes');
+
+// Usar rutas
+app.use('/auth', authRoutes);
+app.use('/usuarios', usuarioRoutes);
+app.use('/citas', citaServicioRoutes);
+app.use('/visitas-tecnicas', visitaTecnicaRoutes);
+app.use('/diagnosticos', diagnosticoRoutes);
+app.use('/cotizaciones', cotizacionRoutes);
+app.use('/servicios', servicioRoutes);
+
 
 // Probando ruta de prueba
 app.use('/prueba', (req, res) => {
@@ -54,7 +52,7 @@ knex.raw('SELECT 1').then(() => {
     console.log(`Conexión a la base de datos de ${process.env.DB_NAME} exitosa`);
     //El servidor se inicia solo si laconexion a la base de datos es exitosa
     app.listen(PORT, () => {
-        console.log('Servidor corriendo en http//localhost:' + PORT);
+        console.log(`Servidor corriendo en http://localhost:${PORT}`);
     })
 }).catch((error) => {
     //en caso de algun error se muestro en la consola un mensaje de error
