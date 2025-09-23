@@ -7,7 +7,7 @@ class UsuarioModel {
     /*Obtener un Usuario por ID*/
     async getUsuarioById(id) {
         try {
-            const resultQuery = await knex('usuario').where({ IdUsuario: id }).first();
+            const resultQuery = await knex('Usuario').where({ IdUsuario: id }).first();
             return resultQuery;
         } catch (error) {
             return 'Error buscando Usuario con id ' + id + ': ' + error;
