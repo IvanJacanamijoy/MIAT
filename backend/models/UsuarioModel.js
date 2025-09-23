@@ -17,7 +17,7 @@ class UsuarioModel {
     /*Obtener un Usuario por Email*/
     async getUsuarioByEmail(email) {
         try {
-            const resultQuery = await knex('usuario').where({ Email: email }).first();
+            const resultQuery = await knex('Usuario').where({ Email: email }).first();
             return resultQuery || false;
         } catch (error) {
             return error;
@@ -27,7 +27,7 @@ class UsuarioModel {
     /* Obtener todos los usuarios */
     async getAllUsuarios() {
         try {
-            return await knex('usuario').select('*');
+            return await knex('Usuario').select('*');
         } catch (error) {
             return 'Error buscando usuarios: ' + error;
         }
@@ -36,7 +36,7 @@ class UsuarioModel {
     /* Obtener todos los técnicos (IdRol=2 por defecto) */
     async getAllTecnicos() {
         try {
-            return await knex('usuario').where({ IdRol: 2 }).select('*');
+            return await knex('Usuario').where({ IdRol: 2 }).select('*');
         } catch (error) {
             return 'Error buscando técnicos: ' + error;
         }
@@ -53,7 +53,7 @@ class UsuarioModel {
     async createUsuario(UsuarioData) {
         try {
             const contraseñaHash = await this.hashPassword(UsuarioData.Contraseña);
-            const [IdUsuario] = await knex('usuario').insert({
+            const [IdUsuario] = await knex('Usuario').insert({
                 Nombres: UsuarioData.Nombres,
                 Apellidos: UsuarioData.Apellidos,
                 Email: UsuarioData.Email,
@@ -73,7 +73,7 @@ class UsuarioModel {
     /* Actualizar Usuario */
     async updateUsuario(id, UsuarioData) {
         try {
-            const affectRows = await knex('usuario').where({ IdUsuario: id }).update(UsuarioData);
+            const affectRows = await knex('Usuario').where({ IdUsuario: id }).update(UsuarioData);
             if (affectRows === 0) return 'No se encontró usuario con ese id';
             return this.getUsuarioById(id);
         } catch (error) {
@@ -84,7 +84,7 @@ class UsuarioModel {
     /* Eliminar Usuario */
     async deleteUsuario(id) {
         try {
-            await knex('usuario').where({ IdUsuario: id }).del();
+            await knex('Usuario').where({ IdUsuario: id }).del();
             return 'Usuario eliminado correctamente';
         } catch (error) {
             return 'Error al eliminar usuario con id ' + id + ': ' + error;
@@ -94,7 +94,7 @@ class UsuarioModel {
     /* Login de usuario */
     async loginUsuario(email, password) {
         try {
-            const usuario = await knex('usuario').where({ Email: email }).first();
+            const usuario = await knex('Usuario').where({ Email: email }).first();
             if (!usuario) return false;
 
             const contraseñaCoincide = await bcrypt.compare(password, usuario.Contraseña);
@@ -110,7 +110,7 @@ class UsuarioModel {
     // Guardar el token de recuperación
     async saveResetToken(idUsuario, tokenHash, expireTime) {
         try {
-            await knex('usuario')
+            await knex('Usuario')
                 .where({ IdUsuario: idUsuario })
                 .update({
                     ResetPasswordToken: tokenHash,
@@ -126,7 +126,7 @@ class UsuarioModel {
     // Buscar usuario por token de recuperación
     async findByResetToken(tokenHash) {
         try {
-            return await knex('usuario')
+            return await knex('Usuario')
                 .where({ ResetPasswordToken: tokenHash })
                 .first();
         } catch (error) {
@@ -138,7 +138,7 @@ class UsuarioModel {
     // Actualizar contraseña
     async updatePassword(idUsuario, newPasswordHash) {
         try {
-            await knex('usuario')
+            await knex('Usuario')
                 .where({ IdUsuario: idUsuario })
                 .update({ Contraseña: newPasswordHash });
             return true;
@@ -151,7 +151,7 @@ class UsuarioModel {
     // Limpiar token de recuperación
     async clearResetToken(idUsuario) {
         try {
-            await knex('usuario')
+            await knex('Usuario')
                 .where({ IdUsuario: idUsuario })
                 .update({
                     ResetPasswordToken: null,
