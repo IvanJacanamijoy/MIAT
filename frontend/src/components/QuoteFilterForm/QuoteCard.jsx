@@ -140,7 +140,7 @@ const QuoteCard = ({ quote, rol, onAccept, onReject, onEdit, onViewMore }) => {
             Ver más
           </button>
 
-          {(rol === "admin" || rol === "tecnico") && (
+          {(rol === "admin" || rol === "tecnico") && estado !== "Aceptada" && estado !== "Cancelada" && (
             <>
               <button
                 onClick={() => setIsEditModalOpen(true)}

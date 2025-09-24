@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Eye, Download } from "lucide-react";
 import servicio1 from "../assets/images/servicecarousel/servicio_1.webp";
 import Modal from "../components/Common/Modal";
 import ServiceReportDetail from "./ServiceReportDetails";
@@ -134,6 +135,9 @@ const ServiceReportCard = ({ servicio, rol, onUpdate }) => {
     }
   };
 
+  // Verificar si el servicio está finalizado para mostrar botones condicionales
+  const esServicioFinalizado = servicio.IdEstado === 4;
+
   // Datos del modelo unificado de servicios finalizados
   const clienteNombre = `${servicio.ClienteNombres || ""} ${servicio.ClienteApellidos || ""}`.trim() || "No disponible";
   const tecnicoNombre = servicio.TecnicoNombres ? `${servicio.TecnicoNombres} ${servicio.TecnicoApellidos}` : "No asignado";
@@ -175,7 +179,9 @@ const ServiceReportCard = ({ servicio, rol, onUpdate }) => {
       ? "bg-green-200 text-green-800"
       : estado === "Cancelada" || estado === "Rechazada"
         ? "bg-red-200 text-red-800"
-        : "bg-gray-200 text-gray-800";
+        : estado === "Pendiente"
+          ? "bg-yellow-200 text-yellow-800"
+          : "bg-gray-200 text-gray-800";
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col md:flex-row">
@@ -229,17 +235,26 @@ const ServiceReportCard = ({ servicio, rol, onUpdate }) => {
           </p>
         </div>
 
-        {/* Botones ver informe, editar y descargar PDF */}
+        {/* Botones ver informe, editar y descargar PDF - Solo mostrar Ver Informe y Descargar PDF si está finalizado */}
         <div className="flex justify-end gap-2 mt-4">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-          >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" />
-            </svg>
-            Ver Informe
-          </button>
+          {esServicioFinalizado && (
+            <>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+              >
+                <Eye className="w-4 h-4" />
+                Ver Informe
+              </button>
+              <button
+                onClick={() => handleDownloadPDF()}
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Descargar PDF
+              </button>
+            </>
+          )}
           {(rol === "admin" || rol === "tecnico") && (
             <button
               onClick={() => setIsEditModalOpen(true)}
@@ -251,15 +266,6 @@ const ServiceReportCard = ({ servicio, rol, onUpdate }) => {
               Editar
             </button>
           )}
-          <button
-            onClick={() => handleDownloadPDF()}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-          >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
-            </svg>
-            Descargar PDF
-          </button>
         </div>
       </div>
 

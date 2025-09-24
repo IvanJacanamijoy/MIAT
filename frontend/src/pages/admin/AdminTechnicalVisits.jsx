@@ -160,19 +160,12 @@ export default function AdminTechnicalVisits() {
         await updateDiagnosticoApi(editingDiagnosis.IdDiagnostico, data, authToken);
         toast.success("Diagnóstico actualizado exitosamente");
       } else {
-        // 1. Crear diagnóstico
-        const nuevoDiagnostico = await createDiagnosticoApi(data, authToken);
-
-        // 2. Actualizar visita con el IdDiagnostico
-        await updateVisitaTecnicaApi(
-          data.IdCita,
-          { IdDiagnostico: nuevoDiagnostico.IdDiagnostico },
-          authToken
-        );
-
-        toast.success("Diagnóstico guardado y vinculado correctamente");
+        // Crear diagnóstico (la relación se establece automáticamente con IdCita)
+        await createDiagnosticoApi(data, authToken);
+        toast.success("Diagnóstico guardado correctamente");
       }
-      await refresh();
+      // Actualizar la lista de visitas técnicas después de crear/actualizar el diagnóstico
+      await loadData();
     } catch (error) {
       toast.error(editingDiagnosis ? "Error al actualizar diagnóstico" : "Error al guardar diagnóstico");
       console.error(error);

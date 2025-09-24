@@ -136,8 +136,6 @@ const LoginForm = ({ styles, openModal }) => {
         </div>
       )}
 
-      {isLoading && <p className="text-center text-blue-500 mb-2">Cargando...</p>}
-
       <div className="flex justify-center">
         <motion.button
           type="submit"
@@ -146,10 +144,10 @@ const LoginForm = ({ styles, openModal }) => {
           animate="show"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-4 px-8 rounded focus:outline-none focus:shadow-outline cursor-pointer"
+          className={`${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 hover:bg-red-700'} text-white font-bold py-4 px-8 rounded focus:outline-none focus:shadow-outline cursor-pointer`}
           disabled={isLoading}
         >
-          Ingresar
+          {isLoading ? 'Cargando...' : 'Ingresar'}
         </motion.button>
       </div>
 

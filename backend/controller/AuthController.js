@@ -28,6 +28,7 @@ class AuthController {
             email: loginUsuario.Email,
             rol: loginUsuario.IdRol,
             nombre: loginUsuario.Nombres,
+            estado: loginUsuario.IdEstado,
           },
         };
 

@@ -126,6 +126,23 @@ const TechnicianQuote = () => {
     }
   };
 
+  // Función para actualizar las listas después de crear una cotización
+  const actualizarListasDespuesDeCrear = async () => {
+    try {
+      // Actualizar la lista de diagnósticos
+      setDiagnosticos(prev => 
+        prev.filter(d => d.IdDiagnostico !== selectedDiagnostico.IdDiagnostico)
+      );
+
+      // Recargar cotizaciones
+      const quotesData = await fetchCotizacionesApi(authToken, { idTecnico: usuario.id });
+      setQuotes(quotesData);
+      setFilteredQuotes(quotesData);
+    } catch (error) {
+      console.error("Error al actualizar listas:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-200 relative max-w-7xl mx-auto">
       {/* Banner */}
@@ -228,6 +245,7 @@ const TechnicianQuote = () => {
             idDiagnostico={selectedDiagnostico.IdDiagnostico}
             onSubmit={handleSubmitCotizacion}
             onCancel={handleCloseModal}
+            onSuccess={actualizarListasDespuesDeCrear}
           />
         )}
       </Modal>

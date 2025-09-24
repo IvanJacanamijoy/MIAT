@@ -12,6 +12,9 @@ const app = express();
 //puerto del proyecto
 const PORT = process.env.PORT;
 
+// Importar servicio de cancelación automática
+const visitaCancelationService = require('./services/visitaCancelationService');
+
 // Middlewares
 // app.use(cors({
 //   origin: 'https://miat.site',
@@ -53,6 +56,10 @@ app.use('/prueba', (req, res) => {
 knex.raw('SELECT 1').then(() => {
     //si la conexion es esxitosa se muestra en la consola un mensaje indicando esto
     console.log(`Conexión a la base de datos de ${process.env.DB_NAME} exitosa`);
+    
+    // Iniciar el servicio de cancelación automática de visitas técnicas
+    visitaCancelationService.startAutomaticCancelation();
+    
     //El servidor se inicia solo si laconexion a la base de datos es exitosa
     app.listen(PORT, () => {
         console.log(`Servidor corriendo en http://localhost:${PORT}`);

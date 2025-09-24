@@ -43,6 +43,13 @@ export const AuthProvider = ({ children }) => {
                         ...decoded.user, // Copia el resto de las propiedades del payload
                         rol: userRoleName // Sobrescribe el 'rol' con el nombre
                     });
+                    
+                    // Verificar si el usuario está inactivo (estado 2)
+                    if (decoded.user.estado === 2) {
+                        alert("Te encuentras inactivo en el sistema, comunícate con el administrador");
+                        cerrarSesion();
+                        return;
+                    }
                 } else {
                     console.error('Rol desconocido en el token:', decoded.user.rol);
                     cerrarSesion();
@@ -70,6 +77,13 @@ export const AuthProvider = ({ children }) => {
                     ...decoded.user,
                     rol: userRoleName
                 });
+                
+                // Verificar si el usuario está inactivo (estado 2)
+                if (decoded.user.estado === 2) {
+                    alert("Te encuentras inactivo en el sistema, comunícate con el administrador");
+                    cerrarSesion();
+                    return;
+                }
             } else {
                 console.error('Rol desconocido en el token recién recibido:', decoded.user.rol);
                 cerrarSesion(); // Invalidar sesión si el rol es desconocido

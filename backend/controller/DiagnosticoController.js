@@ -1,4 +1,5 @@
 const DiagnosticoModel = require('../models/DiagnosticoModel');
+const VisitaTecnicaModel = require('../models/VisitaTecnicaModel');
 
 class DiagnosticoController {
     async getAllDiagnosticos(req, res) {
@@ -26,6 +27,12 @@ class DiagnosticoController {
         try {
             const data = req.body;
             const nuevoDiagnostico = await DiagnosticoModel.createDiagnostico(data);
+            
+            // Actualizar el estado de la visita técnica a "Finalizado" (IdEstado = 4)
+            if (data.IdCita) {
+                await VisitaTecnicaModel.updateStatus(data.IdCita, 4);
+            }
+            
             res.status(201).json(nuevoDiagnostico);
         } catch (error) {
             res.status(400).json({ message: error.message });

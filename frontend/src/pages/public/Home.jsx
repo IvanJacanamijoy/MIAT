@@ -109,7 +109,7 @@ const Home = () => {
               initial="hidden"
               animate="show"
             >
-              <h2 className="text-4xl font-bold text-gray-950 mb-6 text-shadow-lg">
+              <h2 className="text-4xl font-bold text-white mb-6 text-shadow-lg">
                 Calidad y precisión en cada conexión
               </h2>
               <p className="text-lg text-white mb-8 font-semibold text-shadow-lg">

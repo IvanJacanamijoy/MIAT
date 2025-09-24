@@ -69,7 +69,7 @@ const TechnicianTechnicalVisits = () => {
         toast.success("Diagnóstico creado exitosamente");
       }
       handleCloseModal();
-      // Recargar visitas
+      // Actualizar la lista de visitas técnicas después de crear/actualizar el diagnóstico
       if (usuario?.id) {
         fetchVisitasTecnicasApi(authToken, { tecnicoId: usuario.id })
           .then(setVisits)

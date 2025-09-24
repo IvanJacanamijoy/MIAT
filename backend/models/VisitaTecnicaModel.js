@@ -312,5 +312,12 @@ class VisitaTecnicaModel {
             .update({ IdTecnico });
     }
 
+    // Actualizar el estado de una cita
+    async updateStatus(IdCita, IdEstado) {
+        return await knex('CitaServicio')
+            .where('IdCita', IdCita)
+            .update({ IdEstado });
+    }
+
 }
 module.exports = new VisitaTecnicaModel();
