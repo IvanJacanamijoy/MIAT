@@ -70,7 +70,7 @@ const PendingDiagnoses = () => {
       {/* Diagnósticos sin cotización */}
       <h3 className="text-xl font-semibold mb-3 text-white">Diagnósticos pendientes de cotización</h3>
       {diagnosticos.length === 0 ? (
-        <p className="mb-6 text-black">No hay diagnósticos pendientes de cotización.</p>
+        <p className="mb-6 text-white bg-white">No hay diagnósticos pendientes de cotización.</p>
       ) : (
         <div className="h-96 overflow-y-auto mb-6">
           <div className="grid gap-4">

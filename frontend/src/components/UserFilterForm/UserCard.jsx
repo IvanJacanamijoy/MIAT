@@ -1,5 +1,6 @@
 import Switch from "@mui/material/Switch";
 import { useAuth } from "../../context/AuthContext";
+import imagenPerfil from "../../assets/images/userfilter/imagen_perfil.png"
 const UserCard = ({ user, onEditClick, onToggleStatus }) => {
     const { usuario } = useAuth();
     return (
@@ -13,7 +14,7 @@ const UserCard = ({ user, onEditClick, onToggleStatus }) => {
                 {user.IdRol == 3 ? 'Administrador' : user.IdRol == 2 ? 'Tecnico' : 'Usuario'}
             </span>
             <img
-                src="/src/assets/images/userfilter/imagen_perfil.png" // Asegúrate de que esta ruta sea accesible
+                src={imagenPerfil}
                 alt="imagen de perfil"
                 className='h-25 mx-auto my-4 rounded-full border-8 border-red-500'
             />

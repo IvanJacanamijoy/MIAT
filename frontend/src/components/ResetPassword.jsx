@@ -6,7 +6,7 @@ import {
   slideIn,
   pulse,
 } from "../Animations/variants"; 
-import logoMiat from "/src/assets/images/navbar/logo_miat_rojo.png";
+import logoMiat from "../assets/images/navbar/logo_miat_rojo.png";
 
 const ResetPassword = ({ token, onClose }) => {
   const [password, setPassword] = useState("");

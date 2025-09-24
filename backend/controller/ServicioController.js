@@ -34,46 +34,48 @@ class ServicioController {
  * GET /api/servicios
  */
     async getAllServicios(req, res) {
-        const filters = {};
-        const options = {
-            orderBy: req.query.orderBy || 'IdServicio',
-            orderDirection: req.query.orderDirection || 'DESC'
-        };
-
-        // Filtros por rol
-        if (req.userRole === 1) { // Cliente
-            filters.clienteId = req.userId;
-        } else if (req.userRole === 2) { // Técnico
-            filters.tecnicoId = req.userId;
-        }
-
-        // Filtros adicionales desde query
-        if (req.query.estadoId) {
-            filters.estadoId = parseInt(req.query.estadoId);
-        }
-
-        if (req.query.cotizacionId) {
-            filters.cotizacionId = parseInt(req.query.cotizacionId);
-        }
-
-        if (req.query.fecha && req.query.fecha !== "") {
-            filters.fecha = req.query.fecha; // formato YYYY-MM-DD
-        }
-
-        if (req.query.clienteIdentificacion !== undefined) {
-            filters.clienteIdentificacion = req.query.clienteIdentificacion;
-        }
-
-        if (req.query.tipoServicioId) {
-            try {
-                filters.tipoServicioId = JSON.parse(req.query.tipoServicioId); // espera un array
-            } catch (error) {
-                console.warn("Error al parsear tipoServicioId:", error);
-                filters.tipoServicioId = [];
-            }
-        }
-
         try {
+            const filters = req.query;
+            const options = {
+                orderBy: req.query.orderBy || 'IdServicio',
+                orderDirection: req.query.orderDirection || 'DESC'
+            };
+
+            console.log("Rol del usuario:", req.userRole);
+            // Filtrar según el rol del usuario (igual que en CotizacionController)
+            if (req.userRole === 1) { // Cliente
+                filters.clienteId = req.userId;
+            } else if (req.userRole === 2) { // Técnico
+                filters.tecnicoId = req.userId;
+            }
+            // Admin (rol 3) puede ver todos
+
+            // Filtros adicionales desde query
+            if (req.query.estadoId) {
+                filters.estadoId = parseInt(req.query.estadoId);
+            }
+
+            if (req.query.cotizacionId) {
+                filters.cotizacionId = parseInt(req.query.cotizacionId);
+            }
+
+            if (req.query.fecha && req.query.fecha !== "") {
+                filters.fecha = req.query.fecha; // formato YYYY-MM-DD
+            }
+
+            if (req.query.clienteIdentificacion !== undefined) {
+                filters.clienteIdentificacion = req.query.clienteIdentificacion;
+            }
+
+            if (req.query.tipoServicioId) {
+                try {
+                    filters.tipoServicioId = JSON.parse(req.query.tipoServicioId); // espera un array
+                } catch (error) {
+                    console.warn("Error al parsear tipoServicioId:", error);
+                    filters.tipoServicioId = [];
+                }
+            }
+
             const servicios = await ServicioModel.getAll(filters, options);
             res.status(200).json(servicios);
         } catch (error) {

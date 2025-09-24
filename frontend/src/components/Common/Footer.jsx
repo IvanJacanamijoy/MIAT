@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { fadeIn, slideIn, staggerContainer, zoomIn } from "../../Animations/variants";
 import { Mail, Phone, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import logoMiat from "/src/assets/images/navbar/logo_miat_rojo.png";
+import logoMiat from "../../assets/images/navbar/logo_miat_rojo.png";
 
 // Ícono simple para WhatsApp (respetando paleta gris/rojo)
 const WhatsAppIcon = (props) => (

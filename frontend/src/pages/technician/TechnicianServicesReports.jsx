@@ -10,20 +10,32 @@ const TechnicianServiceReports = () => {
   const { usuario, authToken } = useAuth();
   const [servicios, setServicios] = useState([]);
 
-  useEffect(() => {
-    fetchAllServicesApi(authToken, { tecnicoId: usuario.id }).then((data) => {
-      // Mostrar todos los servicios asignados al técnico sin filtrar por estado
+  const loadServices = async () => {
+    try {
+      const data = await fetchAllServicesApi(authToken, { tecnicoId: usuario.id });
       setServicios(data);
-    });
+    } catch (error) {
+      console.error("Error al cargar servicios:", error);
+    }
+  };
+
+  useEffect(() => {
+    loadServices();
   }, [usuario, authToken]);
 
+  const handleServiceUpdate = () => {
+    // Recargar servicios después de una actualización
+    loadServices();
+  };
+
   const handleFilter = (filters) => {
-    const filtrosCombinados = {
+    // Incluir tecnicoId en los filtros como en TechnicianQuote
+    const filtrosConTecnico = {
       ...filters,
-      tecnicoId: usuario.id
+      tecnicoId: usuario.id,
     };
-    fetchAllServicesApi(authToken, filtrosCombinados).then((data) => {
-      // Mostrar todos los servicios asignados al técnico sin filtrar por estado
+    
+    fetchAllServicesApi(authToken, filtrosConTecnico).then((data) => {
       setServicios(data);
     });
   };
@@ -46,7 +58,7 @@ const TechnicianServiceReports = () => {
           {servicios.length === 0 ? (
             <EmptyState title="No hay servicios registrados" description="Cuando los servicios asignados se completen y generen informe, aparecerán aquí." icon="services" />
           ) : (
-            servicios.map((s) => <ServiceReportCard key={s.IdCita} servicio={s} rol="tecnico" />)
+            servicios.map((s) => <ServiceReportCard key={s.IdCita} servicio={s} rol="tecnico" onUpdate={handleServiceUpdate} />)
           )}
         </div>
       </div>

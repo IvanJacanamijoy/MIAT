@@ -11,15 +11,20 @@ const ClientServiceReports = () => {
   const [servicios, setServicios] = useState([]);
 
   useEffect(() => {
+    // Incluir clienteId como en UserQuote para mantener consistencia
     fetchAllServicesApi(authToken, { clienteId: usuario.id }).then((data) => {
-      // Mostrar todos los servicios del cliente sin filtrar por estado
       setServicios(data);
     });
   }, [usuario, authToken]);
 
   const handleFilter = (filters) => {
-    fetchAllServicesApi(authToken, filters).then((data) => {
-      // Mostrar todos los servicios sin filtrar por estado
+    // Incluir clienteId en los filtros como en UserQuote
+    const filtrosConCliente = {
+      ...filters,
+      clienteId: usuario.id,
+    };
+    
+    fetchAllServicesApi(authToken, filtrosConCliente).then((data) => {
       setServicios(data);
     });
   };

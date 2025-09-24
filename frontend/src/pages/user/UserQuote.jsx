@@ -104,8 +104,8 @@ const UserQuotes = () => {
           alt="Fondo"
         />
         <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 text-center text-gray-200">
-          <h1 className="font-bold md:text-6xl">Mis Cotizaciones</h1>
-          <p className="md:text-xl py-4">
+          <h1 className="font-bold text-4xl md:text-6xl">Mis Cotizaciones</h1>
+          <p className="sm:text-lg md:text-xl py-4">
             Aquí puede revisar el estado y los detalles de todas sus cotizaciones.
             Acepte o rechace según corresponda.
           </p>

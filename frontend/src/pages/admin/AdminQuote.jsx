@@ -112,7 +112,6 @@ const AdminQuote = () => {
                 quote={q}
                 rol="admin"
                 onEdit={handleEdit}
-                onApprove={handleComplete}
                 onViewMore={handleViewMore}
               />
             ))

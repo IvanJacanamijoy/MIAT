@@ -121,7 +121,8 @@ const AdminServicesReports = () => {
                           <ServiceReportCard 
                             key={servicio.IdServicio} 
                             servicio={servicio} 
-                            rol="admin" 
+                            rol="admin"
+                            onUpdate={handleServiceUpdate}
                           />
                         ))}
                       </div>

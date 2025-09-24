@@ -214,7 +214,6 @@ const TechnicianQuote = () => {
                 quote={q}
                 rol="tecnico"
                 onEdit={handleEdit}
-                onComplete={handleComplete}
                 onViewMore={handleViewMore}
               />
             ))

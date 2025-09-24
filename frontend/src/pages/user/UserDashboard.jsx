@@ -26,7 +26,7 @@ const UserDashboard = () => {
         setLoading(true);
         const [visitasData, serviciosData, diagnosticosData, cotizacionesData] = await Promise.all([
           fetchVisitasTecnicasApi(authToken),
-          fetchAllServicesApi(authToken, { clienteId: usuario.id }),
+          fetchAllServicesApi(authToken), // El backend ya filtra por clienteId automáticamente para usuarios con rol 1
           getDiagnosticosApi(authToken),
           fetchCotizacionesApi(authToken)
         ]);

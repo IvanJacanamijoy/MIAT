@@ -221,7 +221,7 @@ const TechnicianDashboard = () => {
         {estadisticas.visitasHoy > 0 ? (
           visitas.filter(v => new Date(v.Fecha).toDateString() === new Date().toDateString()).map((visita) => (
             <motion.div key={visita.IdCita} variants={zoomIn(0.2)}>
-              <VisitCard visita={visita} />
+              <VisitCard visit={visita} />
             </motion.div>
           ))
         ) : (

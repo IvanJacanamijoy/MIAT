@@ -61,7 +61,6 @@ class CotizacionModel {
             .leftJoin('CitaTipoServicio as CTS', 'CS.IdCita', '=', 'CTS.IdCita')
             .leftJoin('TipoServicio as TS', 'CTS.IdTipoServicio', '=', 'TS.IdTipoServicio');
 
-        // 🔍 Filtros
         // 🔍 Filtros dinámicos
         if (filters.IdCotizacion) {
             query.where('C.IdCotizacion', filters.IdCotizacion);
@@ -90,7 +89,7 @@ class CotizacionModel {
         const clienteId = filters.IdCliente ?? filters.clienteId;
         if (clienteId !== undefined && clienteId !== '') {
             query.where('CS.IdCliente', clienteId);
-            console.log('Filtro clienteId aplicado:', clienteId);
+            // console.log('Filtro clienteId aplicado:', clienteId);
         }
 
         // ✅ Filtro por fecha
@@ -180,7 +179,7 @@ class CotizacionModel {
         }
 
         try {
-            console.log('Consulta SQL generada:', query.toString());
+            // console.log('Consulta SQL generada:', query.toString());
             const rows = await query;
             return rows;
         } catch (error) {

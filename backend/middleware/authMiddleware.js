@@ -19,6 +19,9 @@ function authenticateToken(req, res, next) {
         }
         //revisa
         req.user = user;
+        // Establecer propiedades adicionales para fácil acceso
+        req.userId = user.user.id;
+        req.userRole = user.user.rol;
         next();
     })
 }

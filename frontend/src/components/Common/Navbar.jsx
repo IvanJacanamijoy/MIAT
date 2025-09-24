@@ -2,15 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../context/AuthContext';
+import logoMiatRojo from '../../assets/images/navbar/logo_miat_rojo.png'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
-
-const images = {
-  logo_miat_rojo: '/src/assets/images/navbar/logo_miat_rojo.png',
-  ruta: '/src/assets/navbar/logo_miat_rojo.png',
-};
 
 const Navbar = () => {
   const [rol, setRol] = useState(null);
@@ -102,7 +98,7 @@ const Navbar = () => {
           </div>
           <div className="flex flex-1 items-center justify-center xl:items-stretch xl:justify-around mt-3 xl:mt-0">
             <div className="flex shrink-0 items-center">
-              <img alt="Logo miat" src={images.logo_miat_rojo} className="h-8 w-auto" />
+              <img alt="Logo miat" src={logoMiatRojo} className="h-8 w-auto" />
               <p className="text-3xl font-bold">MIAT</p>
             </div>
             {/* ¡NO modificamos los botones! */}

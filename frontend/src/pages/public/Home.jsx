@@ -11,6 +11,17 @@ import { ServiceCarousel } from "../../components/ServiceCarousel";
 import { fadeIn, zoomIn, rotateIn } from "../../Animations/variants";
 import { useAuth } from "../../context/AuthContext";
 
+// Importar imágenes optimizadas en formato WebP para mejor rendimiento en producción
+import imagenFondoNosotros from "../../assets/images/home/imagen_fondo_nosotros.webp";
+import imagenFondoServicios from "../../assets/images/home/imagen_fondo_servicios.webp";
+import imagenAgendar from "../../assets/images/home/imagen_fondo_agendar.webp";
+import imagenLogoRojo from "../../assets/images/navbar/logo_miat_rojo.webp";
+
+// Importar imágenes del carrusel de servicios
+import servicio1 from "../../assets/images/servicecarousel/servicio_1.webp";
+import servicio2 from "../../assets/images/servicecarousel/servicio_2.webp";
+import servicio3 from "../../assets/images/servicecarousel/servicio_3.webp";
+
 const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -29,41 +40,43 @@ const Home = () => {
     }
   }, [location]);
 
+  //importando las imagenes del carrucel 
+
   const carouselItems = [
     {
       titulo: "Servicio Eléctrico Residencial",
       descripcion: "Soluciones completas para tu hogar con garantía de 2 años",
-      imageUrl: "/src/assets/images/servicecarousel/servicio_1.png",
+      imageUrl: servicio1,
       textoBoton: "Ver Mas",
     },
     {
       titulo: "Servicio Eléctrico otro",
       descripcion: "Soluciones completas para tu hogar con garantía de 2 años",
-      imageUrl: "/src/assets/images/servicecarousel/servicio_2.png",
+      imageUrl: servicio2,
       textoBoton: "Ver Mas",
     },
     {
       titulo: "Servicio otro Residencial",
       descripcion: "Soluciones completas para tu hogar con garantía de 2 años",
-      imageUrl: "/src/assets/images/servicecarousel/servicio_3.png",
+      imageUrl: servicio3,
       textoBoton: "Ver Mas",
     },
     {
       titulo: "Servicio Eléctrico Residencial",
       descripcion: "Soluciones completas para tu hogar con garantía de 2 años",
-      imageUrl: "/src/assets/images/servicecarousel/servicio_1.png",
+      imageUrl: servicio1,
       textoBoton: "Ver Mas",
     },
     {
       titulo: "Servicio Eléctrico otro",
       descripcion: "Soluciones completas para tu hogar con garantía de 2 años",
-      imageUrl: "/src/assets/images/servicecarousel/servicio_2.png",
+      imageUrl: servicio2,
       textoBoton: "Ver Mas",
     },
     {
       titulo: "Servicio otro Residencial",
       descripcion: "Soluciones completas para tu hogar con garantía de 2 años",
-      imageUrl: "/src/assets/images/servicecarousel/servicio_3.png",
+      imageUrl: servicio3,
       textoBoton: "Ver Mas",
     },
   ];
@@ -83,7 +96,10 @@ const Home = () => {
     <div className="flex flex-col items-center">
       {/* Hero */}
       <section className="relative lg:h-[500px] md:w-[945px] lg:w-[1280px] max-w-full">
-        <div className="absolute inset-0 bg-[url(src/assets/images/home/imagen_fondo_nosotros.png)] bg-local bg-center bg-cover opacity-80"></div>
+        <div 
+          className="absolute inset-0 bg-local bg-center bg-cover opacity-80"
+          style={{ backgroundImage: `url(${imagenFondoNosotros})` }}
+        ></div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 md:py-10">
           <div className="grid md:grid-cols-2 gap-4 md:gap-12 items-center h-full my-7 md:my-0">
@@ -175,14 +191,17 @@ const Home = () => {
           initial="hidden"
           whileInView="show"
           viewport={{ amount: 0.2 }}
-          src="/src/assets/images/home/imagen_fondo_agendar.png"
+          src={imagenAgendar}
           alt=""
           className="max-h-screen min-h-[500px] hidden md:block md:col-span-2 lg:col-span-1 box-border"
         />
       </section>
 
       {/* Carrusel de servicios */}
-      <section className="bg-[url(src/assets/images/home/imagen_fondo_servicios.png)] bg-local bg-cover bg-center max-w-full h-[560px] md:w-[945px] lg:w-[1280px]">
+      <section 
+        className="bg-local bg-cover bg-center max-w-full h-[560px] md:w-[945px] lg:w-[1280px]"
+        style={{ backgroundImage: `url(${imagenFondoServicios})` }}
+      >
         <motion.div
           variants={fadeIn("up", 0.2)}
           initial="hidden"
@@ -195,7 +214,10 @@ const Home = () => {
       </section>
 
       {/* Sección final */}
-      <section className="bg-[url(src/assets/images/home/imagen_fondo_nosotros.png)] bg-local bg-cover bg-center max-w-full h-[560px] w-full md:w-[945px] lg:w-[1280px] flex justify-center items-center">
+      <section 
+        className="bg-local bg-cover bg-center max-w-full h-[560px] w-full md:w-[945px] lg:w-[1280px] flex justify-center items-center"
+        style={{ backgroundImage: `url(${imagenFondoNosotros})` }}
+      >
         <motion.div
           variants={fadeIn("up", 0.2)}
           initial="hidden"
@@ -208,9 +230,11 @@ const Home = () => {
             initial="hidden"
             whileInView="show"
             viewport={{ amount: 0.2 }}
-            src="/src/assets/images/navbar/logo_miat_rojo.png"
+            src={imagenLogoRojo}
             alt="logo miat"
             className="w-40 lg:w-50 mb-4"
+            loading="lazy"
+            decoding="async"
           />
           <p className="font-semibold lg:font-bold text-white text-md lg:text-xl">
             Nuestras cotizaciones son detalladas y transparentes, permitiéndote

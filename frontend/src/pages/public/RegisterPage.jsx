@@ -1,7 +1,15 @@
 import RegisterForm from "../../components/RegisterForm";
+
+// Importar imágenes optimizadas en formato WebP para mejor rendimiento en producción
+import imagenFondo from "../../assets/images/home/imagen_fondo.webp";
+import logoMiatRojo from "../../assets/images/navbar/logo_miat_rojo.webp";
+
 const RegisterPage = () => {
   return (
-    <div className='flex flex-col items-center justify-center min-h-screen bg-[url(src/assets/images/home/imagen_fondo.png)] bg-local bg-center bg-cover bg-opacity-70'>
+    <div 
+      className='flex flex-col items-center justify-center min-h-screen bg-local bg-center bg-cover bg-opacity-70'
+      style={{ backgroundImage: `url(${imagenFondo})` }}
+    >
       <a
         href="/"
         className='text-red-500 absolute z-50 top-0 left-0  ml-5 mt-4 border-2 border-red-500 rounded-full p-1 hover:text-red-700 hover:border-red-700 shadow-md block  xl:hidden shadow-black'
@@ -20,7 +28,13 @@ const RegisterPage = () => {
       <h2 className='text-5xl mb-14 text-white font-semibold text-shadow-lg'>Registra Tus Datos</h2>
       <div className="bg-white bg-opacity-90 p-8 rounded-xl shadow-lg w-[350px] sm:w-[500px]">
         <div className="flex justify-center mb-4">
-          <img src="src/assets/images/navbar/logo_miat_rojo.png" alt="MIAT Logo" className="h-20" />
+          <img 
+            src={logoMiatRojo} 
+            alt="MIAT Logo" 
+            className="h-20" 
+            loading="lazy"
+            decoding="async"
+          />
         </div>
         <RegisterForm/>
       </div>

@@ -5,6 +5,9 @@ import ForgetPassword from "../../components/ForgetPassword";
 import ResetPassword from "../../components/ResetPassword";
 import Modal from "../../components/Common/Modal";
 
+// Importar imagen optimizada en formato WebP para mejor rendimiento en producción
+import imagenFondo from "../../assets/images/home/imagen_fondo.webp";
+
 const LoginPage = () => {
   const location = useLocation();
   const [activeForm, setActiveForm] = useState(null);
@@ -21,7 +24,10 @@ const LoginPage = () => {
   }, [location]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[url(src/assets/images/home/imagen_fondo.png)] bg-local bg-center bg-cover bg-opacity-70">
+    <div 
+      className="flex flex-col items-center justify-center min-h-screen bg-local bg-center bg-cover bg-opacity-70"
+      style={{ backgroundImage: `url(${imagenFondo})` }}
+    >
       {/* Botón de volver al inicio (mobile y desktop) */}
       <a
         href="/"

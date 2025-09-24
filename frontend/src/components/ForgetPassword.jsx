@@ -6,7 +6,7 @@ import {
   slideIn,
   pulse,
 } from "../Animations/variants"; // 👈 ajusta la ruta si es diferente
-import logoMiat from "/src/assets/images/navbar/logo_miat_rojo.png";
+import logoMiat from "../assets/images/navbar/logo_miat_rojo.png";
 
 const ForgetPassword = ({ onClose }) => {
   const [email, setEmail] = useState("");

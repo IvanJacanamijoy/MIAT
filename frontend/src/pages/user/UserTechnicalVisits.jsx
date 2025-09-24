@@ -68,28 +68,6 @@ const UserTechnicalVisits = () => {
     handleCloseModal();
   };
 
-  const handleSubmitVisit = async (data) => {
-    try {
-      const response = await fetch("https://tuservidor.com/api/visitas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, usuarioId: usuario?.id }),
-      });
-
-      if (!response.ok) throw new Error("Error al agendar la visita");
-
-      const nuevaVisita = await response.json();
-
-      alert("Visita agendada exitosamente");
-
-      const updatedVisits = [...visits, nuevaVisita];
-      setVisits(updatedVisits);
-      setShowFormModal(false);
-    } catch (error) {
-      alert("Ocurrió un error: " + error.message);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-200 relative max-w-7xl mx-auto">
       {/* Hero */}
@@ -100,15 +78,15 @@ const UserTechnicalVisits = () => {
           alt="Fondo eléctrico"
         />
         <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 text-center text-gray-200">
-          <h1 className="font-bold md:text-6xl">Mis Visitas Técnicas</h1>
-          <p className="md:text-xl py-4">
+          <h1 className="font-bold text-4xl md:text-6xl">Mis Visitas Técnicas</h1>
+          <p className=" sm:text-lg md:text-xl py-4">
             Aquí puede revisar el estado y los detalles de todas sus visitas técnicas programadas.
           </p>
         </div>
       </div>
 
       {/* Contenido */}
-      <div className="relative z-10 rounded-t-3xl -mt-40 sm:-mt-34 md:-mt-30 px-4 pb-10 lg:pb-0 pt-10 lg:pt-0 mx-10 text-white">
+      <div className="relative z-10 rounded-t-3xl -mt-20 md:-mt-26 px-4 pb-10 lg:pb-0 pt-10  mx-10 text-white">
         <ButtonTechnicalVisits />
         <VisitFilterForm onFilter={handleFilter} />
 
@@ -140,15 +118,6 @@ const UserTechnicalVisits = () => {
           currentVisit={selectedVisit}
           onSubmit={handleReprogramVisit}
           onCancel={() => setShowModal(false)}
-        />
-      </Modal>
-
-      {/* Modal para agendar visita */}
-      <Modal isOpen={showFormModal} onClose={() => setShowFormModal(false)}>
-        <VisitForm
-          agendar={true}
-          visitaTecnica={{}}
-          onSubmit={handleSubmitVisit}
         />
       </Modal>
     </div>

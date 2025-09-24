@@ -5,13 +5,18 @@ import { motion } from "framer-motion";
 import { fadeIn } from "../../Animations/variants";
 import EmptyState from "../../components/Common/EmptyState";
 
+// Importar imágenes del carrusel de servicios
+import servicio1 from "../../assets/images/servicecarousel/servicio_1.webp";
+import servicio2 from "../../assets/images/servicecarousel/servicio_2.webp";
+import servicio3 from "../../assets/images/servicecarousel/servicio_3.webp";
+
 const serviciosData = [
   {
     id: 1,
     titulo: "Aumento de carga",
     descripcion:
       "Incrementa la capacidad eléctrica de tu hogar u oficina con seguridad y certificación.",
-    imageUrl: "/src/assets/images/servicecarousel/servicio_1.png",
+    imageUrl: servicio1,
     tipoServicioId: 1,
   },
   {
@@ -19,7 +24,7 @@ const serviciosData = [
     titulo: "Instalaciones eléctricas",
     descripcion:
       "Instalaciones confiables y modernas para proyectos residenciales o industriales.",
-    imageUrl: "/src/assets/images/servicecarousel/servicio_2.png",
+    imageUrl: servicio2,
     tipoServicioId: 4,
   },
   {
@@ -27,7 +32,7 @@ const serviciosData = [
     titulo: "Trámites y diseños",
     descripcion:
       "Asesoría profesional en legalización, diseño de redes y licencias eléctricas.",
-    imageUrl: "/src/assets/images/servicecarousel/servicio_3.png",
+    imageUrl: servicio3,
     tipoServicioId: 8,
   },
   // ... agrega más servicios si deseas

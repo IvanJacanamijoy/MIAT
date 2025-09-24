@@ -1,4 +1,4 @@
-import servicio1 from "../../assets/images/servicecarousel/servicio_1.png";
+import servicio1 from "../../assets/images/servicecarousel/servicio_1.webp";
 
 const VisitCard = ({
   visit,
