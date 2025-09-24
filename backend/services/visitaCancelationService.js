@@ -28,13 +28,13 @@ class VisitaCancelationService {
             // 2. Estado no es "Cancelada" (IdEstado = 7) ni "Finalizado" (IdEstado = 4)
             // 3. Estado es "Pendiente" (IdEstado = 5) o "Aceptada" (IdEstado = 6) o "En proceso" (IdEstado = 3)
             const expiredVisits = await knex('CitaServicio')
-                .leftJoin('diagnostico', 'CitaServicio.IdCita', 'diagnostico.IdCita')
+                .leftJoin('Diagnostico', 'CitaServicio.IdCita', 'Diagnostico.IdCita')
                 .select(
                     'CitaServicio.IdCita', 
                     'CitaServicio.Fecha', 
                     'CitaServicio.Hora', 
                     'CitaServicio.IdEstado',
-                    'diagnostico.IdDiagnostico'
+                    'Diagnostico.IdDiagnostico'
                 )
                 .where(function() {
                     // Visitas cuya fecha es anterior a la fecha límite
